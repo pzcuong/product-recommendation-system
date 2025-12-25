@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files (too large for git)
+data/*.csv
+!data/.gitkeep
+
+# Model files (can be regenerated)
+*.pt
+*.pth
+*.h5
+*.pkl
+*.pickle
+
+# Embeddings (can be regenerated)
+embeddings/*.npy
+embeddings/*.json
+embeddings_*/
+
+# Submission files (keep only best)
+submission_*.csv
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
