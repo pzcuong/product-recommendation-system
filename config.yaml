@@ -1,0 +1,87 @@
+# Configuration for Advanced Recommendation System
+
+data:
+  data_path: "data/"
+  recency_cutoff: "2025-07-01"  # Critical: only use recent data
+  max_session_length: 50
+  min_session_length: 2
+  
+embeddings:
+  use_bert: true
+  bert_model: "distilbert-base-multilingual-cased"
+  embedding_dim: 768
+  projection_dim: 256
+  cache_path: "embeddings_bert/"
+  normalize: true  # Normalize to unit sphere
+  
+model:
+  # UniSRec / SASRec configuration
+  hidden_dim: 256
+  num_blocks: 2  # Shallow to prevent overfitting
+  num_heads: 4
+  dropout: 0.3  # High dropout for sparse data
+  max_seq_length: 50
+  
+  # Rental-specific features
+  use_rental_features: true
+  use_age_progression: true
+  use_seasonality: true
+  
+training:
+  batch_size: 64
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 20
+  num_negatives: 2048  # Sampled softmax
+  hard_negative_ratio: 0.3
+  patience: 5  # Early stopping
+  validate_every: 1
+  
+retrieval:
+  num_candidates: 100
+  
+  # Retrieval weights (will be optimized)
+  covisit_weight: 2.0
+  transition_weight: 3.0
+  intent_weight: 2.5
+  biological_weight: 3.0
+  semantic_weight: 1.0
+  order_weight: 2.0
+  
+  # FAISS configuration
+  faiss_k: 50
+  faiss_index_type: "IndexFlatIP"
+  
+  # Co-visitation configuration
+  covisit_window_hours: 24
+  time_decay_factor: 1.0
+  
+ensemble:
+  # RRF configuration
+  rrf_k: 60
+  
+  # Model weights (to be optimized)
+  unisrec_weight: 1.0
+  covisit_weight: 1.0
+  semantic_weight: 1.0
+  
+  # LightGBM configuration
+  lgbm_num_leaves: 31
+  lgbm_max_depth: 6
+  lgbm_learning_rate: 0.05
+  lgbm_n_estimators: 100
+  
+evaluation:
+  metrics:
+    - "recall@6"
+    - "ndcg@6"
+    - "coverage"
+    - "diversity"
+  
+  # Submission configuration
+  num_predictions: 6
+  
+system:
+  seed: 42
+  num_workers: 4
+  device: "cuda"  # or "cpu"
