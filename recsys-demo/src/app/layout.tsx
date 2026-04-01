@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CL-GRU4Rec+RP Demo",
-  description: "Contrasting Learning Enhanced GRU4Rec with Re-Purchase Awareness",
+  description:
+    "Contrasting Learning Enhanced GRU4Rec with Re-Purchase Awareness",
 };
 
 export default function RootLayout({
