@@ -3,6 +3,7 @@
 ## Thư mục này chứa các tài liệu liên quan đến đồ án:
 
 ### 📄 Báo cáo chi tiết
+
 - **`BAO_CAO_DO_AN_CL_GRU4REC_RP.md`**: Báo cáo khoa học đầy đủ (30-50 trang khi in)
   - 6 chương chính
   - Công thức toán học chi tiết
@@ -10,6 +11,7 @@
   - Kết quả thực nghiệm
 
 ### 📊 Slide trình bày
+
 - **`SLIDE_DECK.md`**: Nội dung slide cho bảo vệ đồ án
   - 19 slides theo cấu trúc chuẩn
   - Trực quan hóa kiến trúc
@@ -26,10 +28,12 @@ $$
 ### 🛠️ Công cụ xem tài liệu
 
 **Online:**
+
 - GitHub: Xem trực tiếp (rendering tốt cho markdown và LaTeX)
 - GitLab: Tương tự GitHub
 
 **Offline:**
+
 ```bash
 # Cài đặt Pandoc để convert sang PDF
 brew install pandoc
@@ -45,6 +49,7 @@ pandoc BAO_CAO_DO_AN_CL_GRU4REC_RP.md -o bao_cao.pdf \
 ```
 
 **VS Code:**
+
 - Cài extension: Markdown Preview Enhanced
 - Mở file và chọn "Open Preview to the Side"
 
@@ -94,6 +99,7 @@ BAO_CAO_DO_AN_CL_GRU4REC_RP.md
 ### 🔗 Liên kết với code chính
 
 Báo cáo tham chiếu đến các file implementation:
+
 - `../cl_gru4rec_rp_unified.py` - Main model
 - `../cl_gru4rec_rp_v3.py` - BPR variant
 - `../cl_gru4rec_rp_academic.py` - Academic evaluation
