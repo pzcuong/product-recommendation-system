@@ -125,37 +125,13 @@ class DataLoader:
     def get_popular_products(self, limit: int = 50) -> List[str]:
         """Get most popular product IDs"""
         try:
-            # Count product views
-            product_views = {}
-
-            if self.hits_df is not None:
-                for _, row in self.hits_df.head(50000).iterrows():
-                    url = row.get('url', '')
-                    page_type = row.get('page_type', '')
-
-                    if page_type == 'PRODUCT':
-                        # Extract product ID
-                        parts = url.split('/')[-1].replace('.html', '').split('-')
-                        if parts:
-                            pid = parts[-1]
-                            product_views[pid] = product_views.get(pid, 0) + 1
-
-            # If we have product views, use them; otherwise return all products
-            if product_views:
-                # Sort by view count
-                sorted_products = sorted(
-                    product_views.items(),
-                    key=lambda x: x[1],
-                    reverse=True
-                )
-                return [pid for pid, _ in sorted_products[:limit]]
-            else:
-                # Return first N products from product_map
-                return list(self.product_map.keys())[:limit]
-
+            # For now, just return first N products from product_map
+            # TODO: Implement proper popularity tracking from session data
+            all_product_ids = list(self.product_map.keys())
+            return all_product_ids[:limit]
         except Exception as e:
             logger.error(f"Error getting popular products: {e}")
-            return list(self.product_map.keys())[:limit]
+            return []
 
 
 # Global data loader instance
