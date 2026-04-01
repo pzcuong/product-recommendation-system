@@ -16,13 +16,13 @@ import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from collections import Counter, defaultdict
 from tqdm import tqdm
 
 # Set style for better visualization
-sns.set_style("whitegrid")
-sns.set_palette("husl")
+plt.style.use('default')
+plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams['font.size'] = 10
 
 # ============================================================================
 # METRICS
