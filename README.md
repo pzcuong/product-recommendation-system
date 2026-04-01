@@ -1,234 +1,221 @@
-# 🏆 Product Recommendation System - Enhanced Pipeline
+# CL-GRU4Rec+RP: Product Recommendation System
 
-## 📊 Target Score: **0.420-0.422** (Kaggle Private)
+**Contrastive Learning Enhanced GRU4Rec with Re-Purchase Awareness**
+
+---
+
+## 🎯 Method Overview
+
+CL-GRU4Rec+RP combines three novel components for session-based product recommendation:
+
+1. **GRU4Rec**: Sequential pattern learning with clean PyTorch implementation
+2. **Contrastive Learning**: Item similarity discovery via session co-occurrence
+3. **Re-Purchase Awareness**: Behavioral signal for repeated product interactions
+
+With **Adaptive Two-Stage Fusion** for dataset-specific optimization.
+
+---
+
+## 📊 Datasets Supported
+
+- **Kaggle Rental Product**: Rental product recommendation
+- **Synerise RecSys 2025**: E-commerce session-based recommendation
 
 ---
 
 ## 🚀 Quick Start
 
-**Upload to Kaggle and run:**
+### Installation
 
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install torch pandas numpy tqdm
 ```
-lru.py (ipynb format)
+
+### Training & Evaluation
+
+```bash
+# Kaggle Rental Product
+python cl_gru4rec_rp_unified.py --dataset rental
+
+# Synerise RecSys 2025
+python cl_gru4rec_rp_unified.py --dataset synerise
 ```
 
-**Expected runtime:** ~30-40 minutes  
-**Hardware:** GPU required (CUDA)
-
 ---
 
-## 🎯 Key Improvements
-
-### 1. Enhanced GRU4Rec
-
-- **Layers**: 150 (increased from baseline 100)
-- **Epochs**: 30 (increased from baseline 20)
-- **Result**: Better sequential pattern learning
-
-### 2. Optimized Consensus Bonuses
-
-- **Previous**: 3.71x max multiplier (caused overfitting)
-- **New**: 2.53x max multiplier
-- **Result**: Reduced overfitting, improved generalization
-
-### 3. 4-Model Adaptive Ensemble
-
-- **GRU4Rec**: Neural network for sequential patterns
-- **v16**: Category + Co-occurrence
-- **v42**: Asymmetric Co-occurrence
-- **v45**: Bayesian Optimized
-
-### 4. 8-Type Session Classification
-
-Sessions classified into:
-
-- `cold_single_cat` (12.8%) - Ưu tiên category signals
-- `cold_multi_cat` (40.8%) - Balanced approach
-- `short_focused` (17.2%) - GRU4Rec + category
-- `short_exploring` (14.0%) - Category diversity
-- `medium_focused` (5.2%) - GRU4Rec + category
-- `medium_diverse` (2.9%) - Balanced
-- `long_focused` (6.9%) - GRU4Rec dominates
-- `long_diverse` (0.2%) - Mixed signals
-
-Each type gets different model weights!
-
----
-
-## 📈 Expected Performance
-
-| Metric                  | Value           |
-| ----------------------- | --------------- |
-| **Target Score**        | **0.420-0.422** |
-| Improvement vs baseline | +10-11%         |
-| GRU4Rec alone           | ~0.409          |
-| Ensemble boost          | +1.1-1.3%       |
-| Unique products         | ~270-290        |
-| Coverage                | 100%            |
-
----
-
-## 🔬 What's Different from 0.414 Solution?
-
-### Previous (0.41448):
-
-- GRU4Rec: 100 layers, 20 epochs
-- Consensus: 3.71x max (too high)
-- Result: 0.41448
-
-### Current (0.420-0.422):
-
-- GRU4Rec: 150 layers, 30 epochs ✅
-- Consensus: 2.53x max ✅
-- Result: Expected 0.420-0.422
-
-**Key insight:** Lower consensus multipliers prevent overfitting on test set!
-
----
-
-## 📁 File Structure
+## 📁 Project Structure
 
 ```
 product-recommendation-system/
-├── lru.py              # Complete solution (32KB, 961 lines)
-└── data/               # Dataset (549MB)
-    ├── metrika_hits.csv
-    ├── metrika_visits.csv
-    ├── metrika_hits_test.csv
-    ├── metrika_visits_test.csv
-    ├── new_site_products.csv
-    ├── old_site_products.csv
-    └── ...
+├── cl_gru4rec_rp_unified.py    # Main model (unified PyTorch)
+├── data/                         # Kaggle rental data
+│   ├── metrika_hits.csv
+│   ├── metrika_visits.csv
+│   └── ...
+├── synerise_dataset/             # Synerise RecSys data
+│   ├── add_to_cart.parquet
+│   ├── product_buy.parquet
+│   └── ...
+├── synerise_final.pkl            # Cached Synerise data
+├── docs/                         # Academic documentation
+│   ├── BAO_CAO_HOC_LUAN.md       # Pure academic report (recommended)
+│   ├── BAO_CAO_DO_AN_CL_GRU4REC_RP.md
+│   ├── SLIDE_DECK.md
+│   └── README.md
+└── submission.csv                # Final predictions
 ```
 
 ---
 
-## 🎓 Technical Deep Dive
+## 🔬 Architecture
 
-### Consensus Bonus Formula
-
-**Previous (overfitting):**
+### Component 1: GRU4Rec
 
 ```python
-if count == 2: score *= 1.65
-if count == 3: score *= 1.55
-if count == 4: score *= 1.45
-# Max: 1.65 × 1.55 × 1.45 = 3.71x
+class GRU4RecModel(nn.Module):
+    - Embedding dim: 128
+    - Hidden dim: 200
+    - Dropout: 0.15
+    - Loss: Cross-entropy
+    - Ensemble: 3 seeds (42, 123, 456)
 ```
 
-**New (optimized):**
+### Component 2: Contrastive Learning
 
 ```python
-if count == 2: score *= 1.50
-if count == 3: score *= 1.35
-if count == 4: score *= 1.25
-# Max: 1.50 × 1.35 × 1.25 = 2.53x
+class ContrastiveItemModel(nn.Module):
+    - Embedding dim: 64
+    - Temperature: 0.07
+    - Loss: InfoNCE
+    - Positive pairs: Session co-occurrence
+    - Negative samples: 256 per batch
 ```
 
-### Session-Adaptive Weights Example
-
-**Cold Start (cold_single_cat):**
+### Component 3: Re-Purchase Awareness
 
 ```python
-weights = {
-    'v16': 1.3,   # Category-based (highest)
-    'v42': 1.0,   # Asymmetric
-    'v45': 0.9,   # Bayesian
-    'gru': 0.3    # Neural (low, no history)
-}
+# Stage 1: RP scoring (dominant for repeat-purchase data)
+for item, event in user_history:
+    weight = 5.0 if event == "buy" else 2.0
+    recency_boost = 1.0 + (position / len(history))
+    rp_score[item] += weight * recency_boost
 ```
 
-**Long Focused (long_focused):**
+### Adaptive Two-Stage Fusion
+
+```
+Stage 1: RP fills slots (buy-boosted + recency)
+    ↓
+Stage 2: Discovery fills remaining slots
+    - Co-occurrence patterns
+    - CL similarity embeddings
+    - GRU sequential scores
+```
+
+---
+
+## 📈 Performance
+
+### Kaggle Rental Product
+
+| Method | Recall@6 | NDCG@6 | HR@6 |
+|--------|----------|--------|------|
+| Popularity | 0.0XXX | 0.0XXX | 0.0XXX |
+| RePurchase | 0.0XXX | 0.0XXX | 0.0XXX |
+| GRU4Rec | 0.0XXX | 0.0XXX | 0.0XXX |
+| **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
+
+### Synerise RecSys 2025
+
+| Method | Recall@6 | NDCG@6 | HR@6 |
+|--------|----------|--------|------|
+| Popularity | 0.0XXX | 0.0XXX | 0.0XXX |
+| RePurchase | 0.0XXX | 0.0XXX | 0.0XXX |
+| GRU4Rec | 0.0XXX | 0.0XXX | 0.0XXX |
+| **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
+
+---
+
+## 🎓 Key Innovations
+
+1. **Separate Training**: GRU and CL trained independently, combined at inference
+2. **Adaptive Fusion**: Dataset-specific signal combination (RP for Synerise, GRU for Rental)
+3. **Session-Adaptive**: Fallback strategies for cold-start sessions
+4. **Per-User Split**: Academic-standard 80/20 per-user evaluation (not time-based)
+
+---
+
+## 📝 Documentation
+
+See `docs/` folder for:
+
+- **BAO_CAO_HOC_LUAN.md**: Pure academic report (30-40 pages, no code)
+- **SLIDE_DECK.md**: 20-slide presentation for defense
+
+---
+
+## ⚙️ Configuration
+
+Edit `cl_gru4rec_rp_unified.py` to modify:
 
 ```python
-weights = {
-    'v16': 0.45,  # Category-based (low)
-    'v42': 0.35,  # Asymmetric
-    'v45': 0.25,  # Bayesian
-    'gru': 1.5    # Neural (highest, rich history)
-}
+# GRU config
+GRU_EMBED_DIM = 128
+GRU_HIDDEN_DIM = 200
+GRU_DROPOUT = 0.15
+GRU_EPOCHS = 25
+
+# CL config
+CL_EMBED_DIM = 64
+CL_EPOCHS = 25
+CL_TEMP = 0.07
+
+# Fusion
+K = 6  # Number of recommendations
 ```
 
 ---
 
-## 🔍 Evaluation Pipeline
+## 🔄 Reproducibility
 
-Solution includes full train/valid/test splits:
-
-- **Validation set**: Internal evaluation
-- **Test set**: Ground truth comparison
-- **Metrics**: Recall@6
-
-You'll see:
-
-```
-VALIDATION SET - GRU4Rec Only
-recall@6: 0.XXXX
-
-VALIDATION SET - ENSEMBLE
-recall@6: 0.YYYY  (higher!)
-
-TEST SET - GRU4Rec Only
-recall@6: 0.ZZZZ
-
-TEST SET - ENSEMBLE
-recall@6: 0.WWWW  (higher!)
-```
+- Fixed seeds: 42, 123, 456
+- Deterministic CUDA operations
+- Version-controlled data splits
 
 ---
 
-## ⚠️ Important Notes
+## 📊 Evaluation Metrics
 
-1. **GPU Required**: Training takes ~30 minutes on GPU
-2. **Order Matters**: Submission must match test set order (handled automatically)
-3. **Cold Start**: Uses consensus-based fallback for minimal history sessions
-4. **Reproducibility**: Seed=123 for consistent results
+- **Recall@K**: Fraction of ground truth items in top-K
+- **NDCG@K**: Normalized discounted cumulative gain
+- **Hit Rate@K**: Binary success metric
 
----
-
-## 🎯 Submission Checklist
-
-- [x] GRU4Rec trained with 150 layers, 30 epochs
-- [x] Behavioral signals built from training data
-- [x] All 4 models generate predictions
-- [x] Adaptive ensemble with optimized consensus
-- [x] Cold start handling
-- [x] Correct visit order
-- [x] 100% coverage
+For Synerise, extended metrics:
+- **Novelty**: 1 - popularity^100 (competition formula)
+- **Diversity**: Entropy of recommendation distribution
+- **Coverage**: Catalog coverage percentage
 
 ---
 
-## 📊 Expected Output
+## 🚀 Future Work
 
-```
-SUBMISSION SUMMARY
-================================================================================
-Total visits: 1363
-Unique products: 270-290
-Avg products per visit: 6.00
-
-Expected Score: 0.420-0.422 (Kaggle Private)
-
-KEY IMPROVEMENTS:
-   - GRU4Rec: 100→150 layers, 20→30 epochs
-   - Consensus: 3.71x→2.53x max (reduced overfitting)
-   - 4-model adaptive ensemble with 8 session types
-   - Full evaluation pipeline with train/val/test splits
-```
+1. **Explainable AI**: Interpretability for fusion decisions
+2. **Real-time API**: Production-ready inference
+3. **Seasonal Modeling**: Time-aware recommendations
+4. **Multi-Behavior**: Extend beyond cart/buy events
 
 ---
 
-## 🚀 Next Steps
+## 📄 License
 
-1. **Upload lru.py to Kaggle**
-2. **Run notebook** (~30-40 mins)
-3. **Submit submission.csv**
-4. **Expected score**: 0.420-0.422
-
-**Good luck! 🍀**
+Academic project for RecSys 2025 competition.
 
 ---
 
-**Date**: February 16, 2026  
-**Team**: Product Recommendation Team  
-**Based on**: kaggle_notebook.py (0.41448) + optimizations
+**Last Updated**: April 2025
+**Model**: CL-GRU4Rec+RP v4 (Unified PyTorch)
