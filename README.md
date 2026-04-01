@@ -53,6 +53,7 @@ python cl_gru4rec_rp_unified.py --dataset synerise
 ```
 product-recommendation-system/
 ├── cl_gru4rec_rp_unified.py    # Main model (unified PyTorch)
+├── demo.py                       # Interactive demo script
 ├── data/                         # Kaggle rental data
 │   ├── metrika_hits.csv
 │   ├── metrika_visits.csv
