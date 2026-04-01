@@ -37,16 +37,31 @@ class DataLoader:
 
                 # Build product map
                 for _, row in self.products_df.iterrows():
+                    # Helper to safely get string values
+                    def safe_str(val, default=''):
+                        if pd.isna(val) or val is None:
+                            return default
+                        return str(val)
+
+                    # Helper to safely get numeric values
+                    def safe_num(val, default=0):
+                        if pd.isna(val) or val is None:
+                            return default
+                        try:
+                            return float(val)
+                        except (ValueError, TypeError):
+                            return default
+
                     self.product_map[str(row['id'])] = {
                         'id': str(row['id']),
-                        'name': row.get('name', ''),
-                        'brand': row.get('brand', ''),
-                        'main_category': row.get('main_category', ''),
-                        'categories': row.get('categories', ''),
-                        'price': row.get('price_per_period_day', 0),
-                        'price_sell': row.get('price_sell', 0),
-                        'description': row.get('description', ''),
-                        'slug': row.get('slug', ''),
+                        'name': safe_str(row.get('name')),
+                        'brand': safe_str(row.get('brand')),
+                        'main_category': safe_str(row.get('main_category')),
+                        'categories': safe_str(row.get('categories')),
+                        'price': safe_num(row.get('price_per_period_day')),
+                        'price_sell': safe_num(row.get('price_sell')),
+                        'description': safe_str(row.get('description')),
+                        'slug': safe_str(row.get('slug')),
                     }
             else:
                 logger.warning(f"Products file not found: {products_file}")
