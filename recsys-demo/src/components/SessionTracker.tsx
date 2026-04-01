@@ -14,7 +14,11 @@ interface SessionTrackerProps {
   onClear?: () => void;
 }
 
-export function SessionTracker({ products, onRemove, onClear }: SessionTrackerProps) {
+export function SessionTracker({
+  products,
+  onRemove,
+  onClear,
+}: SessionTrackerProps) {
   if (products.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-4">
@@ -34,7 +38,9 @@ export function SessionTracker({ products, onRemove, onClear }: SessionTrackerPr
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-900">🛒 Session hiện tại</h3>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">{products.length} sản phẩm</span>
+          <span className="text-xs text-gray-500">
+            {products.length} sản phẩm
+          </span>
           {onClear && (
             <button
               onClick={onClear}
@@ -72,13 +78,16 @@ export function SessionTracker({ products, onRemove, onClear }: SessionTrackerPr
 
       {/* Session info */}
       <div className="mt-3 pt-3 border-t text-xs text-gray-500">
-        <p>💡 Session length: <span className="font-semibold">{products.length}</span></p>
+        <p>
+          💡 Session length:{" "}
+          <span className="font-semibold">{products.length}</span>
+        </p>
         <p className="text-gray-400 mt-1">
           {products.length < 3
             ? "Session ngắn - Gợi ý dựa trên popularity"
             : products.length < 7
-            ? "Session trung bình - Kết hợp GRU + CL"
-            : "Session dài - GRU4Rec chiếm ưu thế"}
+              ? "Session trung bình - Kết hợp GRU + CL"
+              : "Session dài - GRU4Rec chiếm ưu thế"}
         </p>
       </div>
     </div>
