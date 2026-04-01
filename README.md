@@ -123,20 +123,20 @@ Stage 2: Discovery fills remaining slots
 
 ### Kaggle Rental Product
 
-| Method | Recall@6 | NDCG@6 | HR@6 |
-|--------|----------|--------|------|
-| Popularity | 0.0XXX | 0.0XXX | 0.0XXX |
-| RePurchase | 0.0XXX | 0.0XXX | 0.0XXX |
-| GRU4Rec | 0.0XXX | 0.0XXX | 0.0XXX |
+| Method            | Recall@6   | NDCG@6     | HR@6       |
+| ----------------- | ---------- | ---------- | ---------- |
+| Popularity        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
+| RePurchase        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
+| GRU4Rec           | 0.0XXX     | 0.0XXX     | 0.0XXX     |
 | **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
 
 ### Synerise RecSys 2025
 
-| Method | Recall@6 | NDCG@6 | HR@6 |
-|--------|----------|--------|------|
-| Popularity | 0.0XXX | 0.0XXX | 0.0XXX |
-| RePurchase | 0.0XXX | 0.0XXX | 0.0XXX |
-| GRU4Rec | 0.0XXX | 0.0XXX | 0.0XXX |
+| Method            | Recall@6   | NDCG@6     | HR@6       |
+| ----------------- | ---------- | ---------- | ---------- |
+| Popularity        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
+| RePurchase        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
+| GRU4Rec           | 0.0XXX     | 0.0XXX     | 0.0XXX     |
 | **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
 
 ---
@@ -196,6 +196,7 @@ K = 6  # Number of recommendations
 - **Hit Rate@K**: Binary success metric
 
 For Synerise, extended metrics:
+
 - **Novelty**: 1 - popularity^100 (competition formula)
 - **Diversity**: Entropy of recommendation distribution
 - **Coverage**: Catalog coverage percentage
