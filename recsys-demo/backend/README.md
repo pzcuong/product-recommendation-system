@@ -5,22 +5,26 @@ Real recommendation API using the actual PyTorch model.
 ## Setup
 
 1. **Install dependencies:**
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 2. **Run the server:**
+
 ```bash
 python -m app.main
 ```
 
 Or with uvicorn directly:
+
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 3. **Access API:**
+
 - API: http://localhost:8000
 - Docs: http://localhost:8000/docs
 - Health: http://localhost:8000/health
@@ -43,5 +47,6 @@ The backend uses the real CL-GRU4Rec+RP model from:
 ## Data
 
 Real data is loaded from:
+
 - Products: `/Users/macbook/Desktop/product-recommendation-system/data/new_site_products.csv`
 - Sessions: `/Users/macbook/Desktop/product-recommendation-system/data/metrika_hits.csv`
