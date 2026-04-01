@@ -46,6 +46,21 @@ python cl_gru4rec_rp_unified.py --dataset rental
 python cl_gru4rec_rp_unified.py --dataset synerise
 ```
 
+### Interactive Demo
+
+```bash
+# Run demo on Kaggle Rental data
+python demo.py --dataset rental
+
+# Run demo on Synerise data
+python demo.py --dataset synerise
+```
+
+The demo showcases:
+- **Single Session Recommendation**: Full explanation of each recommendation
+- **Session Progression**: How recommendations evolve as user interacts
+- **Cold Start Handling**: Fallback strategies for new users
+
 ---
 
 ## 📁 Project Structure
@@ -123,11 +138,13 @@ Stage 2: Discovery fills remaining slots
 ## 📈 Performance
 
 ### Kaggle Rental Product
+
 - **Recall@6**: 0.0XXX
 - **NDCG@6**: 0.0XXX
 - **Hit Rate@6**: 0.0XXX
 
 ### Synerise RecSys 2025
+
 - **Recall@6**: 0.0XXX
 - **NDCG@6**: 0.0XXX
 - **Hit Rate@6**: 0.0XXX
