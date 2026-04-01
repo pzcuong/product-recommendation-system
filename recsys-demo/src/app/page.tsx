@@ -215,7 +215,9 @@ export default function HomePage() {
                   Tất cả ({products.length})
                 </button>
                 {categories.map((cat) => {
-                  const count = products.filter((p) => p.main_category === cat).length;
+                  const count = products.filter(
+                    (p) => p.main_category === cat,
+                  ).length;
                   return (
                     <button
                       key={cat}
