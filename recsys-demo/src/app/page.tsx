@@ -43,7 +43,7 @@ export default function HomePage() {
   };
 
   const handleRemoveFromSession = (productId: string) => {
-    setSessionIds(sessionIds.filter(id => id !== productId));
+    setSessionIds(sessionIds.filter((id) => id !== productId));
   };
 
   const handleClearSession = () => {
@@ -52,11 +52,11 @@ export default function HomePage() {
   };
 
   const filteredProducts = selectedCategory
-    ? PRODUCTS.filter(p => p.category === selectedCategory)
+    ? PRODUCTS.filter((p) => p.category === selectedCategory)
     : PRODUCTS;
 
   const sessionProducts = sessionIds
-    .map(id => getProductById(id))
+    .map((id) => getProductById(id))
     .filter(Boolean);
 
   if (!isAuthenticated) {
@@ -121,7 +121,7 @@ export default function HomePage() {
                 >
                   Tất cả ({PRODUCTS.length})
                 </button>
-                {CATEGORIES.map(cat => (
+                {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
@@ -131,7 +131,7 @@ export default function HomePage() {
                         : "hover:bg-gray-100"
                     }`}
                   >
-                    {cat} ({PRODUCTS.filter(p => p.category === cat).length})
+                    {cat} ({PRODUCTS.filter((p) => p.category === cat).length})
                   </button>
                 ))}
               </div>
@@ -157,7 +157,7 @@ export default function HomePage() {
               </h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredProducts.map(product => (
+              {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -180,7 +180,10 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-white border-t mt-8 py-4">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-600">
-          <p>CL-GRU4Rec+RP Demo - Contrasting Learning Enhanced GRU4Rec with Re-Purchase Awareness</p>
+          <p>
+            CL-GRU4Rec+RP Demo - Contrasting Learning Enhanced GRU4Rec with
+            Re-Purchase Awareness
+          </p>
         </div>
       </footer>
     </div>
