@@ -10,15 +10,15 @@ import { Product, getProductById } from "./mock-data";
 export interface RecommendationScore {
   productId: string;
   finalScore: number;
-  gruScore: number;        // Sequential pattern
-  clScore: number;         // Contrastive similarity
-  rpScore: number;         // Re-purchase frequency
+  gruScore: number; // Sequential pattern
+  clScore: number; // Contrastive similarity
+  rpScore: number; // Re-purchase frequency
 }
 
 export interface RecommendationResult {
   recommendations: RecommendationScore[];
   sessionProducts: Product[];
-  confidence: number;      // GRU confidence based on session length
+  confidence: number; // GRU confidence based on session length
 }
 
 /**
@@ -27,7 +27,7 @@ export interface RecommendationResult {
 function calculateGRUScore(
   productId: string,
   sessionIds: string[],
-  allProducts: Product[]
+  allProducts: Product[],
 ): number {
   // Simulate sequential pattern scoring
   // Products in same category get higher scores
@@ -38,7 +38,7 @@ function calculateGRUScore(
 
   // Category co-occurrence boost
   const sessionCategories = new Set(
-    sessionIds.map(id => getProductById(id)?.category).filter(Boolean)
+    sessionIds.map((id) => getProductById(id)?.category).filter(Boolean),
   );
 
   if (sessionCategories.has(product.category)) {
@@ -57,14 +57,11 @@ function calculateGRUScore(
 /**
  * Simulated Contrastive Learning similarity score
  */
-function calculateCLScore(
-  productId: string,
-  sessionIds: string[]
-): number {
+function calculateCLScore(productId: string, sessionIds: string[]): number {
   // Simulate embedding similarity
   // Products with similar IDs (simulating similar embeddings) get higher scores
   const productNum = parseInt(productId.slice(1));
-  const sessionNums = sessionIds.map(id => parseInt(id.slice(1)));
+  const sessionNums = sessionIds.map((id) => parseInt(id.slice(1)));
 
   let similarity = 0;
   for (const sessionNum of sessionNums) {
@@ -81,7 +78,7 @@ function calculateCLScore(
  * Re-Purchase score based on frequency in session
  */
 function calculateRPScore(productId: string, sessionIds: string[]): number {
-  const count = sessionIds.filter(id => id === productId).length;
+  const count = sessionIds.filter((id) => id === productId).length;
   if (count === 0) return 0;
 
   // Normalize by session length
@@ -94,7 +91,7 @@ function calculateRPScore(productId: string, sessionIds: string[]): number {
 export function generateRecommendations(
   sessionIds: string[],
   allProducts: Product[],
-  k: number = 6
+  k: number = 6,
 ): RecommendationResult {
   // Calculate GRU confidence based on session length
   const sessionLength = sessionIds.length;
@@ -102,7 +99,7 @@ export function generateRecommendations(
 
   // Adaptive weights based on session length
   const gruWeight = 0.5 + Math.min(sessionLength / 20, 0.3); // 0.5 - 0.8
-  const clWeight = 0.25 - Math.min(sessionLength / 50, 0.1);  // 0.15 - 0.25
+  const clWeight = 0.25 - Math.min(sessionLength / 50, 0.1); // 0.15 - 0.25
   const rpWeight = 0.25; // Fixed
 
   // Calculate scores for all products not in session
@@ -117,9 +114,7 @@ export function generateRecommendations(
     const rpScore = calculateRPScore(product.id, sessionIds);
 
     const finalScore =
-      gruWeight * gruScore +
-      clWeight * clScore +
-      rpWeight * rpScore;
+      gruWeight * gruScore + clWeight * clScore + rpWeight * rpScore;
 
     scores.push({
       productId: product.id,
@@ -136,7 +131,7 @@ export function generateRecommendations(
 
   // Get product details
   const sessionProducts = sessionIds
-    .map(id => getProductById(id))
+    .map((id) => getProductById(id))
     .filter(Boolean) as Product[];
 
   return {
@@ -151,11 +146,11 @@ export function generateRecommendations(
  */
 export function getColdStartRecommendations(
   allProducts: Product[],
-  k: number = 6
+  k: number = 6,
 ): RecommendationResult {
   const recommendations: RecommendationScore[] = allProducts
     .slice(0, k)
-    .map(p => ({
+    .map((p) => ({
       productId: p.id,
       finalScore: Math.random() * 0.5 + 0.3,
       gruScore: Math.random() * 0.3,
