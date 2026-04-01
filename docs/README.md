@@ -4,11 +4,16 @@
 
 ### 📄 Báo cáo chi tiết
 
-- **`BAO_CAO_DO_AN_CL_GRU4REC_RP.md`**: Báo cáo khoa học đầy đủ (30-50 trang khi in)
-  - 6 chương chính
-  - Công thức toán học chi tiết
-  - Code examples minh họa
-  - Kết quả thực nghiệm
+- **`BAO_CAO_HOC_LUAN.md`**: Báo cáo khoa học thuần túy (không có code) - **KHUYẾN NGHỊ DÙNG**
+  - Kết cấu chuẩn của báo cáo khoa học
+  - Lời mở đầu, Tóm tắt, Mục lục hoàn chỉnh
+  - 6 chương chính với công thức toán học chi tiết
+  - Không có code blocks - phù hợp nộp giao đồ án
+  - 30-40 trang A4 khi in
+
+- **`BAO_CAO_DO_AN_CL_GRU4REC_RP.md`**: Báo cáo chi tiết có code examples
+  - Thích hợp cho tham khảo kỹ thuật
+  - Chứa code snippets minh họa
 
 ### 📊 Slide trình bày
 

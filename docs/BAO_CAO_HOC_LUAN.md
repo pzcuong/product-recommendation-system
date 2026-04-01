@@ -1,6 +1,9 @@
 # BÁO CÁO KHOA HỌC
+
 # HỆ THỐNG GỢI Ý SẢN PHẨM THUÊ DỰA TRÊN
+
 # HỌC BIỂU DIỄN ĐỐI CHIẾU VÀ MÔ HÌNH GRU
+
 # VỚI TÍN HIỆU MUA LẠI
 
 **(Contrastive Learning - GRU4Rec with Re-Purchase Awareness)**
@@ -10,6 +13,7 @@
 **GVHD**: TS. Nguyễn Văn A
 
 **Nhóm thực hiện**:
+
 - Thành viên 1: Trần Văn B - MSSV: 20210001
 - Thành viên 2: Lê Thị C - MSSV: 20210002
 - Thành viên 3: Phạm Văn D - MSSV: 20210003
@@ -31,6 +35,7 @@ Khác với mua sắm truyền thống, hoạt động cho thuê sản phẩm c�
 Xuất phát từ những nhu cầu thực tế đó, đồ án này tập trung nghiên cứu và phát triển một phương pháp mới kết hợp kỹ thuật Học biểu diễn đối chiếu (Contrastive Learning), mạng nơ-ron hồi quy (GRU), và mô hình hóa hành vi mua lại để giải quyết bài toán gợi ý sản phẩm thuê. Phương pháp đề xuất đã được đánh giá toàn diện trên hai bộ dữ liệu thực tế từ Kaggle Rental Product Recommendation Challenge và Synerise RecSys 2025 Competition, cho thấy những kết quả khả quan so với các phương pháp nền tảng.
 
 Đồ án được thực hiện với mục tiêu:
+
 1. Nghiên cứu và đề xuất phương pháp mới phù hợp với đặc thù của bài toán gợi ý sản phẩm thuê.
 2. Xây dựng và triển khai hệ thống gợi ý hoàn chỉnh có khả năng áp dụng thực tế.
 3. Đánh giá hiệu quả của phương pháp đề xuất thông qua các thí nghiệm trên nhiều bộ dữ liệu.
@@ -408,12 +413,14 @@ $$
 #### 2.1.3 Ưu điểm và nhược điểm
 
 **Ưu điểm:**
+
 - Đơn giản, dễ hiểu và dễ triển khai
 - Không cần thông tin nội dung của sản phẩm
 - Có khả năng giải thích được (dựa trên "người dùng tương tự" hoặc "sản phẩm tương tự")
 - Hiệu quả tốt khi có đủ dữ liệu
 
 **Nhược điểm:**
+
 - **Cold-start problem**: Không thể gợi ý cho người dùng hoặc sản phẩm mới
 - **Sparsity problem**: Ma trận người dùng-sản phẩm thường rất thưa, làm giảm chất lượng gợi ý
 - **Scalability issues**: Với số lượng người dùng và sản phẩm lớn, việc tính độ tương đồng trở nên tốn kém
@@ -430,6 +437,7 @@ R \approx U \times V^T
 $$
 
 Trong đó:
+
 - $U \in \mathbb{R}^{m \times k}$ là ma trận embedding người dùng
 - $V \in \mathbb{R}^{n \times k}$ là ma trận embedding sản phẩm
 - $k$ là dimension ẩn (latent dimension), thường $k \ll m, n$
@@ -457,14 +465,16 @@ Trong đó, $\mathcal{K}$ là tập các cặp người dùng-sản phẩm có r
 ALS optimize từng biến một thời điểm trong khi giữ các biến khác cố định:
 
 1. Giữ $V$ cố định, giải cho $U$:
-$$
-u_u = (V^T V + \lambda I)^{-1} V^T R_{(u,:)} \quad \forall u
-$$
+
+   $$
+   u_u = (V^T V + \lambda I)^{-1} V^T R_{(u,:)} \quad \forall u
+   $$
 
 2. Giữ $U$ cố định, giải cho $V$:
-$$
-v_i = (U^T U + \lambda I)^{-1} U^T R_{(:,i)} \quad \forall i
-$$
+
+   $$
+   v_i = (U^T U + \lambda I)^{-1} U^T R_{(:,i)} \quad \forall i
+   $$
 
 3. Lặp lại cho đến khi hội tụ
 
@@ -491,6 +501,7 @@ $$
 $$
 
 Trong đó:
+
 - $\mu$ là rating trung bình toàn cục
 - $b_u$ và $b_i$ là biases của người dùng và sản phẩm
 - $N(u)$ là tập sản phẩm người dùng $u$ đã tương tác (implicit feedback)
@@ -589,6 +600,7 @@ $$
 Session-Based Recommendation (SBR) tập trung vào việc dự đoán item tiếp theo trong một phiên ngắn hạn (thường là 30 phút), không sử dụng thông tin người dùng dài hạn. Điều này khác với các phương pháp truyền thống nơi toàn bộ lịch sử người dùng được sử dụng.
 
 Đặc thù của SBR:
+
 - Không có thông tin định danh (anonymous sessions)
 - Chuỗi tương tác ngắn
 - Cần real-time recommendations
@@ -603,6 +615,7 @@ h_t = \text{GRU}(h_{t-1}, e_{i_t})
 $$
 
 Trong đó:
+
 - $h_t$ là hidden state tại thời điểm t
 - $e_{i_t}$ là embedding của item $i_t$ được tương tác tại thời điểm t
 - $h_0$ là initial hidden state (thường là zero vector)
@@ -663,12 +676,14 @@ $$
 $$
 
 Trong đó:
+
 - $(u,i,j)$ là triplet: người dùng u, positive item i, negative item j
 - $\hat{y}_{ui}$ là score cho positive item
 - $\hat{y}_{uj}$ là score cho negative sample
 - $\sigma$ là sigmoid function
 
 Ưu điểm của BPR:
+
 - Direct ranking optimization phù hợp với Top-K recommendation
 - Efficient với in-batch negative sampling
 - Không cần compute over full item space
@@ -733,6 +748,7 @@ $$
 $$
 
 Trong đó:
+
 - $\tau$ là temperature parameter (thường 0.07-0.1)
 - $N$ là tập negative samples
 
@@ -803,6 +819,7 @@ $$
 $$
 
 **S3-Rec** (Sun et al., 2019) sử dụng self-supervised tasks cho sequential recommendation:
+
 - Attribute masking: Dự đoán attributes bị mask
 - Item predicting: Dự đoán items bị mask trong sequence
 - Direction prediction: Dự đoán direction của sequence
@@ -868,10 +885,12 @@ Trong đó $\alpha_j$ là weight cho recommender thứ j, và $\sum_j \alpha_j =
 - State-of-the-art cho các benchmark datasets khi đó
 
 **NARM** (Li et al., 2017) (Neural Attentive Session-based Recommendation):
+
 - Sử dụng attention mechanism để capture cả sequential behavior và user's main purpose
 - Hybrid encoder với GRU và attention
 
 **STAMP** (Liu et al., 2018) (Short-Term Attention/Memory Priority):
+
 - Sử dụng short-term memory và attention để model session interests
 - Efficient với memory complexity thấp
 
@@ -884,11 +903,13 @@ $$
 $$
 
 Ưu điểm chính:
+
 - Parallel training (khác RNN)
 - Better long-term dependency modeling
 - State-of-the-art performance
 
 **BERT4Rec** (Sun et al., 2019) sử dụng bidirectional self-attention:
+
 - Masked language model approach cho RecSys
 - Left-to-right và bidirectional training
 
@@ -979,18 +1000,21 @@ Chương này trình bày chi tiết phương pháp CL-GRU4Rec+RP đề xuất, 
 Phương pháp đề xuất được thiết kế theo kiến trúc mô-đun với ba thành phần độc lập:
 
 **Thành phần 1: GRU4Rec với BPR Loss**
+
 - Mục tiêu: Learn sequential patterns trong chuỗi hành vi người dùng
 - Input: Chuỗi item IDs đã tương tác
 - Output: Hidden states cho mỗi position trong sequence
 - Loss function: BPR (Bayesian Personalized Ranking)
 
 **Thành phần 2: Contrastive Learning**
+
 - Mục tiêu: Learn semantic item embeddings không phụ thuộc vào sequential context
 - Input: Các cặp items xuất hiện cùng session
 - Output: Item embeddings với cosine similarity
 - Loss function: InfoNCE (Contrastive Loss)
 
 **Thành phần 3: Re-Purchase Awareness**
+
 - Mục tiêu: Capture cyclical re-purchase behavior đặc trưng của rental domain
 - Input: Lịch sử tương tác với event types
 - Output: Scores reflecting re-purchase probability
@@ -1056,6 +1080,7 @@ Ba thành phần được huấn luyện độc lập với các mục tiêu kh�
 3. **Re-Purchase**: Không cần huấn luyện, tính toán trực tiếp từ lịch sử
 
 Ưu điểm của chiến lược này:
+
 - Tránh multi-task confusion: Khi train multiple objectives cùng lúc, các gradients có thể interfere với nhau
 - Flexible: Mỗi thành phần có thể được updated/retrained độc lập
 - Debuggable: Dễ dàng analyze contribution của từng thành phần
@@ -1126,6 +1151,7 @@ h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t
 $$
 
 Trong đó:
+
 - $r_t$ là reset gate
 - $z_t$ là update gate
 - $\tilde{h}_t$ là candidate hidden state
@@ -1224,6 +1250,7 @@ Trong thực nghiệm, chúng tôi sử dụng in-batch negative sampling để 
 **Ensemble Training**
 
 Chúng tôi train ensemble của 3 models với different random seeds (42, 123, 456) để:
+
 - Reduce variance của predictions
 - Improve stability của model
 - Better generalization
@@ -1237,6 +1264,7 @@ $$
 $$
 
 Trong đó:
+
 - $\eta_{max}$ là initial learning rate
 - $\eta_{min}$ là minimum learning rate
 - $T_{cur}$ là current epoch
@@ -1263,6 +1291,7 @@ if len(sequence) > max_length + 1:
 ```
 
 Điều này:
+
 - Acts như data augmentation
 - Forces model to learn context-independent representations
 - Reduces overfitting
@@ -1276,7 +1305,8 @@ if len(sequence) > max_length + 1:
 Items xuất hiện cùng trong một session được coi là positive pairs:
 
 $$
-\mathcal{P} = \{(i, j) : \exists s, i \in s \land j \in s \land i \neq j\}$$
+\mathcal{P} = \{(i, j) : \exists s, i \in s \land j \in s \land i \neq j\}
+$$
 
 Với $s$ là một session.
 
@@ -1285,16 +1315,18 @@ Với $s$ là một session.
 Có hai chiến lược được sử dụng:
 
 1. **Full pairing** cho short sessions (< 20 items):
-$$
-\mathcal{P}_{full} = \{(i, j) : i, j \in s, i < j\}
-$$
+
+   $$
+   \mathcal{P}_{full} = \{(i, j) : i, j \in s, i < j\}
+   $$
 
 2. **Random sampling** cho long sessions (≥ 20 items):
-$$
-\mathcal{P}_{sample} = \text{Sample}(\{(i, j) : i, j \in s, i \neq j\}, N=40)
-$$
+   $$
+   \mathcal{P}_{sample} = \text{Sample}(\{(i, j) : i, j \in s, i \neq j\}, N=40)
+   $$
 
 Điều này:
+
 - Balance giữa quantity và quality của positive pairs
 - Avoid over-representing very long sessions
 - Reduce computational cost
@@ -1331,6 +1363,7 @@ z_i = \frac{z_i^2}{\|z_i^2\|_2}
 $$
 
 Điều này đảm bảo:
+
 - Cosine similarity bằng dot product sau normalization
 - Stable training
 - Better representations
@@ -1382,6 +1415,7 @@ $$
 $$
 
 Trong đó:
+
 - $\text{sim}(u, v) = u^T v$ (dot product của L2-normalized vectors = cosine similarity)
 - $\tau$ là temperature parameter (0.07)
 - $\mathcal{N}$ là tập negative samples
@@ -1416,6 +1450,7 @@ Khác với mua sắm truyền thống, rental có pattern đặc trưng:
 **Empirical Analysis**
 
 Trên Synerise dataset, chúng tôi观察到:
+
 - ~35% users có re-purchase behavior
 - Re-purchase rate cho buy events: ~28%
 - Re-purchase rate cho cart events: ~15%
@@ -1436,6 +1471,7 @@ w(e) = \begin{cases}
 $$
 
 **Rationale**:
+
 - Buy events thể hiện clear intent
 - Cart events thể hiện moderate intent
 - View events thể hiện weak intent
@@ -1445,7 +1481,8 @@ $$
 Recent interactions được weighted cao hơn:
 
 $$
-r(pos) = 1 + \frac{pos}{len(history)}$$
+r(pos) = 1 + \frac{pos}{len(history)}
+$$
 
 Trong đó $pos$ là position trong sequence (0-indexed từ đầu đến cuối).
 
@@ -1509,6 +1546,7 @@ Score_{discovery}(i) = \alpha \cdot Score_{GRU}(i) + \beta \cdot Score_{CL}(i) +
 $$
 
 Với:
+
 - $\alpha = 0.5$, $\beta = 0.3$, $\gamma = 0.2$ (default weights)
 - Weights được adjusted based on session characteristics
 
@@ -1529,6 +1567,7 @@ $$
 Trong đó $n$ là số lượng items trong history.
 
 **Rationale**:
+
 - Long history users có stable preferences → RP works well
 - Short history users cần exploration → Discovery dominates
 - Medium history users cần balance
@@ -1755,10 +1794,12 @@ Recall@K = \frac{1}{|U|} \sum_{u \in U} \frac{| \hat{I}_u^K \cap I_u^{test} |}{|
 $$
 
 Ưu điểm:
+
 - Direct measure của "coverage" relevant items
 - Phù hợp cho domain where users expect to see all relevant items
 
 Nhược điểm:
+
 - Không xem xét vị trí của relevant items
 - Có thể biased toward users có few test items
 
@@ -1771,14 +1812,17 @@ NDCG@K = \frac{1}{|U|} \sum_{u \in U} \frac{1}{Z_K} \sum_{i=1}^{K} \frac{2^{rel_
 $$
 
 Trong đó:
+
 - $rel_i = 1$ nếu item tại vị trí $i$ relevant, ngược lại $0$
 - $Z_K$ là normalization factor (DCG@K của ideal ranking)
 
 Ưu điểm:
+
 - Xem xét ranking position
 - Heavier weight cho top positions
 
 Nhược điểm:
+
 - More complex tính toán
 - Binary relevance có thể không capture all information
 
@@ -1791,10 +1835,12 @@ HR@K = \frac{1}{|U|} \sum_{u \in U} \mathbb{1}(|\hat{I}_u^K \cap I_u^{test}| > 0
 $$
 
 Ưu điểm:
+
 - Đơn giản, dễ hiểu
 - Phù hợp cho domains where users satisfied với ít relevant items
 
 Nhược điểm:
+
 - Không phân biệt giữa 1 và nhiều relevant items
 - Less informative
 
@@ -1817,9 +1863,11 @@ $$
 Diversity được đo bằng entropy của distribution:
 
 $$
-Diversity@K = \frac{H(recommendations)}{\max(H)}$$
+Diversity@K = \frac{H(recommendations)}{\max(H)}
+$$
 
 Với entropy:
+
 $$
 H = -\sum_{i} p_i \log_2 p_i
 $$
@@ -1859,10 +1907,12 @@ Test:  Sessions from 2024-03-01 onwards
 ```
 
 Ưu điểm:
+
 - Mô phỏng thực tế production environment
 - Avoid "leaking future information"
 
 Nhược điểm:
+
 - Không đảm bảo mỗi user có cả train và test
 - Temporal drift có thể affect results
 
@@ -1876,11 +1926,13 @@ For each user u:
 ```
 
 Ưu điểm:
+
 - Đảm bảo mỗi user có cả train và test
 - Fair evaluation cho users ở các activity levels
 - Tránh data leakage
 
 Nhược điểm:
+
 - Không mô phỏng production scenario (where users come and go)
 
 #### 5.2.3 Các phương pháp so sánh
@@ -2210,30 +2262,36 @@ Hình 5.5 minh họa các loại lỗi:
 **Over-repetition Problem**
 
 Nguyên nhân:
+
 - RP score quá dominant cho users với long history
 - Không có diversity constraints trong Stage 1
 
 Hướng cải tiến:
+
 - Apply Maximum Marginal Relevance (MMR) reranking
 - Cap RP score contribution dựa trên session characteristics
 
 **Missing Seasonal Patterns**
 
 Nguyên nhân:
+
 - Không có explicit temporal seasonality features
 - Model chỉ learns implicit temporal patterns
 
 Hướng cải tiến:
+
 - Add cyclical time features (month, day of week)
 - Use seasonal embeddings hoặc time-aware attention
 
 **Cold-start Users**
 
 Nguyên nhân:
+
 - Users với < 3 interactions không đủ data cho GRU/CL
 - RP component cũng không effective với ít data
 
 Hướng cải tiến:
+
 - Use content-based features cho true cold-start
 - Implement hybrid approach với popularity-based fallback
 
@@ -2264,6 +2322,7 @@ $$
 Trong đó $\alpha_t$ là attention weight của item tại position $t$ đối với prediction hiện tại.
 
 **Benefits**
+
 - Identify which history items influence each recommendation
 - Provide interpretable explanations
 - Debug model behavior
@@ -2281,6 +2340,7 @@ Trong đó $\alpha_t$ là attention weight của item tại position $t$ đối 
 ```
 
 **Advantages**
+
 - Natural language explanations
 - Easy to implement
 - User-friendly
@@ -2375,6 +2435,7 @@ def get_user_embedding(user_id):
 **Batch Inference**
 
 Process multiple users simultaneously:
+
 ```python
 def batch_recommend(user_ids):
     histories = [get_history(uid) for uid in user_ids]
@@ -2418,6 +2479,7 @@ hour_cos = cos(2π * hour / 24)
 **Rationale**
 
 Sử dụng cả sin và cos components preserves cyclical nature:
+
 - December (12) và January (1) should be close
 - Sunday (0) và Saturday (6) should be close
 
@@ -2525,19 +2587,19 @@ $$
 
 #### C.1 GRU4Rec
 
-| Parameter | Optimal Value | Range Tested |
-|-----------|---------------|--------------|
-| embed_dim | 128 | 64, 128, 256 |
-| hidden_dim | 200 | 128, 200, 256 |
-| dropout | 0.15 | 0.1, 0.15, 0.2 |
-| learning_rate | 0.001 | 0.0005, 0.001, 0.002 |
-| batch_size | 256 | 128, 256, 512 |
+| Parameter     | Optimal Value | Range Tested         |
+| ------------- | ------------- | -------------------- |
+| embed_dim     | 128           | 64, 128, 256         |
+| hidden_dim    | 200           | 128, 200, 256        |
+| dropout       | 0.15          | 0.1, 0.15, 0.2       |
+| learning_rate | 0.001         | 0.0005, 0.001, 0.002 |
+| batch_size    | 256           | 128, 256, 512        |
 
 #### C.2 Contrastive Learning
 
-| Parameter | Optimal Value | Range Tested |
-|-----------|---------------|--------------|
-| embed_dim | 64 | 32, 64, 128 |
-| temperature | 0.07 | 0.05, 0.07, 0.1 |
-| n_neg | 256 | 128, 256, 512 |
-| learning_rate | 0.003 | 0.001, 0.003, 0.005 |
+| Parameter     | Optimal Value | Range Tested        |
+| ------------- | ------------- | ------------------- |
+| embed_dim     | 64            | 32, 64, 128         |
+| temperature   | 0.07          | 0.05, 0.07, 0.1     |
+| n_neg         | 256           | 128, 256, 512       |
+| learning_rate | 0.003         | 0.001, 0.003, 0.005 |
