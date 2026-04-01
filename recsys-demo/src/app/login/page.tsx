@@ -65,7 +65,10 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email
               </label>
               <input
@@ -80,7 +83,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Mật khẩu
               </label>
               <input
@@ -119,9 +125,19 @@ export default function LoginPage() {
               Điền tài khoản demo nhanh
             </button>
             <div className="mt-3 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-              <p>Email: <code className="bg-gray-200 px-1 rounded">demo@example.com</code></p>
-              <p className="mt-1">Mật khẩu: <code className="bg-gray-200 px-1 rounded">demo123</code></p>
-              <p className="mt-2 text-gray-400">Hoặc bất kỳ email nào đều hoạt động!</p>
+              <p>
+                Email:{" "}
+                <code className="bg-gray-200 px-1 rounded">
+                  demo@example.com
+                </code>
+              </p>
+              <p className="mt-1">
+                Mật khẩu:{" "}
+                <code className="bg-gray-200 px-1 rounded">demo123</code>
+              </p>
+              <p className="mt-2 text-gray-400">
+                Hoặc bất kỳ email nào đều hoạt động!
+              </p>
             </div>
           </div>
         </div>
