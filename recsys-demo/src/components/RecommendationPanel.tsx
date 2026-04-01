@@ -5,23 +5,25 @@
 
 "use client";
 
-import { Product, getProductById } from "@/lib/mock-data";
-import { RecommendationResult } from "@/lib/recommendation-engine";
+import { Product } from "@/lib/api-client";
+import { RecommendationResult } from "@/lib/api-client";
 import { ProductCard } from "./ProductCard";
 
 interface RecommendationPanelProps {
   result: RecommendationResult | null;
+  products: Map<string, Product>;
   onProductClick?: (productId: string) => void;
 }
 
 export function RecommendationPanel({
   result,
+  products,
   onProductClick,
 }: RecommendationPanelProps) {
   if (!result) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">🎯 Gợi ý cho bạn</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-900">🎯 Gợi ý cho bạn</h2>
         <p className="text-gray-500 text-center py-8">
           Chưa có gợi ý. Hãy xem sản phẩm để nhận gợi ý!
         </p>
@@ -29,7 +31,7 @@ export function RecommendationPanel({
     );
   }
 
-  const { recommendations, confidence } = result;
+  const { recommendations, confidence, component_weights } = result;
 
   // Get confidence level
   const getConfidenceLevel = (conf: number) => {
@@ -45,7 +47,7 @@ export function RecommendationPanel({
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">🎯 Gợi ý cho bạn</h2>
+        <h2 className="text-xl font-bold text-gray-900">🎯 Gợi ý cho bạn</h2>
         <div
           className={`px-3 py-1 rounded-full text-xs font-semibold ${confLevel.bg} ${confLevel.color}`}
         >
@@ -58,15 +60,21 @@ export function RecommendationPanel({
         <p className="font-semibold text-gray-700 mb-2">Trọng số Components:</p>
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div className="text-center">
-            <p className="font-medium text-blue-600">GRU4Rec</p>
+            <p className="font-medium text-blue-600">
+              GRU4Rec ({(component_weights.gru * 100).toFixed(0)}%)
+            </p>
             <p className="text-gray-500">Sequential</p>
           </div>
           <div className="text-center">
-            <p className="font-medium text-purple-600">Contrastive</p>
+            <p className="font-medium text-purple-600">
+              Contrastive ({(component_weights.cl * 100).toFixed(0)}%)
+            </p>
             <p className="text-gray-500">Similarity</p>
           </div>
           <div className="text-center">
-            <p className="font-medium text-green-600">Re-Purchase</p>
+            <p className="font-medium text-green-600">
+              Re-Purchase ({(component_weights.rp * 100).toFixed(0)}%)
+            </p>
             <p className="text-gray-500">History</p>
           </div>
         </div>
@@ -75,41 +83,41 @@ export function RecommendationPanel({
       {/* Recommendations grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {recommendations.map((rec, idx) => {
-          const product = getProductById(rec.productId);
+          const product = products.get(rec.product_id);
           if (!product) return null;
 
           return (
-            <div key={rec.productId} className="relative">
+            <div key={rec.product_id} className="relative">
               <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
                 #{idx + 1}
               </div>
               <ProductCard
                 product={product}
-                onClick={() => onProductClick?.(rec.productId)}
+                onClick={() => onProductClick?.(rec.product_id)}
               />
               <div className="mt-2 p-2 bg-gray-50 rounded text-xs space-y-1">
                 <div className="flex justify-between">
                   <span className="text-gray-600">GRU:</span>
                   <span className="font-medium text-blue-600">
-                    {rec.gruScore.toFixed(3)}
+                    {rec.gru_score.toFixed(3)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">CL:</span>
                   <span className="font-medium text-purple-600">
-                    {rec.clScore.toFixed(3)}
+                    {rec.cl_score.toFixed(3)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">RP:</span>
                   <span className="font-medium text-green-600">
-                    {rec.rpScore.toFixed(3)}
+                    {rec.rp_score.toFixed(3)}
                   </span>
                 </div>
                 <div className="flex justify-between border-t pt-1 mt-1">
-                  <span className="font-semibold">Total:</span>
+                  <span className="font-semibold text-gray-900">Total:</span>
                   <span className="font-bold text-gray-900">
-                    {rec.finalScore.toFixed(3)}
+                    {rec.score.toFixed(3)}
                   </span>
                 </div>
               </div>

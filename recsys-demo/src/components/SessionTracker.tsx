@@ -18,11 +18,11 @@ interface SessionTrackerProps {
 function getCategoryIcon(category: string): string {
   const categoryIcons: Record<string, string> = {
     "Коконы для новорожденных": "👶",
-    "Электрокачели": "🎠",
+    Электрокачели: "🎠",
     "Качели, шезлонги": "🪑",
-    "Коляски": "👼",
-    "Манеж": "🏠",
-    "Ходунки": "🚶",
+    Коляски: "👼",
+    Манеж: "🏠",
+    Ходунки: "🚶",
     "Стульчики для кормления": "🍼",
     default: "📦",
   };
@@ -74,9 +74,13 @@ export function SessionTracker({
             className="flex items-center gap-2 p-2 bg-gray-50 rounded group"
           >
             <span className="text-xs text-gray-400 w-4">{idx + 1}</span>
-            <span className="text-xl">{getCategoryIcon(product.main_category)}</span>
+            <span className="text-xl">
+              {getCategoryIcon(product.main_category)}
+            </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-gray-900">{product.name}</p>
+              <p className="text-sm font-medium truncate text-gray-900">
+                {product.name}
+              </p>
               <p className="text-xs text-gray-500">{product.main_category}</p>
             </div>
             {onRemove && (
