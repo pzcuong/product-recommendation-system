@@ -50,12 +50,13 @@ export default function HomePage() {
 
         // Build product map for quick lookup
         const map = new Map<string, Product>();
-        productsData.products.forEach(p => map.set(p.id, p));
+        productsData.products.forEach((p) => map.set(p.id, p));
         setProductMap(map);
-
       } catch (error) {
         console.error("Failed to load data:", error);
-        setApiError("Không thể kết nối đến API. Vui lòng đảm bảo FastAPI backend đang chạy.");
+        setApiError(
+          "Không thể kết nối đến API. Vui lòng đảm bảo FastAPI backend đang chạy.",
+        );
       } finally {
         setLoading(false);
       }
@@ -73,7 +74,11 @@ export default function HomePage() {
 
     async function fetchRecommendations() {
       try {
-        const result = await apiClient.getRecommendations(sessionIds, 6, user?.id);
+        const result = await apiClient.getRecommendations(
+          sessionIds,
+          6,
+          user?.id,
+        );
         setRecommendations(result);
       } catch (error) {
         console.error("Failed to get recommendations:", error);
@@ -100,12 +105,47 @@ export default function HomePage() {
   };
 
   const filteredProducts = selectedCategory
-    ? PRODUCTS.filter((p) => p.category === selectedCategory)
-    : PRODUCTS;
+    ? products.filter((p) => p.main_category === selectedCategory)
+    : products;
 
   const sessionProducts = sessionIds
-    .map((id) => getProductById(id))
-    .filter(Boolean);
+    .map((id) => productMap.get(id))
+    .filter(Boolean) as Product[];
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // API Error state
+  if (apiError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center gap-3 text-red-600 mb-4">
+            <AlertCircle size={24} />
+            <h2 className="text-lg font-semibold">Lỗi kết nối API</h2>
+          </div>
+          <p className="text-gray-600 mb-4">{apiError}</p>
+          <div className="bg-gray-50 p-4 rounded-lg text-sm">
+            <p className="font-semibold mb-2">Khắc phục:</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-600">
+              <li>Chạy FastAPI backend: <code className="bg-gray-200 px-1 rounded">cd backend && python -m app.main</code></li>
+              <li>Đảm bảo Python 3.14+ và dependencies đã cài đặt</li>
+              <li>Kiểm tra xem port 8000 có đang được sử dụng không</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
