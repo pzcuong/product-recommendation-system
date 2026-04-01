@@ -31,10 +31,12 @@ npm run dev --turbo
 ## Demo Credentials
 
 Any email/password works! Quick test:
+
 - Email: `demo@example.com`
 - Password: `demo123`
 
 Or use pre-configured:
+
 - Email: `user@demo.com`
 - Password: any
 
@@ -93,6 +95,7 @@ The demo simulates CL-GRU4Rec+RP with three components:
 ### Adaptive Fusion
 
 Weights adapt based on session length:
+
 - Short session (< 3 items): GRU=50%, CL=25%, RP=25%
 - Medium session (3-7 items): GRU=65%, CL=15%, RP=20%
 - Long session (> 7 items): GRU=80%, CL=10%, RP=10%
