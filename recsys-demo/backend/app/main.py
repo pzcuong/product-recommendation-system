@@ -5,8 +5,7 @@ Real recommendation API with actual PyTorch model
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Dict, Optional
 import logging
 
 from .data_loader import data_loader
@@ -34,37 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Pydantic models
-class RecommendationRequest(BaseModel):
-    session_items: List[str]
-    k: Optional[int] = 10
-    client_id: Optional[str] = None
-
-
-class RecommendationResponse(BaseModel):
-    recommendations: List[dict]
-    confidence: float
-    session_length: int
-    component_weights: dict
-
-
-class Product(BaseModel):
-    id: str
-    name: str
-    brand: Optional[str] = ""
-    main_category: str
-    categories: str
-    price: float
-    description: Optional[str] = ""
-    slug: str
-
-
-class ProductsResponse(BaseModel):
-    products: List[Product]
-    total: int
-    categories: List[str]
 
 
 # Startup event
@@ -105,11 +73,8 @@ async def health():
     }
 
 
-@app.get("/api/products", response_model=ProductsResponse)
-async def get_products(
-    category: Optional[str] = None,
-    limit: Optional[int] = None
-):
+@app.get("/api/products")
+async def get_products(category: Optional[str] = None, limit: Optional[int] = None):
     """Get all products or filter by category"""
     try:
         if category:
@@ -126,36 +91,47 @@ async def get_products(
                 for pid in popular_ids if pid in product_map
             ]
 
-        return ProductsResponse(
-            products=[
-                Product(
-                    id=p['id'],
-                    name=p['name'],
-                    brand=p.get('brand', ''),
-                    main_category=p.get('main_category', ''),
-                    categories=p.get('categories', ''),
-                    price=p.get('price', 0),
-                    description=p.get('description', '')[:200] if p.get('description') else '',
-                    slug=p.get('slug', '')
-                )
-                for p in products[:limit] if limit else products
-            ],
-            total=len(products),
-            categories=data_loader.get_categories()
-        )
+        # Format products
+        formatted_products = []
+        for p in (products[:limit] if limit else products):
+            formatted_products.append({
+                "id": p['id'],
+                "name": p['name'],
+                "brand": p.get('brand', ''),
+                "main_category": p.get('main_category', ''),
+                "categories": p.get('categories', ''),
+                "price": p.get('price', 0),
+                "description": (p.get('description', '') or '')[:200],
+                "slug": p.get('slug', '')
+            })
+
+        return {
+            "products": formatted_products,
+            "total": len(products),
+            "categories": data_loader.get_categories()
+        }
     except Exception as e:
         logger.error(f"Error getting products: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/products/{product_id}", response_model=Product)
+@app.get("/api/products/{product_id}")
 async def get_product(product_id: str):
     """Get a single product by ID"""
     product = data_loader.get_product(product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    return Product(**product)
+    return {
+        "id": product['id'],
+        "name": product['name'],
+        "brand": product.get('brand', ''),
+        "main_category": product.get('main_category', ''),
+        "categories": product.get('categories', ''),
+        "price": product.get('price', 0),
+        "description": product.get('description', ''),
+        "slug": product.get('slug', '')
+    }
 
 
 @app.get("/api/categories")
@@ -165,16 +141,20 @@ async def get_categories():
     return {"categories": categories}
 
 
-@app.post("/api/recommend", response_model=RecommendationResponse)
-async def recommend(request: RecommendationRequest):
+@app.post("/api/recommend")
+async def recommend(request: Dict):
     """Generate recommendations for a session"""
     try:
+        session_items = request.get('session_items', [])
+        k = request.get('k', 10)
+        client_id = request.get('client_id')
+
         model = get_model()
 
         if not model._initialized:
             # Fallback: return popular products
             logger.warning("Model not initialized, using fallback")
-            popular_ids = data_loader.get_popular_products(request.k or 10)
+            popular_ids = data_loader.get_popular_products(k)
 
             recommendations = [
                 {
@@ -184,24 +164,24 @@ async def recommend(request: RecommendationRequest):
                     "cl_score": 0.3,
                     "rp_score": 0.2
                 }
-                for i, pid in enumerate(popular_ids[:request.k or 10])
+                for i, pid in enumerate(popular_ids[:k])
             ]
 
-            return RecommendationResponse(
-                recommendations=recommendations,
-                confidence=0.5,
-                session_length=len(request.session_items),
-                component_weights={"gru": 0.5, "cl": 0.3, "rp": 0.2}
-            )
+            return {
+                "recommendations": recommendations,
+                "confidence": 0.5,
+                "session_length": len(session_items),
+                "component_weights": {"gru": 0.5, "cl": 0.3, "rp": 0.2}
+            }
 
         # Get real recommendations
-        recs = model.predict(request.session_items, k=request.k or 10)
+        recs = model.predict(session_items, k=k)
 
         # Calculate confidence
-        confidence = model.get_confidence(len(request.session_items))
+        confidence = model.get_confidence(len(session_items))
 
         # Calculate component weights based on session length
-        session_len = len(request.session_items)
+        session_len = len(session_items)
         if session_len < 3:
             weights = {"gru": 0.5, "cl": 0.25, "rp": 0.25}
         elif session_len < 7:
@@ -209,12 +189,12 @@ async def recommend(request: RecommendationRequest):
         else:
             weights = {"gru": 0.80, "cl": 0.10, "rp": 0.10}
 
-        return RecommendationResponse(
-            recommendations=recs,
-            confidence=confidence,
-            session_length=session_len,
-            component_weights=weights
-        )
+        return {
+            "recommendations": recs,
+            "confidence": confidence,
+            "session_length": session_len,
+            "component_weights": weights
+        }
 
     except Exception as e:
         logger.error(f"Error generating recommendations: {e}")
@@ -231,7 +211,16 @@ async def get_popular_products(limit: int = 50):
         for pid in popular_ids:
             product = data_loader.get_product(pid)
             if product:
-                products.append(Product(**product))
+                products.append({
+                    "id": product['id'],
+                    "name": product['name'],
+                    "brand": product.get('brand', ''),
+                    "main_category": product.get('main_category', ''),
+                    "categories": product.get('categories', ''),
+                    "price": product.get('price', 0),
+                    "description": product.get('description', ''),
+                    "slug": product.get('slug', '')
+                })
 
         return {"products": products[:limit]}
 
