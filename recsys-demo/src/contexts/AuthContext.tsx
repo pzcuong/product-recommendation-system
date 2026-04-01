@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     // Mock login - accept any password
-    const foundUser = MOCK_USERS.find(u => u.email === email);
+    const foundUser = MOCK_USERS.find((u) => u.email === email);
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem("recsys_user", JSON.stringify(foundUser));
