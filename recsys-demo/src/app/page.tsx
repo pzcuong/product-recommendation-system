@@ -269,6 +269,7 @@ export default function HomePage() {
           <div>
             <RecommendationPanel
               result={recommendations}
+              products={productMap}
               onProductClick={handleProductClick}
             />
           </div>

@@ -23,7 +23,9 @@ export function RecommendationPanel({
   if (!result) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4 text-gray-900">🎯 Gợi ý cho bạn</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-900">
+          🎯 Gợi ý cho bạn
+        </h2>
         <p className="text-gray-500 text-center py-8">
           Chưa có gợi ý. Hãy xem sản phẩm để nhận gợi ý!
         </p>
