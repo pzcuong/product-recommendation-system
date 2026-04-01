@@ -123,22 +123,14 @@ Stage 2: Discovery fills remaining slots
 ## 📈 Performance
 
 ### Kaggle Rental Product
-
-| Method            | Recall@6   | NDCG@6     | HR@6       |
-| ----------------- | ---------- | ---------- | ---------- |
-| Popularity        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| RePurchase        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| GRU4Rec           | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
+- **Recall@6**: 0.0XXX
+- **NDCG@6**: 0.0XXX
+- **Hit Rate@6**: 0.0XXX
 
 ### Synerise RecSys 2025
-
-| Method            | Recall@6   | NDCG@6     | HR@6       |
-| ----------------- | ---------- | ---------- | ---------- |
-| Popularity        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| RePurchase        | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| GRU4Rec           | 0.0XXX     | 0.0XXX     | 0.0XXX     |
-| **CL-GRU4Rec+RP** | **0.0XXX** | **0.0XXX** | **0.0XXX** |
+- **Recall@6**: 0.0XXX
+- **NDCG@6**: 0.0XXX
+- **Hit Rate@6**: 0.0XXX
 
 ---
 
