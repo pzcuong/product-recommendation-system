@@ -13,7 +13,11 @@ interface ProductCardProps {
   variant?: "default" | "compact";
 }
 
-export function ProductCard({ product, onClick, variant = "default" }: ProductCardProps) {
+export function ProductCard({
+  product,
+  onClick,
+  variant = "default",
+}: ProductCardProps) {
   if (variant === "compact") {
     return (
       <button
@@ -40,7 +44,9 @@ export function ProductCard({ product, onClick, variant = "default" }: ProductCa
       <div className="aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-3">
         <span className="text-6xl">{product.image}</span>
       </div>
-      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{product.name}</h3>
+      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+        {product.name}
+      </h3>
       <p className="text-sm text-gray-500 mb-2">{product.category}</p>
       <p className="text-lg font-bold text-blue-600">
         {product.price.toLocaleString()}đ
