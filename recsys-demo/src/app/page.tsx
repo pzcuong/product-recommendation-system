@@ -137,7 +137,12 @@ export default function HomePage() {
           <div className="bg-gray-50 p-4 rounded-lg text-sm">
             <p className="font-semibold mb-2">Khắc phục:</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-600">
-              <li>Chạy FastAPI backend: <code className="bg-gray-200 px-1 rounded">cd backend && python -m app.main</code></li>
+              <li>
+                Chạy FastAPI backend:{" "}
+                <code className="bg-gray-200 px-1 rounded">
+                  cd backend && python -m app.main
+                </code>
+              </li>
               <li>Đảm bảo Python 3.14+ và dependencies đã cài đặt</li>
               <li>Kiểm tra xem port 8000 có đang được sử dụng không</li>
             </ol>
@@ -198,30 +203,33 @@ export default function HomePage() {
             {/* Category Filter */}
             <div className="bg-white rounded-lg shadow p-4">
               <h3 className="font-semibold text-gray-900 mb-3">📁 Danh mục</h3>
-              <div className="space-y-1">
+              <div className="space-y-1 max-h-64 overflow-y-auto">
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
                     selectedCategory === null
                       ? "bg-blue-600 text-white"
-                      : "hover:bg-gray-100"
+                      : "hover:bg-gray-100 text-gray-700"
                   }`}
                 >
-                  Tất cả ({PRODUCTS.length})
+                  Tất cả ({products.length})
                 </button>
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                      selectedCategory === cat
-                        ? "bg-blue-600 text-white"
-                        : "hover:bg-gray-100"
-                    }`}
-                  >
-                    {cat} ({PRODUCTS.filter((p) => p.category === cat).length})
-                  </button>
-                ))}
+                {categories.map((cat) => {
+                  const count = products.filter((p) => p.main_category === cat).length;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                        selectedCategory === cat
+                          ? "bg-blue-600 text-white"
+                          : "hover:bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {cat} ({count})
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
