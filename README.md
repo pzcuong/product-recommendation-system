@@ -57,6 +57,7 @@ python demo.py --dataset synerise
 ```
 
 The demo showcases:
+
 - **Single Session Recommendation**: Full explanation of each recommendation
 - **Session Progression**: How recommendations evolve as user interacts
 - **Cold Start Handling**: Fallback strategies for new users
