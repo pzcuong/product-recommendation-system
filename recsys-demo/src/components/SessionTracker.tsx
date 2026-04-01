@@ -5,13 +5,28 @@
 
 "use client";
 
-import { Product } from "@/lib/mock-data";
+import { Product } from "@/lib/api-client";
 import { X } from "lucide-react";
 
 interface SessionTrackerProps {
   products: Product[];
   onRemove?: (productId: string) => void;
   onClear?: () => void;
+}
+
+// Get emoji icon based on category
+function getCategoryIcon(category: string): string {
+  const categoryIcons: Record<string, string> = {
+    "Коконы для новорожденных": "👶",
+    "Электрокачели": "🎠",
+    "Качели, шезлонги": "🪑",
+    "Коляски": "👼",
+    "Манеж": "🏠",
+    "Ходунки": "🚶",
+    "Стульчики для кормления": "🍼",
+    default: "📦",
+  };
+  return categoryIcons[category] || categoryIcons.default;
 }
 
 export function SessionTracker({
@@ -59,10 +74,10 @@ export function SessionTracker({
             className="flex items-center gap-2 p-2 bg-gray-50 rounded group"
           >
             <span className="text-xs text-gray-400 w-4">{idx + 1}</span>
-            <span className="text-xl">{product.image}</span>
+            <span className="text-xl">{getCategoryIcon(product.main_category)}</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{product.name}</p>
-              <p className="text-xs text-gray-500">{product.category}</p>
+              <p className="text-sm font-medium truncate text-gray-900">{product.name}</p>
+              <p className="text-xs text-gray-500">{product.main_category}</p>
             </div>
             {onRemove && (
               <button
