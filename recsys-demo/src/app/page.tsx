@@ -1,27 +1,68 @@
 /**
  * CL-GRU4Rec+RP Demo - Main Page
- * E-commerce style demo with real-time recommendations
+ * E-commerce style demo with real-time recommendations from FastAPI backend
  */
 
 "use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { PRODUCTS, CATEGORIES, getProductById } from "@/lib/mock-data";
-import {
-  generateRecommendations,
-  getColdStartRecommendations,
-} from "@/lib/recommendation-engine";
+import { apiClient, Product } from "@/lib/api-client";
 import { ProductCard } from "@/components/ProductCard";
 import { RecommendationPanel } from "@/components/RecommendationPanel";
 import { SessionTracker } from "@/components/SessionTracker";
-import { LogOut, ShoppingCart } from "lucide-react";
+import { LogOut, ShoppingCart, AlertCircle } from "lucide-react";
 
 export default function HomePage() {
   const { user, logout, isAuthenticated } = useAuth();
   const [sessionIds, setSessionIds] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<any>(null);
+
+  // Real data state
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [productMap, setProductMap] = useState<Map<string, Product>>(new Map());
+
+  // Load products and categories on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setApiError(null);
+
+        // Check API health
+        const health = await apiClient.healthCheck();
+
+        if (!health.model_loaded || !health.products_loaded) {
+          console.warn("API not fully loaded:", health);
+        }
+
+        // Load categories first
+        const cats = await apiClient.getCategories();
+        setCategories(cats);
+
+        // Load products (limit to 100 initially for performance)
+        const productsData = await apiClient.getProducts(undefined, 100);
+        setProducts(productsData.products);
+
+        // Build product map for quick lookup
+        const map = new Map<string, Product>();
+        productsData.products.forEach(p => map.set(p.id, p));
+        setProductMap(map);
+
+      } catch (error) {
+        console.error("Failed to load data:", error);
+        setApiError("Không thể kết nối đến API. Vui lòng đảm bảo FastAPI backend đang chạy.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
 
   // Update recommendations when session changes
   useEffect(() => {
@@ -30,10 +71,17 @@ export default function HomePage() {
       return;
     }
 
-    // Generate new recommendations
-    const result = generateRecommendations(sessionIds, PRODUCTS, 6);
-    setRecommendations(result);
-  }, [sessionIds]);
+    async function fetchRecommendations() {
+      try {
+        const result = await apiClient.getRecommendations(sessionIds, 6, user?.id);
+        setRecommendations(result);
+      } catch (error) {
+        console.error("Failed to get recommendations:", error);
+      }
+    }
+
+    fetchRecommendations();
+  }, [sessionIds, user]);
 
   const handleProductClick = (productId: string) => {
     // Add to session if not already present

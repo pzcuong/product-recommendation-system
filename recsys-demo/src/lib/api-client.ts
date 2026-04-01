@@ -48,7 +48,10 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options?: RequestInit,
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     try {
@@ -71,7 +74,10 @@ class ApiClient {
     }
   }
 
-  async getProducts(category?: string, limit?: number): Promise<ProductsResponse> {
+  async getProducts(
+    category?: string,
+    limit?: number,
+  ): Promise<ProductsResponse> {
     const params = new URLSearchParams();
     if (category) params.append("category", category);
     if (limit) params.append("limit", limit.toString());
@@ -85,14 +91,16 @@ class ApiClient {
   }
 
   async getCategories(): Promise<string[]> {
-    const response = await this.request<{ categories: string[] }>("/api/categories");
+    const response = await this.request<{ categories: string[] }>(
+      "/api/categories",
+    );
     return response.categories;
   }
 
   async getRecommendations(
     sessionItems: string[],
     k: number = 10,
-    clientId?: string
+    clientId?: string,
   ): Promise<RecommendationResult> {
     return this.request<RecommendationResult>("/api/recommend", {
       method: "POST",
@@ -104,12 +112,22 @@ class ApiClient {
     });
   }
 
-  async getPopularProducts(limit: number = 50): Promise<{ products: Product[] }> {
+  async getPopularProducts(
+    limit: number = 50,
+  ): Promise<{ products: Product[] }> {
     return this.request<{ products: Product[] }>(`/api/popular?limit=${limit}`);
   }
 
-  async healthCheck(): Promise<{ status: string; model_loaded: boolean; products_loaded: boolean }> {
-    return this.request<{ status: string; model_loaded: boolean; products_loaded: boolean }>("/health");
+  async healthCheck(): Promise<{
+    status: string;
+    model_loaded: boolean;
+    products_loaded: boolean;
+  }> {
+    return this.request<{
+      status: string;
+      model_loaded: boolean;
+      products_loaded: boolean;
+    }>("/health");
   }
 }
 
