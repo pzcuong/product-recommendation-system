@@ -14,7 +14,10 @@ interface RecommendationPanelProps {
   onProductClick?: (productId: string) => void;
 }
 
-export function RecommendationPanel({ result, onProductClick }: RecommendationPanelProps) {
+export function RecommendationPanel({
+  result,
+  onProductClick,
+}: RecommendationPanelProps) {
   if (!result) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
@@ -30,8 +33,10 @@ export function RecommendationPanel({ result, onProductClick }: RecommendationPa
 
   // Get confidence level
   const getConfidenceLevel = (conf: number) => {
-    if (conf < 0.4) return { text: "THẤP", color: "text-yellow-600", bg: "bg-yellow-50" };
-    if (conf < 0.7) return { text: "TRUNG BÌNH", color: "text-blue-600", bg: "bg-blue-50" };
+    if (conf < 0.4)
+      return { text: "THẤP", color: "text-yellow-600", bg: "bg-yellow-50" };
+    if (conf < 0.7)
+      return { text: "TRUNG BÌNH", color: "text-blue-600", bg: "bg-blue-50" };
     return { text: "CAO", color: "text-green-600", bg: "bg-green-50" };
   };
 
@@ -41,7 +46,9 @@ export function RecommendationPanel({ result, onProductClick }: RecommendationPa
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">🎯 Gợi ý cho bạn</h2>
-        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${confLevel.bg} ${confLevel.color}`}>
+        <div
+          className={`px-3 py-1 rounded-full text-xs font-semibold ${confLevel.bg} ${confLevel.color}`}
+        >
           Độ tin cậy: {confLevel.text} ({(confidence * 100).toFixed(0)}%)
         </div>
       </div>
@@ -76,23 +83,34 @@ export function RecommendationPanel({ result, onProductClick }: RecommendationPa
               <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
                 #{idx + 1}
               </div>
-              <ProductCard product={product} onClick={() => onProductClick?.(rec.productId)} />
+              <ProductCard
+                product={product}
+                onClick={() => onProductClick?.(rec.productId)}
+              />
               <div className="mt-2 p-2 bg-gray-50 rounded text-xs space-y-1">
                 <div className="flex justify-between">
                   <span className="text-gray-600">GRU:</span>
-                  <span className="font-medium text-blue-600">{rec.gruScore.toFixed(3)}</span>
+                  <span className="font-medium text-blue-600">
+                    {rec.gruScore.toFixed(3)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">CL:</span>
-                  <span className="font-medium text-purple-600">{rec.clScore.toFixed(3)}</span>
+                  <span className="font-medium text-purple-600">
+                    {rec.clScore.toFixed(3)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">RP:</span>
-                  <span className="font-medium text-green-600">{rec.rpScore.toFixed(3)}</span>
+                  <span className="font-medium text-green-600">
+                    {rec.rpScore.toFixed(3)}
+                  </span>
                 </div>
                 <div className="flex justify-between border-t pt-1 mt-1">
                   <span className="font-semibold">Total:</span>
-                  <span className="font-bold text-gray-900">{rec.finalScore.toFixed(3)}</span>
+                  <span className="font-bold text-gray-900">
+                    {rec.finalScore.toFixed(3)}
+                  </span>
                 </div>
               </div>
             </div>
