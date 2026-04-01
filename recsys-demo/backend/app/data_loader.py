@@ -109,32 +109,35 @@ class DataLoader:
 
     def get_popular_products(self, limit: int = 50) -> List[str]:
         """Get most popular product IDs"""
-        if self.hits_df is None:
-            return list(self.product_map.keys())[:limit]
-
         try:
             # Count product views
             product_views = {}
 
-            for _, row in self.hits_df.head(50000).iterrows():
-                url = row.get('url', '')
-                page_type = row.get('page_type', '')
+            if self.hits_df is not None:
+                for _, row in self.hits_df.head(50000).iterrows():
+                    url = row.get('url', '')
+                    page_type = row.get('page_type', '')
 
-                if page_type == 'PRODUCT':
-                    # Extract product ID
-                    parts = url.split('/')[-1].replace('.html', '').split('-')
-                    if parts:
-                        pid = parts[-1]
-                        product_views[pid] = product_views.get(pid, 0) + 1
+                    if page_type == 'PRODUCT':
+                        # Extract product ID
+                        parts = url.split('/')[-1].replace('.html', '').split('-')
+                        if parts:
+                            pid = parts[-1]
+                            product_views[pid] = product_views.get(pid, 0) + 1
 
-            # Sort by view count
-            sorted_products = sorted(
-                product_views.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )
+            # If we have product views, use them; otherwise return all products
+            if product_views:
+                # Sort by view count
+                sorted_products = sorted(
+                    product_views.items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )
+                return [pid for pid, _ in sorted_products[:limit]]
+            else:
+                # Return first N products from product_map
+                return list(self.product_map.keys())[:limit]
 
-            return [pid for pid, _ in sorted_products[:limit]]
         except Exception as e:
             logger.error(f"Error getting popular products: {e}")
             return list(self.product_map.keys())[:limit]
