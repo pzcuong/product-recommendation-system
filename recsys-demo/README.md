@@ -1,32 +1,43 @@
 # CL-GRU4Rec+RP Web Demo
 
-Interactive web demo for CL-GRU4Rec+RP recommendation system.
+Interactive web demo for CL-GRU4Rec+RP recommendation system with **real data** and **FastAPI backend**.
 
 ## Tech Stack
 
 - **Next.js 16** - React framework with App Router
 - **TypeScript** - Type safety
 - **Tailwind CSS v4** - Styling
+- **FastAPI** - Python backend with real model
 - **Mock Auth** - localStorage-based authentication
 
 ## Features
 
 - 🔐 **Mock Authentication**: Sign in with any email/password
-- 🛒 **Product Catalog**: 15 products across 5 categories
+- 🛒 **Real Product Catalog**: 689 products from Kaggle Rental Product dataset
 - 🎯 **Real-time Recommendations**: Updates as you add products to session
 - 📊 **Component Scores**: See GRU4Rec, Contrastive Learning, and Re-Purchase scores
 - 💡 **Session Tracking**: Visualize current session and remove items
-- 📁 **Category Filtering**: Filter products by category
+- 📁 **Category Filtering**: Filter products by 27+ Russian product categories
 
 ## Getting Started
 
-```bash
-# Run development server
-npm run dev --turbo
+### 1. Start FastAPI Backend
 
-# Open browser
-# http://localhost:3000
+```bash
+cd backend
+source ../../venv/bin/activate  # or your Python venv
+uvicorn app.main:app --host 0.0.0.0 --port 8001
 ```
+
+API will be available at http://localhost:8001
+
+### 2. Start Next.js Frontend
+
+```bash
+npm run dev --turbo
+```
+
+Frontend will be available at http://localhost:3000
 
 ## Demo Credentials
 
@@ -43,7 +54,7 @@ Or use pre-configured:
 ## How to Use
 
 1. **Login**: Enter any email/password
-2. **Browse Products**: View catalog on the left
+2. **Browse Products**: View catalog on the left (689 real Russian rental products)
 3. **Add to Session**: Click any product to add to your session
 4. **View Recommendations**: Watch real-time recommendations on the right
 5. **See Component Scores**: Each recommendation shows:
@@ -53,64 +64,49 @@ Or use pre-configured:
 6. **Continue Shopping**: Click recommended products to extend session
 7. **Remove Items**: Use X button to remove from session
 
-## File Structure
+## API Endpoints
 
-```
-src/
-├── app/
-│   ├── page.tsx              # Main demo page
-│   ├── login/page.tsx        # Login page
-│   └── layout.tsx            # Root layout with AuthProvider
-├── components/
-│   ├── ProductCard.tsx       # Product display
-│   ├── RecommendationPanel.tsx  # Recommendations with scores
-│   └── SessionTracker.tsx    # Current session display
-├── contexts/
-│   └── AuthContext.tsx       # Mock authentication
-├── lib/
-│   ├── mock-data.ts          # Product catalog
-│   └── recommendation-engine.ts  # CL-GRU4Rec+RP simulation
-```
+- `GET /health` - Health check
+- `GET /api/products?limit=100` - Get products
+- `GET /api/products/{id}` - Get single product
+- `GET /api/categories` - Get all categories
+- `POST /api/recommend` - Get recommendations
+- `GET /api/popular?limit=50` - Get popular products
 
 ## Component Architecture
 
-### Recommendation Engine
+### FastAPI Backend (`/backend`)
 
-The demo simulates CL-GRU4Rec+RP with three components:
+- **data_loader.py**: Loads real data from `/Users/macbook/Desktop/product-recommendation-system/data/`
+  - 689 products from `new_site_products.csv`
+  - Session data from `metrika_hits.csv`
+  - 27+ product categories in Russian
 
-1. **GRU4Rec (Sequential)**
-   - Scores based on category co-occurrence
-   - Position-based boost for recent items
-   - Confidence increases with session length
+- **model_wrapper.py**: Wraps CL-GRU4Rec+RP model
+  - Uses `GRU4RecModel` from parent directory
+  - Falls back to popularity-based recommendations when no checkpoint
+  - To use trained model: Add checkpoint path to `.env`
 
-2. **Contrastive Learning (Similarity)**
-   - Simulates embedding similarity
-   - Products with similar IDs get higher scores
-   - Independent of session length
+- **main.py**: FastAPI application
+  - CORS enabled for localhost:3000
+  - RESTful API for products and recommendations
 
-3. **Re-Purchase (History)**
-   - Frequency-based scoring within session
-   - Normalized by session length
+### Next.js Frontend
 
-### Adaptive Fusion
-
-Weights adapt based on session length:
-
-- Short session (< 3 items): GRU=50%, CL=25%, RP=25%
-- Medium session (3-7 items): GRU=65%, CL=15%, RP=20%
-- Long session (> 7 items): GRU=80%, CL=10%, RP=10%
+- `src/app/page.tsx`: Main demo page
+- `src/components/`: ProductCard, RecommendationPanel, SessionTracker
+- `src/lib/api-client.ts`: Fetches from FastAPI backend
+- `src/contexts/AuthContext.tsx`: Mock authentication
 
 ## Notes
 
-- This is a **demo/simulation** - not the actual trained model
-- Recommendation scores are simulated for demonstration
-- Real CL-GRU4Rec+RP model requires PyTorch training
-- Use this for presentations, demos, and interactive explanations
+- **Real Data**: Products are from Russian rental platform (Synerise RecSys 2025)
+- **Model**: Currently using popularity-based fallback (no trained checkpoint loaded)
+- **To use trained model**: Train the model first, then add checkpoint path to backend
 
 ## Future Enhancements
 
-- Connect to real PyTorch model via API
-- Add more products and categories
-- Implement actual embedding similarity
+- Train and load actual CL-GRU4Rec+RP checkpoint
 - Add user history persistence
 - Include evaluation metrics dashboard
+- Add more product filters (price range, brand)
