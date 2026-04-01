@@ -82,18 +82,13 @@ async def get_products(category: Optional[str] = None, limit: Optional[int] = No
         else:
             products = data_loader.get_all_products()
 
-        # Get popular products if limit specified
-        if limit and not category:
-            popular_ids = data_loader.get_popular_products(limit)
-            product_map = {p['id']: p for p in products}
-            products = [
-                product_map.get(pid, product_map[pid])
-                for pid in popular_ids if pid in product_map
-            ]
+        # Apply limit
+        if limit:
+            products = products[:limit]
 
         # Format products
         formatted_products = []
-        for p in (products[:limit] if limit else products):
+        for p in products:
             formatted_products.append({
                 "id": p['id'],
                 "name": p['name'],
