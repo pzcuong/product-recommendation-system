@@ -147,9 +147,12 @@ async def recommend(request: Dict):
         model = get_model()
 
         if not model._initialized:
-            # Fallback: return popular products
+            # Fallback: return popular products (excluding session items)
             logger.warning("Model not initialized, using fallback")
-            popular_ids = data_loader.get_popular_products(k)
+            all_popular_ids = data_loader.get_popular_products(k * 2)  # Get more to filter
+
+            # Filter out items already in session
+            available_ids = [pid for pid in all_popular_ids if pid not in session_items]
 
             recommendations = [
                 {
@@ -159,7 +162,7 @@ async def recommend(request: Dict):
                     "cl_score": 0.3,
                     "rp_score": 0.2
                 }
-                for i, pid in enumerate(popular_ids[:k])
+                for i, pid in enumerate(available_ids[:k])
             ]
 
             return {
