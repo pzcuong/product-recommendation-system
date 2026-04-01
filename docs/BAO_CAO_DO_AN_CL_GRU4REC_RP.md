@@ -1,6 +1,9 @@
 # BÁO CÁO ĐỒ ÁN KHOA HỌC
+
 # HỆ THỐNG GỢI Ý SẢN PHẨM THUÊ
+
 # Nâng cao bằng Mô hình Học Ý Nghĩa Đối chiếu - GRU4Rec với Tín hiệu Mua lại
+
 # **(Contrastive Learning - GRU4Rec with Re-Purchase Awareness)**
 
 ---
@@ -8,6 +11,7 @@
 **GVHD**: TS. Nguyễn Văn A
 
 **Nhóm thực hiện**:
+
 - Thành viên 1: Trần Văn B - MSSV: 20210001
 - Thành viên 2: Lê Thị C - MSSV: 20210002
 - Thành viên 3: Phạm Văn D - MSSV: 20210003
@@ -44,6 +48,7 @@ Mục tiêu chính của đồ án là thiết kế và triển khai một hệ 
 ### Phạm vi nghiên cứu
 
 Đồ án tập trung vào:
+
 - Nghiên cứu và phát triển mô hình CL-GRU4Rec+RP
 - Đánh giá trên Kaggle Rental Product Recommendation Dataset
 - Mở rộng đánh giá trên Synerise RecSys 2025 Dataset
@@ -101,12 +106,12 @@ Mục tiêu chính của đồ án là thiết kế và triển khai một hệ 
 
 **Hệ thống gợi ý (Recommender System)** là một lớp của hệ thống lọc thông tin nhằm dự đoán rating hoặc preference mà người dùng có thể gán cho một item. Hệ thống gợi ý đã trở thành không thể thiếu trong nhiều dịch vụ trực tuyến:
 
-| Nền tảng | Loại gợi ý | Kỹ thuật chính |
-|----------|------------|----------------|
-| Amazon | Sản phẩm | Collaborative Filtering, Deep Learning |
-| Netflix | Phim/tv | Matrix Factorization, RNN |
-| Spotify | Nhạc | Content-based, Collaborative Filtering |
-| YouTube | Video | Deep Neural Networks |
+| Nền tảng | Loại gợi ý | Kỹ thuật chính                         |
+| -------- | ---------- | -------------------------------------- |
+| Amazon   | Sản phẩm   | Collaborative Filtering, Deep Learning |
+| Netflix  | Phim/tv    | Matrix Factorization, RNN              |
+| Spotify  | Nhạc       | Content-based, Collaborative Filtering |
+| YouTube  | Video      | Deep Neural Networks                   |
 
 **Phân loại hệ thống gợi ý**
 
@@ -148,14 +153,14 @@ Mục tiêu chính của đồ án là thiết kế và triển khai một hệ 
 
 Khác với mua sắm truyền thống, bài toán gợi ý sản phẩm thuê có những khác biệt cơ bản:
 
-| Khía cạnh | Mua sắm truyền thống | Cho thuê sản phẩm |
-|-----------|---------------------|-------------------|
-| **Tần suất** | Một lần (rarely repeat) | Lặp lại theo chu kỳ |
-| **Ràng buộc** | Ngân sách | Thời gian, địa điểm |
-| **Context** | Ý định mua | Hoàn cảnh sử dụng |
-| **Data sparsity** | Khá nhiều users | Ít users hơn |
-| **Cold-start** | Dễ (có metadata) | Khó (hành vi mới) |
-| **Seasonality** | Thấp | Cao (mùa, dịp) |
+| Khía cạnh         | Mua sắm truyền thống    | Cho thuê sản phẩm   |
+| ----------------- | ----------------------- | ------------------- |
+| **Tần suất**      | Một lần (rarely repeat) | Lặp lại theo chu kỳ |
+| **Ràng buộc**     | Ngân sách               | Thời gian, địa điểm |
+| **Context**       | Ý định mua              | Hoàn cảnh sử dụng   |
+| **Data sparsity** | Khá nhiều users         | Ít users hơn        |
+| **Cold-start**    | Dễ (có metadata)        | Khó (hành vi mới)   |
+| **Seasonality**   | Thấp                    | Cao (mùa, dịp)      |
 
 **Ví dụ thực tế**
 
@@ -189,11 +194,13 @@ Our model captures:
 **Bài toán chính**
 
 Cho:
+
 - Một tập người dùng $U = \{u_1, u_2, ..., u_m\}$
 - Một tập sản phẩm $I = \{i_1, i_2, ..., i_n\}$
 - Lịch sử tương tác của người dùng $u$: $S_u = [(i_1, t_1, e_1), (i_2, t_2, e_2), ...]$
 
 Trong đó:
+
 - $i_j \in I$: Sản phẩm được tương tác
 - $t_j \in \mathbb{R}^+$: Timestamp của tương tác
 - $e_j \in \{view, cart, buy\}$: Loại sự kiện
@@ -248,18 +255,19 @@ $$
 
 **Ưu điểm và nhược điểm**
 
-| Ưu điểm | Nhược điểm |
-|---------|------------|
-| Đơn giản, dễ implement | Cold-start problem |
-| Không cần item content | Sparsity problem |
-| Giải thích được | Không capture temporal patterns |
-| Hiệu quả với đủ dữ liệu | Scalability issues |
+| Ưu điểm                 | Nhược điểm                      |
+| ----------------------- | ------------------------------- |
+| Đơn giản, dễ implement  | Cold-start problem              |
+| Không cần item content  | Sparsity problem                |
+| Giải thích được         | Không capture temporal patterns |
+| Hiệu quả với đủ dữ liệu | Scalability issues              |
 
 ### 2.2 Matrix Factorization
 
 **Nguyên lý**
 
 Matrix Factorization (MF) factorizes ma trận rating $R \approx U \times V^T$, với:
+
 - $U \in \mathbb{R}^{m \times k}$: User embeddings
 - $V \in \mathbb{R}^{n \times k}$: Item embeddings
 - $k$: Dimension ẩn (latent dimension)
@@ -298,6 +306,7 @@ Output: User matrix U, Item matrix V
 **Singular Value Decomposition (SVD)**
 
 SVD phân tích ma trận $R = U \Sigma V^T$, với:
+
 - $U$: Ma trận singular vectors trái
 - $\Sigma$: Ma trận đường chéo chứa singular values
 - $V$: Ma trận singular vectors phải
@@ -387,6 +396,7 @@ h_t = GRU(h_{t-1}, e_{i_t})
 $$
 
 Trong đó:
+
 - $h_t$: Hidden state tại thời điểm t
 - $e_{i_t}$: Embedding của item $i_t$
 - $h_0$: Initial hidden state (zero hoặc learned)
@@ -419,11 +429,11 @@ $$
 
 **So sánh các loss functions**
 
-| Loss | Ưu điểm | Nhược điểm |
-|------|---------|------------|
-| CE | Stable, widely used | Compute expensive (softmax over all items) |
-| BPR | Ranking-focused, efficient | Cần negative sampling |
-| TOP1 | Robust, fast | Less studied |
+| Loss | Ưu điểm                    | Nhược điểm                                 |
+| ---- | -------------------------- | ------------------------------------------ |
+| CE   | Stable, widely used        | Compute expensive (softmax over all items) |
+| BPR  | Ranking-focused, efficient | Cần negative sampling                      |
+| TOP1 | Robust, fast               | Less studied                               |
 
 ### 2.5 Contrastive Learning
 
@@ -438,6 +448,7 @@ $$
 $$
 
 Trong đó:
+
 - $z, z^+$: Positive pair
 - $z^-$: Negative samples
 - $\tau$: Temperature parameter
@@ -488,9 +499,9 @@ Hu, Y., et al. (2008) "Collaborative Filtering for Implicit Feedback Datasets"
 
 - Đề xuất ALS cho implicit feedback
 - Weighted loss function:
-$$
-\mathcal{L} = \sum_{u,i} c_{ui} (p_{ui} - u_u^T v_i)^2 + \lambda(\|u_u\|^2 + \|v_i\|^2)
-$$
+  $$
+  \mathcal{L} = \sum_{u,i} c_{ui} (p_{ui} - u_u^T v_i)^2 + \lambda(\|u_u\|^2 + \|v_i\|^2)
+  $$
 
 Trong đó $c_{ui}$ là confidence weight và $p_{ui}$ là preference.
 
@@ -524,12 +535,12 @@ Sun, F., et al. (2019) "BERT4Rec: Sequential Recommendation with Bidirectional E
 
 Từ tổng quan literature, chúng tôi nhận thấy các khoảng trống sau:
 
-| Vấn đề | Trạng thái hiện tại | Khoảng trống |
-|--------|---------------------|--------------|
-| Re-purchase behavior | Ít được nghiên cứu | Cần explicit modeling |
-| Multi-behavior fusion | Treat equally | Cần event-weighted approach |
-| Sequential + Graph | Thường tách rời | Cần integrated approach |
-| Rental domain | Không có research | Domain-specific methods needed |
+| Vấn đề                | Trạng thái hiện tại | Khoảng trống                   |
+| --------------------- | ------------------- | ------------------------------ |
+| Re-purchase behavior  | Ít được nghiên cứu  | Cần explicit modeling          |
+| Multi-behavior fusion | Treat equally       | Cần event-weighted approach    |
+| Sequential + Graph    | Thường tách rời     | Cần integrated approach        |
+| Rental domain         | Không có research   | Domain-specific methods needed |
 
 ---
 
@@ -1395,13 +1406,13 @@ def adaptive_fusion_weights(history_length, k):
 
 **Tóm tắt đóng góp**
 
-| Đóng góp | Mô hình hiện tại | CL-GRU4Rec+RP |
-|----------|------------------|---------------|
-| **Re-purchase modeling** | Không có | Event-weighted RP scoring |
-| **Contrastive item semantics** | Content-based hoặc ko dùng | CL từ behavioral data |
-| **Sequential modeling** | Transformer-based (SASRec) | GRU + BPR (efficient) |
-| **Fusion strategy** | Fixed weights hoặc end-to-end | Adaptive two-stage |
-| **Multi-behavior** | Treat equally | Event-weighted |
+| Đóng góp                       | Mô hình hiện tại              | CL-GRU4Rec+RP             |
+| ------------------------------ | ----------------------------- | ------------------------- |
+| **Re-purchase modeling**       | Không có                      | Event-weighted RP scoring |
+| **Contrastive item semantics** | Content-based hoặc ko dùng    | CL từ behavioral data     |
+| **Sequential modeling**        | Transformer-based (SASRec)    | GRU + BPR (efficient)     |
+| **Fusion strategy**            | Fixed weights hoặc end-to-end | Adaptive two-stage        |
+| **Multi-behavior**             | Treat equally                 | Event-weighted            |
 
 **Innovation chính**
 
@@ -1434,13 +1445,13 @@ Kaggle Rental Product Recommendation Challenge dataset được thu thập từ 
 
 **Thống kê tổng quan**
 
-| Đặc điểm | Giá trị |
-|----------|---------|
-| Số lượng users | ~50,000 |
-| Số lượng products | ~10,000 |
-| Số lượng interactions | ~2,000,000 |
-| Thời gian | 6 tháng |
-| Loại events | view, cart, buy |
+| Đặc điểm              | Giá trị         |
+| --------------------- | --------------- |
+| Số lượng users        | ~50,000         |
+| Số lượng products     | ~10,000         |
+| Số lượng interactions | ~2,000,000      |
+| Thời gian             | 6 tháng         |
+| Loại events           | view, cart, buy |
 
 **Schema dữ liệu**
 
@@ -1471,13 +1482,13 @@ Synerise RecSys 2025 Competition dataset từ nền tảng thương mại điệ
 
 **Thống kê tổng quan**
 
-| Đặc điểm | Giá trị |
-|----------|---------|
-| Số lượng users | ~150,000 |
-| Số lượng products | ~5,000 |
-| Số lượng interactions | ~3,500,000 |
-| Thời gian | 12 tháng |
-| Loại events | view, add_to_cart, buy |
+| Đặc điểm              | Giá trị                |
+| --------------------- | ---------------------- |
+| Số lượng users        | ~150,000               |
+| Số lượng products     | ~5,000                 |
+| Số lượng interactions | ~3,500,000             |
+| Thời gian             | 12 tháng               |
+| Loại events           | view, add_to_cart, buy |
 
 **Schema dữ liệu**
 
@@ -1545,13 +1556,13 @@ for uid, (items, events) in user_data.items():
 
 #### 5.2.3 Baselines
 
-| Method | Type | Description |
-|--------|------|-------------|
-| Popularity | Statistical | Recommend most popular items |
-| RePurchase | Statistical | Recommend user's most interacted items |
-| GRU4Rec-CE | Sequential | GRU4Rec with Cross-Entropy loss |
-| SASRec | Sequential | Self-Attentive Sequential Recommendation |
-| CL-GRU4Rec+RP | **Ours** | Our proposed method |
+| Method        | Type        | Description                              |
+| ------------- | ----------- | ---------------------------------------- |
+| Popularity    | Statistical | Recommend most popular items             |
+| RePurchase    | Statistical | Recommend user's most interacted items   |
+| GRU4Rec-CE    | Sequential  | GRU4Rec with Cross-Entropy loss          |
+| SASRec        | Sequential  | Self-Attentive Sequential Recommendation |
+| CL-GRU4Rec+RP | **Ours**    | Our proposed method                      |
 
 #### 5.2.4 Hyperparameters
 
@@ -2016,6 +2027,7 @@ redis>=4.5.0      # For caching
 ---
 
 **Người thực hiện:**
+
 - Thành viên 1: Trần Văn B
 - Thành viên 2: Lê Thị C
 - Thành viên 3: Phạm Văn D

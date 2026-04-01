@@ -7,6 +7,7 @@
 ## 🚀 Quick Start
 
 **Upload to Kaggle and run:**
+
 ```
 lru.py (ipynb format)
 ```
@@ -19,23 +20,28 @@ lru.py (ipynb format)
 ## 🎯 Key Improvements
 
 ### 1. Enhanced GRU4Rec
+
 - **Layers**: 150 (increased from baseline 100)
 - **Epochs**: 30 (increased from baseline 20)
 - **Result**: Better sequential pattern learning
 
 ### 2. Optimized Consensus Bonuses
+
 - **Previous**: 3.71x max multiplier (caused overfitting)
 - **New**: 2.53x max multiplier
 - **Result**: Reduced overfitting, improved generalization
 
 ### 3. 4-Model Adaptive Ensemble
+
 - **GRU4Rec**: Neural network for sequential patterns
 - **v16**: Category + Co-occurrence
 - **v42**: Asymmetric Co-occurrence
 - **v45**: Bayesian Optimized
 
 ### 4. 8-Type Session Classification
+
 Sessions classified into:
+
 - `cold_single_cat` (12.8%) - Ưu tiên category signals
 - `cold_multi_cat` (40.8%) - Balanced approach
 - `short_focused` (17.2%) - GRU4Rec + category
@@ -51,25 +57,27 @@ Each type gets different model weights!
 
 ## 📈 Expected Performance
 
-| Metric | Value |
-|--------|-------|
-| **Target Score** | **0.420-0.422** |
-| Improvement vs baseline | +10-11% |
-| GRU4Rec alone | ~0.409 |
-| Ensemble boost | +1.1-1.3% |
-| Unique products | ~270-290 |
-| Coverage | 100% |
+| Metric                  | Value           |
+| ----------------------- | --------------- |
+| **Target Score**        | **0.420-0.422** |
+| Improvement vs baseline | +10-11%         |
+| GRU4Rec alone           | ~0.409          |
+| Ensemble boost          | +1.1-1.3%       |
+| Unique products         | ~270-290        |
+| Coverage                | 100%            |
 
 ---
 
 ## 🔬 What's Different from 0.414 Solution?
 
 ### Previous (0.41448):
+
 - GRU4Rec: 100 layers, 20 epochs
 - Consensus: 3.71x max (too high)
 - Result: 0.41448
 
 ### Current (0.420-0.422):
+
 - GRU4Rec: 150 layers, 30 epochs ✅
 - Consensus: 2.53x max ✅
 - Result: Expected 0.420-0.422
@@ -100,14 +108,16 @@ product-recommendation-system/
 ### Consensus Bonus Formula
 
 **Previous (overfitting):**
+
 ```python
 if count == 2: score *= 1.65
-if count == 3: score *= 1.55  
+if count == 3: score *= 1.55
 if count == 4: score *= 1.45
 # Max: 1.65 × 1.55 × 1.45 = 3.71x
 ```
 
 **New (optimized):**
+
 ```python
 if count == 2: score *= 1.50
 if count == 3: score *= 1.35
@@ -118,6 +128,7 @@ if count == 4: score *= 1.25
 ### Session-Adaptive Weights Example
 
 **Cold Start (cold_single_cat):**
+
 ```python
 weights = {
     'v16': 1.3,   # Category-based (highest)
@@ -128,6 +139,7 @@ weights = {
 ```
 
 **Long Focused (long_focused):**
+
 ```python
 weights = {
     'v16': 0.45,  # Category-based (low)
@@ -142,11 +154,13 @@ weights = {
 ## 🔍 Evaluation Pipeline
 
 Solution includes full train/valid/test splits:
+
 - **Validation set**: Internal evaluation
 - **Test set**: Ground truth comparison
 - **Metrics**: Recall@6
 
 You'll see:
+
 ```
 VALIDATION SET - GRU4Rec Only
 recall@6: 0.XXXX

@@ -6,27 +6,28 @@
 
 **Kết quả tốt nhất đạt được:**
 
-| Submission | Private Score | Public Score |
-|---|---|---|
-| GRU4Rec (150) + Re-rank | 0.40924 | 0.39096 |
-| **GRU4Rec × 3 seeds + Re-rank** | **0.41012** | **0.41650** |
-| Baseline (co-occurrence only) | 0.38113 | — |
+| Submission                      | Private Score | Public Score |
+| ------------------------------- | ------------- | ------------ |
+| GRU4Rec (150) + Re-rank         | 0.40924       | 0.39096      |
+| **GRU4Rec × 3 seeds + Re-rank** | **0.41012**   | **0.41650**  |
+| Baseline (co-occurrence only)   | 0.38113       | —            |
 
 ---
 
 ## 2. Phân tích dữ liệu
 
-| Thông số | Giá trị |
-|---|---|
-| Tổng số sự kiện | 1,295,242 |
-| Số người dùng (client_id) | 188,131 |
-| Số phiên duyệt (visit_id) | 276,162 |
-| Số sản phẩm trong catalog | 1,056 items |
-| Số sản phẩm cho phép (new site) | ~688 |
-| Số phiên trong tập test | 1,363 |
-| Cold-start (không có lịch sử) | 53 / 1,363 (3.9%) |
+| Thông số                        | Giá trị           |
+| ------------------------------- | ----------------- |
+| Tổng số sự kiện                 | 1,295,242         |
+| Số người dùng (client_id)       | 188,131           |
+| Số phiên duyệt (visit_id)       | 276,162           |
+| Số sản phẩm trong catalog       | 1,056 items       |
+| Số sản phẩm cho phép (new site) | ~688              |
+| Số phiên trong tập test         | 1,363             |
+| Cold-start (không có lịch sử)   | 53 / 1,363 (3.9%) |
 
 **Đặc điểm dữ liệu:**
+
 - Mỗi visit chứa chuỗi các sự kiện: `PRODUCT`, `CATEGORY`, `SEARCH`, `CART`, `ORDER`...
 - Hai nguồn site: old site → new site (sản phẩm được map ID)
 - Dữ liệu rất sparse (~99.8%): 1.7M hits / 237M tổ hợp có thể
@@ -97,18 +98,18 @@ flowchart TD
 
 Dùng thư viện **Cornac 2.3.5** — implementation GRU4Rec gốc của Hidasi et al. (2016).
 
-| Hyperparameter | Giá trị |
-|---|---|
-| `layers` | [150] (1 hidden layer, 150 units) |
-| `n_epochs` | 30 |
-| `loss` | cross-entropy |
-| `n_sample` | 4096 (negative samples) |
-| `batch_size` | 512 |
-| `dropout_p_embed` | 0.0 |
-| `dropout_p_hidden` | 0.0 |
-| `device` | MPS (Apple Silicon) |
-| `max_row_per_session` | 20 |
-| `split_ratio` | 0.50 (train/valid) |
+| Hyperparameter        | Giá trị                           |
+| --------------------- | --------------------------------- |
+| `layers`              | [150] (1 hidden layer, 150 units) |
+| `n_epochs`            | 30                                |
+| `loss`                | cross-entropy                     |
+| `n_sample`            | 4096 (negative samples)           |
+| `batch_size`          | 512                               |
+| `dropout_p_embed`     | 0.0                               |
+| `dropout_p_hidden`    | 0.0                               |
+| `device`              | MPS (Apple Silicon)               |
+| `max_row_per_session` | 20                                |
+| `split_ratio`         | 0.50 (train/valid)                |
 
 **Float32 patch:** Cornac khởi tạo weights bằng `float64` → không tương thích MPS. Patch `_init_numpy_weights` để ép về `float32`.
 
@@ -152,11 +153,13 @@ final_score  = base_score + boost_capped
 ```
 
 **Recency weighting:**
+
 - Forward: multiplier từ 1.0×(xa) đến 3.0×(gần nhất)
 - Backward: multiplier từ 1.0× đến 2.5×
 - Category: multiplier từ 1.0× đến 2.0×
 
 **Session-adaptive cap:**
+
 - n_history ≥ 3 items → max boost = **25%** of base score
 - n_history = 1–2 → max boost = **15%**
 - n_history = 0 (cold start) → max boost = **8%**
@@ -165,16 +168,16 @@ final_score  = base_score + boost_capped
 
 ## 5. Những thử nghiệm đã qua
 
-| Thử nghiệm | Kết quả | Ghi chú |
-|---|---|---|
-| Co-occurrence only (baseline) | 0.381 | Không có GRU4Rec |
-| GRU4Rec (100 layers, 20 epochs) | 0.409 | Từ kaggle_notebook.py cũ |
-| Score-mixing ensemble (v16+v42+v45) | **0.296** ❌ | 3 lỗi nghiêm trọng trong fusion |
-| GRU4Rec (150, 30) + simple re-rank top-50 | 0.40837 | |
-| + backward cooccur + recency + top-100 | 0.40924 | |
-| GRU4Rec (200 layers, 50 epochs) | 0.385 | Overfitting |
-| + Inject ngoài top-100 | 0.39005 ❌ | Inject phá GRU4Rec |
-| **Multi-seed (×3) + re-rank** | **0.41012** ✅ | Bản tốt nhất |
+| Thử nghiệm                                | Kết quả        | Ghi chú                         |
+| ----------------------------------------- | -------------- | ------------------------------- |
+| Co-occurrence only (baseline)             | 0.381          | Không có GRU4Rec                |
+| GRU4Rec (100 layers, 20 epochs)           | 0.409          | Từ kaggle_notebook.py cũ        |
+| Score-mixing ensemble (v16+v42+v45)       | **0.296** ❌   | 3 lỗi nghiêm trọng trong fusion |
+| GRU4Rec (150, 30) + simple re-rank top-50 | 0.40837        |                                 |
+| + backward cooccur + recency + top-100    | 0.40924        |                                 |
+| GRU4Rec (200 layers, 50 epochs)           | 0.385          | Overfitting                     |
+| + Inject ngoài top-100                    | 0.39005 ❌     | Inject phá GRU4Rec              |
+| **Multi-seed (×3) + re-rank**             | **0.41012** ✅ | Bản tốt nhất                    |
 
 ### Tại sao score-mixing ensemble thất bại (0.296)?
 
@@ -202,11 +205,13 @@ Bug 3: v16, v42, v45 đều dùng cat_to_products + forward_cooccur
 ## 7. Kết luận và giới hạn
 
 **Ceiling thực tế với dataset này:**
+
 - GRU4Rec đã capture gần hết sequential patterns trong data
 - 99.8% sparsity giới hạn co-occurrence signals (chỉ 588 items có co-occurrence đủ mạnh)
 - 3 seed × GRU4Rec = ~0.001 gain — diminishing returns từ ensemble nhanh
 
 **Để cải thiện vượt 0.42 cần:**
+
 1. External product features (ảnh, text description) → content-based filtering
 2. User demographic signals
 3. Dữ liệu order/checkout để học purchase patterns
@@ -214,4 +219,4 @@ Bug 3: v16, v42, v45 đều dùng cat_to_products + forward_cooccur
 
 ---
 
-*Ngày: March 2026 | Dataset: Baby product rental marketplace | Metric: Recall@6*
+_Ngày: March 2026 | Dataset: Baby product rental marketplace | Metric: Recall@6_
