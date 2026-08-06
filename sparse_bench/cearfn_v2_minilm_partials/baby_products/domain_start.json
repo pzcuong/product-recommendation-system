@@ -1,0 +1,15 @@
+{
+  "domain": "Baby_Products",
+  "status": "started",
+  "n_train_sessions": 150777,
+  "n_valid_queries": 5000,
+  "n_test_queries": 150777,
+  "n_items": 36014,
+  "gated_config": {
+    "graph_weight": 0.35,
+    "prototype_transport": false,
+    "contrastive_weight": 0.15,
+    "inbatch_weight": 0.0
+  },
+  "semantic_matrix": "/Users/macbook/Desktop/product-recommendation-system/sparse_bench/semantic_teacher_artifacts/baby_products_minilm.npy"
+}

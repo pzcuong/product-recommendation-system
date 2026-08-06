@@ -1,0 +1,827 @@
+\documentclass[runningheads]{llncs}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage[T5,T1]{fontenc}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=1em
+\newcommand{\method}{CEARF-N}
+
+\begin{document}
+\title{Supplementary Material for \method{}: Validation-Gated Evidence
+Admission for Sparse Session Recommendation}
+\titlerunning{Supplementary Material for \method{}}
+\author{Pham Quoc Cuong\inst{1,2} \and
+Nguyen Ngoc Minh\inst{1,2} \and
+Le Quang Minh\inst{1,2} \and
+\textbf{Nguyen Hoai Nguyet An}\inst{1,2}}
+\authorrunning{P. Q. Cuong et al.}
+\institute{University of Information Technology, Ho Chi Minh City, Vietnam
+\and Vietnam National University Ho Chi Minh City, Vietnam\\
+\email{\{cuongpq.20,minhnn.20,minhlq.20,annhv.20\}@grad.uit.edu.vn}}
+\maketitle
+
+\begin{abstract}
+This document supplements the eight-page short paper. It specifies the
+complete scoring functions, candidate families, nested selection algorithm,
+per-domain neural configurations, per-seed router decisions, external-expert
+subsets, query-regime and shortcut diagnostics, teacher interactions, leakage
+controls, and reproduction artifacts. Its additional stratified results are
+descriptive audits of already locked predictions; the purpose is to make every
+admission, rejection, and stated boundary independently auditable.
+\end{abstract}
+The frozen source and artifact repository is
+\href{https://github.com/pzcuong/product-recommendation-system}
+{github.com/pzcuong/product-recommendation-system}.
+
+\section{Notation and Prediction Task}
+A query is a session prefix $q=(i_1,\ldots,i_L)$ with one held-out next item
+$y_q$. Training item frequency is $f_x$, the catalogue is $\mathcal I$, and
+$\pi_r(q)$ is the ranked list emitted by evidence source $r$. Evaluation ranks
+the full catalogue. Seen items are masked on the Amazon protocols and retained
+on Diginetica, whose protocol permits repeat consumption.
+
+The sole selection objective is
+\[
+U_V(c)=\frac12\mathrm{Recall@6}_V(c)
+      +\frac12\mathrm{Recall@20}_V(c).
+\]
+At most 5,000 validation queries are ordered deterministically by a BLAKE2b
+hash. For validation memory construction, the held-out target and its incoming
+transition are removed from the index. The final index and neural model are
+rebuilt on all training sessions only after configuration lock.
+
+\begin{table}[t]
+\caption{Full-catalogue datasets used by the main paper.}
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Dataset & Items & Train events & Train seq. & Test queries & Items $\leq5$\\
+\midrule
+Amazon Video Games & 25,613 & 625,062 & 94,762 & 94,762 & 27.91\%\\
+Amazon Baby Products & 36,014 & 939,529 & 150,777 & 150,777 & 27.89\%\\
+Diginetica & 43,098 & 906,140 & 186,670 & 60,858 & 19.28\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Exact CEARF Memory}
+\subsection{Directed transition evidence}
+For source item $i$ and candidate $x$, let $c(i,x)$ be the training count of
+$i\!\rightarrow\!x$ within a four-step window, weighted by inverse distance
+during index construction. For the eight most recent context items,
+\[
+T_q(x)=\sum_{a=0}^{\min(7,L-1)}
+\frac{\exp(-0.35a)\log(1+c(i_{L-a},x))}
+     {\sqrt{1+f_x}}.
+\]
+The denominator prevents globally frequent items from dominating local
+transitions. The 200 largest outgoing transition counts per source item are
+retained before query-time aggregation.
+
+\subsection{Neighbour-session evidence}
+Let $\mathrm{df}(i)$ be the number of indexed sessions containing $i$,
+$N_S$ the number of sessions, and
+$\mathrm{idf}(i)=\log(1+N_S/\max(1,\mathrm{df}(i)))$. A training
+session $s$ receives overlap
+\[
+o(s,q)=\sum_{a=0}^{\min(7,L-1)}
+\mathrm{idf}(i_{L-a})e^{-0.20a}\mathrm{I}[i_{L-a}\in s].
+\]
+The 120 largest-overlap sessions are retained. Overlap is divided by the
+square root of the session's distinct-item count. A candidate after the most
+recent context match receives direction weight $1$; an earlier candidate
+receives $0.25$. Distance from that match is discounted by inverse square
+root, and votes are summed across sessions.
+
+\subsection{Rank-space memory fusion}
+Transition, session, and popularity scores are independently converted to
+top-120 lists. For profile $\mathbf w=(w_T,w_S,w_P)$,
+\[
+\widetilde M_q(x)=
+\sum_{r\in\{T,S,P\}}
+\frac{w_r}{20+\mathrm{rank}_{\pi_r(q)}(x)}.
+\]
+If $v_q(x)\geq2$ active components retrieve $x$, the implementation applies
+the declared consensus multiplier
+$M_q(x)=\widetilde M_q(x)[1+0.12(v_q(x)-1)]$; otherwise
+$M_q(x)=\widetilde M_q(x)$. The multiplier ablation changes reported
+Recall@20 by .00000. It is a fixed a-priori scoring constant outside the
+admission family, retained for exact reproduction and not presented as a
+rejected optional stage.
+
+\begin{table}[t]
+\caption{Declared CEARF memory profiles. Each zero is a component-off state.
+P, T+P, and S+P are omitted because popularity was scoped a priori as
+fallback evidence. The family covers four of seven non-empty presence patterns;
+short and long sessions select independently.}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Profile & $w_T$ & $w_S$ & $w_P$\\
+\midrule
+Transition & 1.00 & 0.00 & 0.00\\
+Session & 0.00 & 1.00 & 0.00\\
+Balanced & 0.50 & 0.40 & 0.10\\
+Transition--session & 0.60 & 0.40 & 0.00\\
+Session--transition & 0.35 & 0.60 & 0.05\\
+Short-safe & 0.65 & 0.20 & 0.15\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Exact PASGR Residual}
+PASGR means \emph{Prototype-Aligned Semantic Graph Retrieval}. It is the
+optional ``N'' path of \method{}, not the expansion of CEARF. PASGR labels the
+declared candidate family; selected cells may reject prototype transport and
+do so in all three domains.
+
+\subsection{Item initialization}
+Teacher vectors are reduced or padded to 64 dimensions and normalized.
+Prototypes are fitted on the better-observed half of items. With prototype
+membership vector $p_i$, centre matrix $C$, and trust
+$\rho_i=\sqrt{f_i/(f_i+10)}$, optional transport gives
+\[
+a_i=\rho_i e_i+(1-\rho_i)p_iC.
+\]
+An undirected adjacency view is built from consecutive training items. If
+$g_i$ is the normalized mean of neighbour vectors, optional graph aggregation
+initializes the trainable item vector as
+$h_i=\mathrm{norm}(a_i+\lambda_g g_i)$.
+
+\subsection{Sequence encoder and objective}
+A one-layer GRU encodes the last 50 items. Its final state passes through layer
+normalization and a linear projection to obtain normalized query vector $z_q$.
+Candidate logits are a learned-temperature dot product with normalized item
+vectors. Each update contains the target, 32 prototype/graph hard negatives,
+and random fill negatives. The training loss is
+\[
+\mathcal L_N=\mathcal L_{\rm rank}
++\lambda_{\rm ib}\mathcal L_{\rm inbatch}
++\lambda_{\rm sem}[1-\cos(z_q,\bar e_q)],
+\]
+where $\bar e_q$ is the exponentially recency-weighted frozen-teacher context
+view. Repeated in-batch targets are treated as multiple positives.
+
+\begin{table}[t]
+\caption{The 16-cell PASGR family and selected cells. ``PT'' is prototype
+transport. Selection uses seed 42 validation only; the cell is then locked for
+three matched-seed evaluation.}
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Domain & $\lambda_g$ & PT & $\lambda_{\rm sem}$ &
+$\lambda_{\rm ib}$ & $U_V$\\
+\midrule
+Video Games & .35 & off & .15 & .10 & .1369\\
+Baby Products & 0 & off & .15 & 0 & .0488\\
+Diginetica & .35 & off & 0 & .10 & .4554\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Diagnostic cross-seed PASGR stability. Values are mean validation
+utility over seeds 42/123/456 for the locked seed-42 cell (Sel.), its runner-up
+(RU), and the best prototype-on cell (PT). The diagnostic does not reselect the
+canonical system.}
+\centering
+\begin{tabular}{lrrrl}
+\toprule
+Domain & Sel. & RU & PT & Mean winner (margin over Sel.)\\
+\midrule
+Video Games & .13640 & .13617 & .13347 & Sel.\\
+Baby Products & .04663 & .04740 & .04677 & RU (+.00077)\\
+Diginetica & .45603 & \multicolumn{2}{c}{.45620 (same RU/PT)} & RU/PT (+.00017)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The complete grid is the Cartesian product
+$\lambda_g\in\{0,.35\}$,
+PT$\in\{\mathrm{off},\mathrm{on}\}$,
+$\lambda_{\rm sem}\in\{0,.15\}$, and
+$\lambda_{\rm ib}\in\{0,.10\}$. Exact ties prefer fewer active mechanisms.
+
+\section{Adaptive Fusion and Routers}
+For memory rank $\pi_M$ and neural rank $\pi_N$,
+\[
+F_q(x)=
+\frac{1-\beta_q}{20+\mathrm{rank}_{\pi_M}(x)}
++\frac{\beta_q}{20+\mathrm{rank}_{\pi_N}(x)}.
+\]
+The 21-point grid contains $\beta=0$ and $\beta=1$. Three router families
+compete.
+
+\begin{enumerate}
+\item \textbf{Regime:} one $\beta$ for $L\leq2$ and one for $L>2$.
+\item \textbf{Bucketed:} 12 cells from length
+      (short/mid/long), last-item popularity (head/tail), and top-5
+      cross-memory agreement (low/high). Empty cells fall back to regime
+      $\beta$.
+\item \textbf{Continuous:} ridge regression from length, log length,
+      log last-item frequency, tail flag, length bucket, agreement, and
+      transition/session top-5 rank-occupancy mass. Its target is the smallest
+      grid $\beta$ placing $y_q$ in the fused top 20.
+\end{enumerate}
+
+The two occupancy-mass features depend only on the number of valid entries in
+each top-5 list. They are constant on 100\% of both Amazon test sets and take
+their modal value on 98.94\%/99.84\% of Diginetica
+transition/session lists. They must not be interpreted as transition
+certainty. Effective branching and top-one transition share below are
+post-hoc train-graph diagnostics, not router inputs.
+
+Router parameters are fitted on a deterministic 80\% of validation queries.
+The family is chosen on the disjoint 20\% using $U_V$, with ties preferring
+regime over bucketed over continuous. The chosen family is refitted on all
+validation queries before test inference.
+
+\begin{table}[t]
+\caption{Router family selected by validation for each neural seed.}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Domain & Seed 42 & Seed 123 & Seed 456\\
+\midrule
+Video Games & Bucketed & Regime & Regime\\
+Baby Products & Continuous & Bucketed & Bucketed\\
+Diginetica & Regime & Regime & Bucketed\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Using regime as the router null, the admission/retention diagnostics are:
+\begin{table}[H]
+\caption{Per-seed router admission margin $A$, test retention $R$, and
+reversal $Z$. Values use the common $U=.5R@6+.5R@20$; regime selections have
+$A=R=0$ by definition.}
+\centering
+\begin{tabular}{lrcrr@{\hspace{8pt}}c}
+\toprule
+Domain & Seed & Selected & $A$ & $R$ & $Z$\\
+\midrule
+\multirow{3}{*}{Video Games}
+ & 42 & Bucketed & .00200 & -.00070 & 1\\
+ & 123 & Regime & .00000 & .00000 & 0\\
+ & 456 & Regime & .00000 & .00000 & 0\\
+\midrule
+\multirow{3}{*}{Baby Products}
+ & 42 & Continuous & .00400 & -.00634 & 1\\
+ & 123 & Bucketed & .00050 & .00004 & 0\\
+ & 456 & Bucketed & .00150 & -.00153 & 1\\
+\midrule
+\multirow{3}{*}{Diginetica}
+ & 42 & Regime & .00000 & .00000 & 0\\
+ & 123 & Regime & .00000 & .00000 & 0\\
+ & 456 & Bucketed & .00200 & .00030 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+Three of nine decisions reverse on test (Video 1/3, Baby 2/3, Diginetica
+0/3). This is why adaptive routing is not presented as a universal accuracy
+claim.
+
+\section{End-to-End Locked Selection Algorithm}
+\begin{enumerate}
+\item Declare constants, $U_V$, candidate families, null states, seeds, and
+      tie-breaks before test evaluation.
+\item Remove validation targets and incoming transitions from the tuning
+      index; construct CEARF component lists.
+\item Select short/long CEARF profiles from the six-profile family.
+\item For each of 16 PASGR cells, train on tuning sessions, produce
+      full-catalogue validation ranks, and select its best $\beta$. Lock the
+      cell maximizing $U_V$.
+\item For each evaluation seed, train the locked PASGR cell on tuning data.
+      Split validation 80/20; fit the three router families on 80\% and select
+      the family on 20\%.
+\item Refit the selected router family on full validation. Rebuild CEARF and
+      retrain PASGR on all training sessions using the locked decisions.
+\item Score the test set once. Persist query order, rankings, configuration,
+      fingerprints, and paired outcomes.
+\item Separately form the hard expert family from \method{}, STAN, V-SKNN,
+      NARM, and all 15 non-empty subsets. Select with the same $U_V$; the four
+      singletons can reject ensembling, and no member, including \method{}, is
+      protected. The empty set is inadmissible because a ranking is required.
+\end{enumerate}
+
+\section{Why This Is Not Ordinary Validation}
+\begin{table}[t]
+\caption{Structural difference between a common tuned hybrid and the declared
+\method{} contract. This comparison concerns the search object, not the mere
+presence of a validation split.}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm}
+                >{\raggedright\arraybackslash}p{4.2cm}
+                >{\raggedright\arraybackslash}p{4.2cm}}
+\toprule
+Audit question & Common tuned hybrid & \method{}\\
+\midrule
+Can a proposed block vanish? & Often no; tune its strength conditional on
+inclusion & Explicit absent candidate at the corresponding stage\\
+Are pure endpoints legal? & Full hybrid is privileged & $\beta=0$ and
+$\beta=1$ compete with every mixture\\
+Can adaptivity vanish? & Router class fixed by design & Regime, bucketed, and
+continuous families compete\\
+What happens to rejection? & Often omitted or shown only as test ablation &
+Recorded as a method output\\
+Can the proposed method lose? & Baseline is outside the search & Hard family
+may reject \method{} itself\\
+What does a test reversal mean? & Often prompts redesign & Reported
+validation-to-test selection gap\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The contract is finite and scoped. It does not claim that all possible
+constants or architectures are searched. It requires only that every
+\emph{declared optional mechanism} has a comparable null state and that
+rejections remain visible.
+
+For an admitted stage $j$, we record
+$A_j=U_V(c_j^\star)-U_V(c_j^0)$ (admission margin),
+$R_j=U_T(c_j^\star)-U_T(c_j^0)$ (test retention), and
+$Z_j=\mathrm I[A_j>0\wedge R_j<0]$ (reversal). A rejected null has no
+post-selection superiority claim. These diagnostics turn the declared family
+into an auditable object rather than renaming an ordinary tuning grid.
+
+\section{External-Expert Decisions}
+Let C, S, V, and N denote \method{}, STAN, V-SKNN, and NARM. Reselection below
+uses exactly the core $U_V=.5R@6+.5R@20$, not the earlier exploratory
+$R@10/R@20$ objective. Candidate fusion is equal-weight RRF with $k=20$.
+Every per-seed JSON contains 15 candidates, including C, S, V, and N
+singletons.
+
+\begin{table}[H]
+\caption{Validation-selected hard-expert subsets by seed.}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Domain & Seed 42 & Seed 123 & Seed 456\\
+\midrule
+Video Games & C+S+N & C+N & C+S+N\\
+Baby Products & C+S+V & C+S & C+S+V\\
+Diginetica & C+V+N & C+S+N & C+S+N\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{External-gate diagnostics against the per-seed validation-selected
+singleton.
+$A$ and $R$ are mean utility margins; $\Delta_{20}$ has a query-clustered
+95\% interval over matched seeds.}
+\centering
+\begin{tabular}{l@{\hspace{1.2em}}r@{\hspace{1.2em}}r@{\hspace{1.2em}}r}
+\toprule
+Domain & Mean $A$ & Mean $R$ & $\Delta_{20}$ [95\% CI]\\
+\midrule
+Video Games & .00493 & .00569 & .00658 [.00558,.00757]\\
+Baby Products & .00363 & .00354 & .00518 [.00467,.00569]\\
+Diginetica & .00507 & .00638 & .00384 [.00212,.00556]\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This table is the direct defense against a protected-method interpretation.
+NARM is rejected on every Baby seed; V-SKNN is rejected on every Video seed;
+and Diginetica always retains NARM. All four singletons were legal, but none
+was selected. The paired intervals exclude zero and no external-gate admission
+reverses on test; the stable object is the admission procedure, not a
+universal fixed subset.
+
+\subsection{Aggregate validation-to-test transfer}
+The following audit is recomputed directly from the locked router and external
+gate records under the common utility; it is descriptive because seeds within
+a domain are not independent datasets.
+\begin{table}[H]
+\caption{Transfer of positive validation admissions. $\bar A$ is the mean
+validation admission margin and $\bar R$ the corresponding test margin.}
+\centering\small
+\begin{tabular}{lcccrr}
+\toprule
+Gate & Admit/eligible & Keep & Reverse & $\bar A$ & $\bar R$\\
+\midrule
+Adaptive router & 5/9 & 2 & 3 & .00200 & -.00164\\
+External experts & 9/9 & 9 & 0 & .00454 & .00520\\
+\bottomrule
+\end{tabular}
+\end{table}
+Across the two declared gate types, 11/14 positive admissions retain a
+non-negative test margin. The contrast is the substantive result: the
+external gate transfers consistently, whereas small router-selection margins
+are fragile. Test outcomes are never used to revise a selected family.
+Across the three seeds, modal admit/reject agreement is 2/3, 3/3, and 2/3 for
+the Video, Baby, and Diginetica routers, compared with 3/3 for every external
+gate. Exact selected router-family and expert-subset agreement is 2/3 in every
+domain. Thus admission stability and configuration stability are distinct.
+
+\paragraph{Scope and gate comparability.}
+Transfer is audited only where locked predictions exist for both the selected
+state and its null: adaptive router versus regime, and expert subset versus
+the validation-best singleton. We do not infer test retention for individual
+memory profiles, PASGR switches, or fusion weights. Router families are fitted
+on 4,000 validation queries and selected on 1,000; the 15 expert subsets use
+5,000 validation queries. Their utility-margin resolutions are therefore
+.0005 and .0001. The gates also differ in family size and null definition, so
+their reversal rates diagnose the realized procedures rather than identify a
+causal advantage of one gate type.
+
+\paragraph{Selection and membership stability.}
+The persistent expert cores across seeds are C+N, C+S, and C+N on Video,
+Baby, and Diginetica; intersection-over-union ratios are .667, .667, and
+.500. Across all nine decisions, C/S/V/N are retained 9/7/3/6 times. Despite
+changing membership, selected-gate Recall@20 is
+.153423$\pm$.000673, .058815$\pm$.000104, and
+.537897$\pm$.002984. Configuration membership can therefore vary while the
+reported system metric remains stable.
+
+\paragraph{Selector lineage.}
+The slim canonical artifacts retain target ranks rather than complete top-20
+lists, so the external audit reconstructs CEARF-N lists by refitting the same
+pipeline, configuration, and seed. On Diginetica seed 42, this realization
+has Recall@20 .49757 rather than the canonical .51913. Validation selection
+and test evaluation consistently use the refitted realization, so no test
+reselection occurs, but it is not a bit-identical reuse of the canonical
+prediction and is excluded from canonical output-membership claims.
+
+\section{Evidence-Necessity and Shortcut Diagnostics}
+This audit uses only target-rank vectors from the already locked test
+predictions. It does not tune a threshold, router, or model on test. A rescue
+is a query for which memory misses the target at 20 and selected fusion hits;
+damage is the converse. By construction,
+\[
+\Delta\mathrm{Recall@20}_{F-M}
+  = P(\mathrm{rescue})-P(\mathrm{damage}).
+\]
+
+\begin{table}[H]
+\caption{Constituent endpoints and selected fusion, three-seed means.
+Each cell reports Recall@6/10/20.}
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+Dataset & Memory only & Neural only & Selected fusion\\
+\midrule
+Video & .06932/.08821/.11901 & .06158/.08471/.12571 &
+\textbf{.07803/.10368/.14685}\\
+Baby & .02288/.02900/.03879 & .02337/.03214/.04873 &
+\textbf{.02767/.03668/.05346}\\
+Diginetica & .29174/.37334/.49565 & .26398/.33539/.44852 &
+\textbf{.30738/.39210/.51681}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Query-level evidence decomposition, three-seed means. R and D are
+rescue and damage rates over all test queries.}
+\centering\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Domain & Memory & Neural & Fusion & R & D & R$-$D\\
+\midrule
+Video Games & .11901 & .12571 & .14685 & .04695 & .01911 & .02783\\
+Baby Products & .03879 & .04873 & .05346 & .02791 & .01324 & .01467\\
+Diginetica & .49565 & .44852 & .51681 & .04455 & .02339 & .02116\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Disjoint decomposition of fusion rescues, as three-seed mean query
+rates. New means absent from the union of transition, session, and popularity
+top-120 lists; Unselected means present only in a memory component excluded by
+the locked profile; Promote means selected-memory rank 21--120.}
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+Domain & New & Unselected & Promote & Damage & Net\\
+\midrule
+Video Games & .01553 & .00327 & .02814 & .01911 & .02783\\
+Baby Products & .01283 & .00504 & .01004 & .01324 & .01467\\
+Diginetica & .00079 & .00004 & .04372 & .02339 & .02116\\
+\bottomrule
+\end{tabular}
+\end{table}
+New+Unselected+Promote$-$Damage equals Fusion$-$Memory. Of all rescues,
+33.1\%, 46.0\%, and 1.8\% are New on Video, Baby, and Diginetica. The first
+two domains therefore contain genuine candidate introduction, whereas the
+Diginetica residual is overwhelmingly a reranker of retrieved candidates.
+
+\clearpage
+\begin{table}[H]
+\caption{Net rescue rate by target-popularity stratum. Popularity uses a
+training-frequency item-rank 20/60/20 head/torso/tail split.}
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+Domain & Head & Torso & Tail\\
+\midrule
+Video Games & .03310 & .02339 & .00569\\
+Baby Products & .02022 & .00225 & -.00035\\
+Diginetica & .01228 & .03070 & .03713\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Net fusion-minus-memory Recall@20 under router-observable test
+covariates. Popularity refers to the observed last context item, not the
+unknown target. A dash denotes an empty stratum.}
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+Signal & Level & Video & Baby & Diginetica\\
+\midrule
+Length & $L\leq2$ & -- & -- & .01436\\
+       & $3\leq L\leq7$ & .02725 & .01504 & .02713\\
+       & $L>7$ & .02931 & .01365 & .02556\\
+Last-item popularity & Head & .02627 & .01529 & .01485\\
+                     & Tail & .03288 & .01220 & .04068\\
+Memory agreement & Low & .02874 & .01560 & .02565\\
+                 & High & .02710 & .01374 & .02002\\
+\bottomrule
+\end{tabular}
+\end{table}
+Length-cell counts are 0 / 68,091 / 26,671 (Video),
+0 / 110,156 / 40,621 (Baby), and 27,409 / 25,091 / 8,358 (Diginetica).
+Target-popularity and last-item-popularity results answer different questions:
+only the latter is observable by the router at inference.
+
+\begin{table}[H]
+\caption{Net fusion-minus-memory Recall@20 by validation-frozen transition
+diagnostics. Branching is effective outgoing branch count; certainty is the
+largest outgoing probability. Unsupported final items remain separate.}
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+Diagnostic & Stratum & Video & Baby & Diginetica\\
+\midrule
+Branching & Unsupported & .02705 & -.00120 & .07949\\
+          & Low & .03265 & .01416 & .03514\\
+          & Mid & .02489 & .01467 & .01735\\
+          & High & .02552 & .01539 & .01168\\
+\midrule
+Certainty & Uncertain & .02667 & .01512 & .01260\\
+          & Mid & .02584 & .01505 & .02067\\
+          & Clear & .03079 & .01404 & .03047\\
+\bottomrule
+\end{tabular}
+\end{table}
+Effective-branch terciles are frozen on validation and applied unchanged to
+test; zero-outgoing contexts are never folded into ``low''. The patterns do
+not support a universal claim that neural evidence helps more as branching
+increases. Low cross-memory agreement is the more directionally consistent
+locator.
+
+\clearpage
+\begin{table}[H]
+\caption{Raw memory-component target coverage and locked transition-removal
+audit. Union is coverage by any component, not an achievable ranking. No-T
+changes only the locked memory path.}
+\centering\scriptsize
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Domain & T & S & P & Union & Memory & Fusion & No-T & $\Delta$\\
+\midrule
+Video & .04223 & .11901 & .03787 & .14621 & .11901 & .14685 & .11901 & .00000\\
+Baby & .00735 & .03879 & .02908 & .06147 & .03879 & .05346 & .03879 & .00000\\
+Diginetica & .40092 & .49427 & .00930 & .55271 & .49565 & .51681 & .49354 & -.00210\\
+\bottomrule
+\end{tabular}
+\end{table}
+All Amazon test contexts use the locked long profile $(0,1,0)$, so transition
+weight is inactive throughout. Diginetica activates it on 54.96\% of queries;
+removal changes memory by -.00383 within that subset. This does not remove
+PASGR graph evidence, refit PASGR, or reselect the router, and hence is a
+memory-path diagnostic rather than a causal full-system ablation.
+
+The Amazon residual is concentrated on frequent targets, whereas Diginetica
+shows the opposite gradient. Consequently, a generic ``neural helps the
+long tail'' interpretation is falsified by Baby Products. Context-length
+net gains remain positive in every domain stratum. Splitting memory evidence
+by top-5 agreement gives low/high net gains of .02874/.02710 on Video,
+.01560/.01374 on Baby, and .02565/.02002 on Diginetica. Neural admission is
+therefore somewhat more valuable when the three memory sources fail to agree,
+but the difference is modest.
+
+The outcome regions further bound the claim. Memory and neural both miss
+82.18\%, 92.80\%, and 42.83\% of Video, Baby, and Diginetica queries. Within
+the neural-only region, selected fusion retains 73.20\%, 80.01\%, and 52.21\%
+of neural hits. These observations establish complementary top-20 evidence,
+not causal immunity to benchmark shortcuts: no test intervention removes
+local transitions or similar sessions.
+
+\section{Statistics and Metadata Fairness}
+Recall@20 comparisons use paired binary outcomes in common query order.
+Confidence intervals use 20,000 query-clustered bootstrap repetitions.
+McNemar's exact test uses the two discordant counts. Seed means and standard
+deviations use the independent seeds 42, 123, and 456. Diginetica contributes
+one next-item query per retained prefix. Original source-session identifiers
+are unavailable after preprocessing, so intervals resample prefixes and may
+underestimate dependence among prefixes from the same source session.
+
+The audit supplies the same ID-only, TF--IDF/SVD, or MiniLM information
+condition to both \method{} and NARM within each comparison, while preserving
+each system's validation-selected checkpoint/configuration. Teachers
+initialize item representations offline; no test label or test interaction is
+used to build them. MiniLM improves \method{} but does not overturn
+matched-teacher NARM, which prevents semantic quality from being credited to
+fusion.
+
+\begin{table}[H]
+\caption{Teacher audit: Recall@20 mean (standard deviation), three seeds.
+``None'' is ID-only.}
+\centering\small
+\begin{tabular}{llrrr}
+\toprule
+Dataset & Model & None & TF--IDF/SVD & MiniLM\\
+\midrule
+\multirow{2}{*}{Video}
+ & \method{} & .13208 (.00056) & .14685 (.00038) & .14794 (.00114)\\
+ & NARM & .13705 (.00081) & .15387 (.00051) & .15392 (.00025)\\
+\midrule
+\multirow{2}{*}{Baby}
+ & \method{} & .05055 (.00065) & .05346 (.00397) & .05761 (.00058)\\
+ & NARM & .02990 (.00018) & .06628 (.00014) & .06493 (.00005)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Architecture gap Recall@20(\method{})$-$Recall@20(NARM).
+Positive values favour \method{}.}
+\centering\small
+\begin{tabular}{llrrrr}
+\toprule
+Domain & Teacher & Overall & Head & Torso & Tail\\
+\midrule
+Video & None & -.00497 & -.01146 & +.00666 & +.00532\\
+      & TF--IDF & -.00702 & -.01653 & +.01072 & +.00608\\
+      & MiniLM & -.00598 & -.01027 & +.00089 & +.00308\\
+\midrule
+Baby & None & +.02065 & +.02667 & +.00795 & +.00216\\
+     & TF--IDF & -.01282 & -.01901 & +.00219 & +.00055\\
+     & MiniLM & -.00732 & -.01171 & +.00355 & +.00150\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Descriptive teacher interaction.}
+For teacher $t$, let $G_t=R@20(\mathrm C,t)-R@20(\mathrm N,t)$ and
+$I_t=[R@20(\mathrm C,t)-R@20(\mathrm C,0)]
+-[R@20(\mathrm N,t)-R@20(\mathrm N,0)]$. For TF--IDF/MiniLM,
+$I_t$ is -.00206/-.00101 on Video and -.03346/-.02797 on Baby.
+These are system-level differences, not a causal factorial decomposition:
+the no-metadata \method{} condition uses the default PASGR cell and regime
+router, whereas semantic conditions use teacher-specific
+validation-selected PASGR cells, routers, and checkpoints. Aggregate
+matched-teacher NARM wins are head-driven; positive mean torso/tail gaps
+should likewise not be read as universal seed-level superiority.
+
+\paragraph{Legacy alignment record.}
+The TF--IDF NARM rank writer stored a metric scalar in its
+\path{test_fingerprint} field. Its generation functions nevertheless use
+sorted test identifiers for both prediction and targets, vector lengths
+match, and aggregate metrics reproduce the recorded results. The audit script
+accepts only this known legacy format and lists every exception explicitly in
+\path{teacher_interaction_audit.json}.
+
+\section{Reproducibility Manifest}
+\begin{table}[t]
+\caption{Primary implementation and evidence artifacts relative to
+\texttt{sparse\_bench/}.}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.4cm}
+                >{\raggedright\arraybackslash}p{6.8cm}}
+\toprule
+Artifact & Purpose\\
+\midrule
+\path{cearf.py} & CEARF index, component scores, profiles, validation split\\
+\path{pasgr.py} & PASGR initialization, losses, training, full-catalogue inference\\
+\path{perquery_router.py} & Bucketed and continuous routers\\
+\path{run_validation_gated_pasgr.py} & 16-cell PASGR selection\\
+\path{run_cearfn_v2.py} & Canonical nested \method{} runner\\
+\path{pasgr_config_per_domain.json} & Locked PASGR choices\\
+\path{cearfn_v2_nested_results.json} & Per-seed router and test records\\
+\path{narm_expert_matched_r6r20.json} & Consistent-objective expert audit\\
+\path{hard_gate_singleton_audit.json} & Paired selected-gate versus
+validation-best-singleton audit\\
+\path{validation_test_transfer_audit.json} & Recomputed admission-retention
+summary\\
+\path{audit_validation_test_transfer.py} & Transfer-audit reproduction script\\
+\path{evidence_necessity_audit.json} & Locked rescue/damage and regime audit\\
+\path{audit_evidence_necessity.py} & Evidence-necessity reproduction script\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Reproducibility manifest (continued).}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.4cm}
+                >{\raggedright\arraybackslash}p{6.8cm}}
+\toprule
+Artifact & Purpose\\
+\midrule
+\path{shortcut_diagnostics_audit.json} & Memory-component and transition-removal audit\\
+\path{audit_shortcut_diagnostics.py} & Shortcut-diagnostic reproduction script\\
+\path{teacher_interaction_audit.json} & Architecture--teacher and popularity audit\\
+\path{audit_teacher_interaction.py} & Teacher-interaction reproduction script\\
+\path{runtime_audit.json} & Canonical timer scope and per-domain wall clock\\
+\path{benchmark_cearfn_inference.py} & Warm full-catalogue inference benchmark\\
+\path{cearfn_inference_benchmark.json} & Component time, throughput, and
+amortized time per query\\
+\path{cearfn_inference_benchmark_pre_reuse.json} & Diagnostic run before exact
+router-feature rank reuse\\
+\path{pasgr_stability_audit.json} & Three-candidate cross-seed PASGR stability\\
+\path{pasgr_stability_artifacts/*.json} & Per-seed candidate utilities and ranks\\
+\path{CANONICAL_EXPERIMENT_LINEAGE.md} & Submission source-of-truth boundary\\
+\path{external_baseline_paired_nested*.json} & Paired baseline outcomes\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The main runs used an Apple M2 Pro with 32\,GB memory. CEARF inference is
+single-process CPU code; PASGR uses Metal. Query fingerprints and rank arrays
+allow all paired tests to be recomputed without retraining.
+
+\paragraph{Offline construction provenance.}
+The canonical training timer is not an inference claim. Per-seed timers wrap
+PASGR training on the tuning and full sessions, neural prediction on
+validation and test, router fitting/selection, fusion, metrics, and compressed
+rank-artifact writing. Domain timers additionally include data loading, CEARF
+index construction, profile tuning, memory ranks, and query features.
+\begin{center}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Domain & Setup (min) & Mean/seed (min) & 3 seeds (min)\\
+\midrule
+Video Games & 13.7 & 10.9 & 46.3\\
+Baby Products & 19.1 & 15.8 & 66.3\\
+Diginetica & 6.0 & 12.1 & 42.3\\
+\bottomrule
+\end{tabular}
+\end{center}
+Because the canonical runner did not separately instrument post-training
+serving, these numbers describe experiment construction rather than deployment.
+
+\paragraph{Warm inference benchmark.}
+We separately instrument the deployable path with trained PASGR checkpoints
+and built CEARF indices. Timed work includes CEARF retrieval to top-120,
+PASGR full-catalogue prediction to top-120 (batch 256), router features,
+selected-router beta assignment, and RRF fusion. It excludes loading, teacher
+construction, training, index construction, profile/router fitting, warm-up,
+metrics, and artifact writing. Before timing, each path processes the first
+512 test queries once and the Metal queue is synchronized. We report one
+complete timed pass per domain (60,858--150,777 queries), rather than a mean
+or median over repeated micro-benchmarks; hence no run-to-run dispersion is
+claimed. ms/query is total time divided by query count and represents
+amortized batch throughput, not isolated request latency.
+\begin{center}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Domain ($Q$) & Items & Memory & Neural & Router+fuse & Total s & ms/$q$ & $q$/s\\
+\midrule
+Video (94,762) & 25,613 & 280.40 & 71.21 & 10.68 & 362.29 &
+3.823 & 261.6\\
+Baby (150,777) & 36,014 & 486.62 & 121.16 & 17.49 & 625.28 &
+4.147 & 241.1\\
+Diginetica (60,858) & 43,098 & 118.10 & 29.67 & 6.63 & 154.41 &
+2.537 & 394.1\\
+\bottomrule
+\end{tabular}
+\end{center}
+Memory retrieval accounts for 76.5--77.8\% and PASGR for 19.2--19.7\% of
+total time; beta assignment is below 0.05\%. The first diagnostic Video run
+recomputed CEARF rankings while extracting router features and required
+620.93\,s (6.553\,ms/query). Reusing the already emitted transition, session,
+and popularity lists is rank-identical under
+\path{test_cearfn_inference_reuse.py} and reduces this to 362.29\,s
+(3.823\,ms/query); the paper reports the non-duplicating implementation.
+
+\paragraph{Canonical lineage.}
+All paper tables use \path{cearfn_v2_nested_results.json}, the matched NARM
+checkpoints, and the $R@6/R@20$ reselection in
+\path{narm_expert_matched_r6r20.json}. The earlier Diginetica
+.49028/.48265 continuous-router exploration is excluded; the locked official
+split yields \method{} .51681 and NARM .53406. Per-seed candidate JSON files
+and selector artifacts preserve the hard-audit query order.
+
+\section{Falsification Checklist}
+The method's claims would be weakened by any of the following observable
+outcomes: (i) selected fusion failing to exceed both direct endpoints;
+(ii) the hard expert gate always protecting \method{}; (iii) matched metadata
+eliminating the apparent fusion gain; (iv) router families changing test
+performance without held-out selection gain; or (v) configuration decisions
+depending on test labels. The main paper reports both supporting and adverse
+cases, including the Diginetica loss to ID-only NARM and the repeat-memory
+validation-to-test reversal.
+
+\end{document}

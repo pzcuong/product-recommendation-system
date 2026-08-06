@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430">
+  <defs>
+    <style>
+      .box{fill:#f7f9fc;stroke:#253858;stroke-width:2;rx:10}
+      .memory{fill:#e8f1fb;stroke:#1f5b99;stroke-width:2;rx:10}
+      .neural{fill:#f6ecfb;stroke:#74429a;stroke-width:2;rx:10}
+      .valid{fill:#fff4d6;stroke:#a66a00;stroke-width:2;rx:10}
+      .out{fill:#e8f6ec;stroke:#26733c;stroke-width:2;rx:10}
+      .t{font:600 17px Arial,sans-serif;fill:#172b4d;text-anchor:middle}
+      .s{font:14px Arial,sans-serif;fill:#344563;text-anchor:middle}
+      .a{stroke:#344563;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .gate{stroke:#a66a00;stroke-width:2;fill:none;stroke-dasharray:7 5;marker-end:url(#arrowGold)}
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#344563"/></marker>
+    <marker id="arrowGold" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#a66a00"/></marker>
+  </defs>
+  <rect class="box" x="25" y="162" width="130" height="76"/>
+  <text class="t" x="90" y="192">Session query</text><text class="s" x="90" y="216">last ≤ 8 items</text>
+  <rect class="memory" x="220" y="28" width="180" height="66"/><text class="t" x="310" y="56">Transition memory</text><text class="s" x="310" y="78">directed, recency-weighted</text>
+  <rect class="memory" x="220" y="112" width="180" height="66"/><text class="t" x="310" y="140">Session memory</text><text class="s" x="310" y="162">IDF neighbour retrieval</text>
+  <rect class="memory" x="220" y="196" width="180" height="66"/><text class="t" x="310" y="224">Popularity</text><text class="s" x="310" y="246">conservative fallback</text>
+  <rect class="neural" x="220" y="280" width="180" height="66"/><text class="t" x="310" y="308">PASGR residual</text><text class="s" x="310" y="330">validation-gated switches</text>
+  <rect class="box" x="475" y="100" width="178" height="84"/><text class="t" x="564" y="130">Memory RRF</text><text class="s" x="564" y="153">profile by context regime</text><text class="s" x="564" y="172">rank list M</text>
+  <rect class="box" x="475" y="247" width="178" height="84"/><text class="t" x="564" y="277">Memory–neural RRF</text><text class="s" x="564" y="300">query-routed β</text><text class="s" x="564" y="319">rank lists M + N</text>
+  <rect class="out" x="728" y="162" width="145" height="76"/><text class="t" x="800" y="192">Top-20 ranking</text><text class="s" x="800" y="216">full catalogue</text>
+  <rect class="valid" x="475" y="365" width="250" height="50"/><text class="t" x="600" y="387">Validation utility</text><text class="s" x="600" y="406">profile · switches · β · router</text>
+  <path class="a" d="M155 180 C185 130 188 61 220 61"/><path class="a" d="M155 190 C185 170 188 145 220 145"/><path class="a" d="M155 205 C185 215 188 229 220 229"/><path class="a" d="M155 220 C185 265 188 313 220 313"/>
+  <path class="a" d="M400 61 C445 72 445 120 475 130"/><path class="a" d="M400 145 L475 145"/><path class="a" d="M400 229 C445 220 445 166 475 157"/>
+  <path class="a" d="M564 184 L564 247"/><path class="a" d="M400 313 L475 302"/><path class="a" d="M653 289 C695 280 695 215 728 205"/>
+  <path class="gate" d="M600 365 C600 346 600 345 600 331"/><path class="gate" d="M545 365 C450 355 430 325 400 320"/>
+</svg>

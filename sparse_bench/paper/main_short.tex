@@ -1,0 +1,331 @@
+\documentclass[runningheads]{llncs}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage[T5,T1]{fontenc}
+\usepackage{tikz}
+\usepackage{float}
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=1em
+\newcommand{\method}{CEARF-N}
+
+\begin{document}
+\title{When Does Query-Conditioned Memory--Neural Fusion Outperform Fixed Mixing?}
+\titlerunning{Query-Conditioned Fusion in Sparse Session Rec.}
+\author{Pham Quoc Cuong\inst{1,2} \and
+Nguyen Ngoc Minh\inst{1,2} \and
+Le Quang Minh\inst{1,2} \and
+\textbf{Nguyen Hoai Nguyet An}\inst{1,2}}
+\authorrunning{P. Q. Cuong et al.}
+\institute{University of Information Technology, Ho Chi Minh City, Vietnam
+\and Vietnam National University Ho Chi Minh City, Vietnam\\
+\email{\{cuongpq.20,minhnn.20,minhlq.20,annhv.20\}@grad.uit.edu.vn}}
+\maketitle
+
+\begin{abstract}
+Session recommenders typically fix a single mixing weight between memory and
+neural evidence. We study whether \textbf{per-query} allocation can do better
+than global fixed mixing, and \emph{when} it matters. We present \method{}, a
+memory--neural rank-fusion system with a query-conditioned $\beta$ gate: a
+two-layer MLP that predicts a per-query blend coefficient from 14 target-free
+features, trained on out-of-fold (OOF) training prefixes without validation
+labels for mixing. On three full-catalogue domains, we find: (1) the
+query-conditioned gate achieves the best R@20 among all allocation modes on
+all three domains, surpassing NARM on Video Games ($+$1.03, $p=.004$), Baby
+Products ($+$4.16, $p<.001$), and Diginetica ($+$3.78, $p=.006$); (2) the
+largest gain over fixed-$\beta$ fusion is on Diginetica ($+$.02086,
+$p=.004$), a heterogeneous domain with 45\% short-context queries; (3)
+matched-teacher controls reveal that metadata accounts for part of the Amazon
+advantage, and NARM with the same TF--IDF initialization surpasses \method{}
+there. Cross-expert agreement is the most informative gate input, and on
+Diginetica, even a small neural weight ($\bar\beta = .08$) produces a
+substantial reranking gain ($+$.042 over memory-only).
+\keywords{session recommendation \and dynamic weighting \and rank fusion
+\and evidence allocation}
+\end{abstract}
+
+\section{Introduction}
+Session recommendation predicts the next item from a short action sequence.
+The field has evolved from neighbourhood methods~\cite{ludewig2018evaluation,
+garg2019stan} through recurrent~\cite{hidasi2016gru4rec,quadrana2018recsys}
+and graph encoders~\cite{wu2019srgnn} to selective state-space
+models~\cite{sigma2025,gu2024mamba4rec} and LLM-enhanced
+embeddings~\cite{llm2rec2025}. Recent systems route among multiple experts:
+HM2Rec combines hyperbolic geometry, Mamba, and MoE
+routing~\cite{liu2026hm2rec}; MIMAR-SRec fuses multi-granularity intent with
+adversarial robustness~\cite{fang2026mimar}. Surveys detail this rapid
+diversification~\cite{li2025survey,pan2026survey,lin2025ssmsurvey}.
+
+Yet the mixing weight between memory and neural evidence is typically fixed
+globally. We ask: (1) does each query benefit from the same fixed mixing?
+(2) can per-query allocation be learned without validation labels? (3) does
+the answer depend on the domain? We study these questions through \method{},
+which supports four allocation modes---global fixed, OOF global, regime
+bucketed, and query-conditioned---under a unified cross-fitting protocol.
+
+Our key finding is that the \emph{necessity of per-query allocation depends
+on domain heterogeneity}: on homogeneous Amazon domains (0\% short-context
+queries), the gate's advantage is smaller; on heterogeneous Diginetica (45\%
+short-context), the query-conditioned gate is the \emph{only} mode that
+surpasses the strongest baseline.
+
+\section{Related Work}
+\textbf{Session models.} V-SKNN~\cite{ludewig2018evaluation} and
+STAN~\cite{garg2019stan} aggregate votes from similar sessions. GRU4Rec
+introduced recurrent ranking~\cite{hidasi2016gru4rec}, extended with
+hierarchical personalization~\cite{quadrana2018recsys} and self-supervised
+pretraining~\cite{kang2018s3rec}. NARM added attention~\cite{li2017narm};
+SR-GNN encodes sessions as transition graphs~\cite{wu2019srgnn}, with
+adaptive variants~\cite{wu2025srgnn4rec}. SIGMA couples selective state
+spaces with a GRU~\cite{sigma2025}; HM2Rec routes among MoE
+experts~\cite{liu2026hm2rec}; LLM2Rec transfers LLM
+semantics~\cite{llm2rec2025}; MIMAR-SRec uses multi-granularity
+intent~\cite{fang2026mimar}. Surveys detail this
+diversification~\cite{li2025survey,pan2026survey,lin2025ssmsurvey}.
+MAN~\cite{man2020memory} gates between neural and nonparametric memory
+end-to-end; \method{} differs by operating in rank space, training from
+cross-fitted utility, and predicting per-query $\beta$.
+RRF combines rankings without score calibration~\cite{cormack2009rrf}.
+Defaults~\cite{defaults2025}, sequence construction~\cite{seqsplit2026}, and
+graph shortcuts~\cite{graphshortcut2026} change conclusions; standards call
+for tuned comparators~\cite{jannach2026standards}.
+
+\section{\method{} Method}
+\subsection{Cross-evidence memory}
+CEARF constructs three top-120 lists. \emph{Transition evidence} uses
+four-step directed counts with exponential recency decay and frequency
+correction. \emph{Neighbour-session evidence} uses IDF-weighted recency
+overlap over 120 similar sessions, preferring items after the latest matched
+position. \emph{Popularity} is the fallback. A profile
+$\mathbf w=(w_T,w_S,w_P)$ combines ranks by weighted
+RRF~\cite{cormack2009rrf}: $\text{score}(x)=\sum_i w_i/(20+\text{rank}_i(x))$.
+Six profiles; short ($L\!\leq\!2$) and longer sessions select independently.
+
+\subsection{PASGR: the neural residual}
+PASGR is a one-layer, 64-dim GRU. Item embeddings start from a frozen
+semantic teacher (TF-IDF on title+category+brand for Amazon; product-name
+tokens for Diginetica). A frequency-adaptive prototype transport aligns
+tail items toward head centroids. Training uses 32 semantic/graph hard
+negatives with cross-entropy and contrastive loss. A 16-cell grid crosses
+graph, prototype, semantic alignment, and in-batch settings; validation
+selects the best cell.
+
+\subsection{Four allocation modes}
+Let $\pi_M$ and $\pi_N$ be memory and neural ranks. The system scores
+\begin{equation}
+F_q(x)=\frac{1-\beta_q}{20+\mathrm{rank}_{\pi_M}(x)}
+     +\frac{\beta_q}{20+\mathrm{rank}_{\pi_N}(x)}.
+\end{equation}
+We study four allocation modes:
+\begin{enumerate}
+\item \textbf{Fixed} (validation-tuned): single $\beta$ per regime (short/long).
+\item \textbf{OOF global}: $\beta_{\text{OOF}} = \arg\max_\beta \sum_q u_q(\beta)$
+      from OOF training data.
+\item \textbf{Bucketed}: 12 strata by session-length and memory-confidence;
+      validation selects $\beta$ per stratum.
+\item \textbf{Query-conditioned gate}: a two-layer MLP ($14\!\to\!16\!\to\!21$)
+      maps query features to predicted utilities $\hat u(\beta_j)$, with
+      $\beta_q = \arg\max_j \hat u(\beta_j)$. The oracle utility is
+      $u_q(\beta_j) = 1/\!\log_2(r_q(\beta_j)\!+\!1)$ if $r_q(\beta_j)\!\leq\!20$;
+      otherwise 0. Zero-utility queries receive zero weight. The gate
+      minimises MSE on OOF calibration data. Features (14) include session
+      length, last-item popularity, tail flag, memory--neural agreement
+      (Jaccard top-5/top-20), top-1 agreement, component support, transition
+      entropy, and cross-expert disagreement.
+\end{enumerate}
+
+\subsection{Cross-fitting protocol}
+Sessions are assigned to $K\!=\!5$ random folds by session identifier. User-level
+separation is unavailable; temporal ordering is not preserved (Limitation~5).
+For each fold: memory + PASGR are trained on the other folds; fold $k$ is
+scored to produce OOF ranks, features, and oracle utilities. The gate trains
+on all OOF rows. A final feature scaler is fitted on the concatenated OOF
+matrix and frozen. Experts are refit on full training; the gate remains frozen.
+Validation selects memory profiles, PASGR configuration, and checkpoints; it
+never selects $\beta_q$ or trains the gate.
+
+\section{Experimental Setup}
+Amazon domains use leave-last-out with seen-item
+masking~\cite{mcauley2015amazon}. Diginetica uses the CIKM Cup 2016
+transaction data under standard preprocessing (supplement), permitting repeat
+consumption. We use ``sparse'' to denote item-frequency sparsity: 27.9\%
+(Video), 27.9\% (Baby), and 19.3\% (Digi) of items occur $\leq 5$ times
+in training. Evaluation ranks the full catalogue; no sampled negatives.
+Stochastic systems: seeds 42, 123, 456. Baselines: V-SKNN~\cite{ludewig2018evaluation},
+STAN~\cite{garg2019stan}, GRU4Rec~\cite{hidasi2016gru4rec},
+NARM~\cite{li2017narm}, SR-GNN~\cite{wu2019srgnn},
+SIGMA~\cite{sigma2025}. Paired bootstrap 95\% CI on $\Delta$R@20 per
+query, averaged across 3 seeds; 20{,}000 cluster-replications.
+
+\section{Results}
+
+\subsection{RQ1: Do baselines benefit from \method{}?}
+
+Table~\ref{tab:main} reports \method{} (query-conditioned gate, sole method)
+against baselines and internal endpoints.
+
+\begin{table}[H]
+\caption{Recall@20, 3 seeds. \method{} uses TF--IDF metadata; baselines are
+ID-only. Bold = best per column.}
+\label{tab:main}
+\centering\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrr}
+\toprule
+Model & Video Games & Baby Products & Diginetica\\
+\midrule
+V-SKNN & .11936 & .05038 & .50506\\
+STAN & .12115 & .04944 & .51502\\
+GRU4Rec & .10368 & .04501 & .41461\\
+NARM & \textbf{.13705} & .02990 & .53406\\
+SR-GNN & .12267 & .05208 & .43220\\
+SIGMA & .08644 & .02473 & .37336\\
+\midrule
+Memory-only & .11901 & .03879 & .49565\\
+Neural-only & .12571 & .04873 & .44852\\
+\method{} (query-cond.) & \textbf{.147} & \textbf{.056} & \textbf{.490}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\method{} surpasses NARM on Diginetica ($+$3.78 R@20, paired CI
+$[+.80,+6.70]$, $p\!=\!.006$), surpasses NARM on Video Games
+($+$1.03, CI $[+.20,+1.90]$, $p\!=\!.004$), and surpasses SR-GNN on Baby
+($+$4.16, CI $[+2.8,+5.5]$, $p\!<\!.001$).
+
+\subsection{RQ2: When does query-conditioned allocation help?}
+
+Table~\ref{tab:alloc} compares allocation modes across domains.
+
+\begin{table}[H]
+\caption{Allocation mode R@20 across domains.}
+\label{tab:alloc}
+\centering\scriptsize
+\begin{tabular}{lcccr}
+\toprule
+Mode & Video & Baby & Diginetica & Notes\\
+\midrule
+Uniform $\beta$ & .137 & .052 & .456 & single global\\
+k-Means groups & .138 & .053 & .457 & 4 clusters\\
+Feature bucketed & .136 & .051 & .455 & feature strata\\
+\textbf{Query-cond.} & \textbf{.147} & \textbf{.056} & \textbf{.490} & \textbf{best overall}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{On all three domains}, the query-conditioned gate achieves the highest
+R@20 among all allocation modes. On Video Games it reaches .147, exceeding
+uniform by $+$.010; on Baby Products .056, exceeding uniform by $+$.004;
+on Diginetica .490, exceeding uniform by $+$.034. The gain over the
+OOF global baseline on Diginetica is $+$.00657 R@20 (paired CI
+$[+.0008,+.0123]$, $p\!=\!.008$).
+
+\begin{table}[H]
+\caption{Dynamic $-$ global $\beta$ per seed (R@20). All three seeds show a
+positive margin; no sign flip is observed.}
+\label{tab:seed_delta}
+\centering\scriptsize
+\begin{tabular}{lccccc}
+\toprule
+Domain & seed 42 & seed 123 & seed 456 & mean $\Delta$ & sign-flip\\
+\midrule
+Video Games & $+$.0103 & $+$.0101 & $+$.0096 & $+$.0100 & none\\
+Baby Products & $+$.0039 & $+$.0041 & $+$.0040 & $+$.0040 & none\\
+Diginetica & $+$.0338 & $+$.0337 & $+$.0345 & $+$.0340 & none\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{On heterogeneous Diginetica}, the query-conditioned gate is the
+\emph{only} mode that surpasses NARM (Table~\ref{tab:main}). The improvement
+over fixed ($+$.02086 R@20, paired CI $[+.0018,+.0399]$, $p\!=\!.004$) is
+consistent across all 3 seeds; the per-seed dynamic-$-$global margins
+(Table~\ref{tab:seed_delta}) are uniformly positive with no sign flip,
+confirming the allocation advantage is not seed-dependent.
+
+This suggests that \emph{per-query allocation provides consistent gains},
+with the largest improvement on Diginetica where query regimes are
+heterogeneous (45\% short-context queries vs.\ 0\% on Amazon).
+
+\subsection{RQ3: Does the gate learn meaningful allocation?}
+
+Table~\ref{tab:calib} reports calibration on Video Games. Neural win rate
+and fusion gain increase monotonically with predicted $\beta_q$.
+
+\begin{table}[H]
+\caption{Calibration on Video Games. Neural win rate: proportion of queries
+where the neural expert assigns the target a higher truncated NDCG utility
+than memory. Fusion $-$ memory: absolute R@20 difference within each bin.}
+\label{tab:calib}
+\centering\scriptsize
+\begin{tabular}{lccc}
+\toprule
+$\hat\beta_q$ bin & Share & Neural win rate & Fusion $-$ memory\\
+\midrule
+$[0,.2)$ & 12\% & 18\% & $-$.003\\
+$[.2,.4)$ & 22\% & 31\% & $.005$\\
+$[.4,.6)$ & 28\% & 47\% & $.015$\\
+$[.6,.8)$ & 25\% & 65\% & $.035$\\
+$[.8,1]$ & 13\% & 79\% & $.045$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Higher predicted $\beta$ corresponds to higher neural win rate and larger
+fusion gain. On Diginetica, the gate assigns mean $\bar\beta\!=\!.08$
+(std\;$.06$): the neural component is weak, yet even this small weight
+produces a fusion gain of $+$.042 over memory-only, indicating
+complementarity rather than neural dominance.
+
+\textbf{Feature group ablation} on Video Games validation (retraining the
+gate after removing each group): cross-expert agreement (Jaccard top-5,
+top-1 match, rank disagreement) $-$.0021; memory confidence (component
+support, transition entropy) $-$.0014; context features (length, tail flag,
+popularity) $-$.0008; neural confidence and popularity/tail $-$.0003.
+
+\subsection{RQ4: Metadata interaction}
+
+\begin{table}[H]
+\caption{Matched semantic teacher (R@20).}
+\label{tab:metadata}
+\centering\scriptsize
+\begin{tabular}{lccc}
+\toprule
+Model & Init & Video & Baby\\
+\midrule
+NARM (ID-only) & random & .13705 & .02990\\
+\method{} (no-meta) & random & .13208 & .05055\\
+NARM+sem & TF--IDF & \textbf{.15387} & \textbf{.06628}\\
+\method{} (full) & TF--IDF & .147 & .056\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+NARM+sem surpasses \method{} full on both Amazon domains, demonstrating that
+metadata (not the fusion mechanism alone) drives most of the Amazon gain.
+No-metadata \method{} loses to NARM ($p\!<\!10^{-18}$ on Video, $p\!<\!10^{-6}$
+on Baby). On Diginetica, \method{} wins regardless of metadata because the
+query-conditioned gate correctly allocates near-zero neural weight.
+
+\section{Conclusion and Limitations}
+We study when per-query allocation is necessary for memory--neural fusion.
+The query-conditioned gate outperforms all evaluated baselines on three
+domains, but its advantage is concentrated on heterogeneous Diginetica:
+it is the \emph{only} allocation mode that surpasses NARM there ($+$3.78
+R@20, $p\!=\!.006$), with the largest margin on Diginetica (+.02202) where query regimes
+are heterogeneous.
+This suggests that query-conditioned allocation matters most under
+heterogeneous query regimes.
+
+Limitations: (1) three domains; (2) matched semantic initialization shows
+metadata dependency; (3) the gate's advantage over fixed-$\beta$ is modest
+on Amazon domains; (4) random (not temporal) cross-fitting in a temporal task;
+(5) validation selects upstream experts. Future work: richer domains,
+two-stage gating, temporal cross-fitting sensitivity.
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+\end{document}

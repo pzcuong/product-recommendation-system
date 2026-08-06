@@ -1,0 +1,725 @@
+\documentclass[runningheads]{llncs}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=1em
+\newcommand{\method}{CEARF-N}
+\begin{document}
+\title{Rejection-Complete Validation Gating for Sparse Session Recommendation}
+\titlerunning{Rejection-Complete Validation Gating}
+\author{Anonymous Author(s)}
+\authorrunning{Anonymous Author(s)}
+\institute{Anonymous Institution}
+\maketitle
+
+\begin{abstract}
+Sparse, large-catalogue next-item recommendation makes it unclear when neural
+sequence evidence is more reliable than explicit local memory. We introduce
+\emph{rejection-complete validation gating}: every optional source, neural
+mechanism, fusion weight, and router is paired with an explicit null or simpler
+alternative, and complexity is admitted only by held-out utility. We instantiate
+the principle in \method{}, which combines transition, session-neighbour,
+popularity, and compact neural rankings using weighted reciprocal-rank
+fusion~\cite{cormack2009rrf}. Under full-catalogue evaluation on two sparse
+Amazon domains and Diginetica, the selected fusion improves over both of its
+own endpoints on all three domains. The metadata-equipped system obtains the
+strongest Recall@20 among evaluated ID-only external baselines on both Amazon
+domains; semantic-initialized NARM overtakes it under matched side information,
+and ID-only NARM is significantly stronger on Diginetica. A fourth,
+weak-metadata Tmall stress test provisionally selects CEARF-N+STAN, whereas
+an expanded expert family selects CEARF-N+STAN+NARM on Video Games, excludes
+NARM on Baby Products, and selects STAN+NARM without CEARF-N on Diginetica.
+Thus the contribution is not a universal winner or a new fusion formula, but a
+falsifiable selection method that identifies when heterogeneous evidence earns
+inclusion and exposes when apparent gains come from side information or a weak
+primary model.
+\keywords{next-item recommendation \and sparse recommendation \and rank fusion
+\and validation-based model selection \and hybrid recommender systems}
+\end{abstract}
+
+\section{Introduction}
+Next-item recommendation ranks the item most likely to follow an observed
+interaction sequence. The task includes anonymous sessions as well as
+session-like prefixes extracted from persistent user histories. Although these
+settings share a ranking objective, they do not share the same data-generating
+process; we therefore evaluate them separately and avoid claims based on
+averages across domains.
+
+Sparse, large-catalogue data creates three recurring failures. First, neural
+sequence models allocate parameters to items whose representations may receive
+too few updates to become reliable. Recent state-space, semantic-embedding,
+and long-tail-oriented systems improve efficiency or representation quality,
+but they do not remove this basic long-tail constraint~\cite{sigma2025,
+llm2rec2025,longtail2026}. Second, neighbourhood and transition methods remain
+strong under careful evaluation, and a 2026 audit shows that local graph
+evidence alone can solve a surprising fraction of widely used sequential
+benchmarks~\cite{popstrat2025,graphshortcut2026}. Their weakness is not lack
+of signal but lack of adaptation: the same heuristic is applied whether a
+query has rich collaborative support or almost none. Third, score-level
+hybrids combine transition counts, neighbourhood similarities, and neural
+logits whose scales and tails are fundamentally different. A weight that works
+in one domain can therefore fail in another for purely numerical reasons.
+
+The deeper methodological problem is that recommender-system development
+usually asks validation to tune a proposed complex model, not whether that
+complexity should exist. Reproducibility studies repeatedly find carefully
+tuned neighbourhood or linear methods competitive with recent neural
+proposals~\cite{ferraridacrema2019progress,ludewig2021empirical}. Existing
+hybrids can improve accuracy by combining recurrent and neighbourhood
+models~\cite{jannach2017hybrid}, but a mandatory hybrid cannot return the
+scientifically meaningful answer ``do not add this component.'' We address
+this missing falsifiability rather than claiming that simple recommendation
+itself is a new observation.
+
+These observations motivate a different architectural prior: use explicit
+memory as the stable base, express each component only through rank, and admit
+neural evidence only when held-out validation supports it. This is the
+principle behind \method{}, a memory-first rank-fusion system with a compact
+neural residual. The fusion primitive is deliberately standard. The new object
+is instead a \emph{rejection-complete} configuration space: every proposed
+mechanism has a null endpoint, every router competes with a global constant,
+and exact router-selection ties resolve toward the simpler system.
+Consequently, the procedure can falsify a design idea rather than merely tune
+its strength.
+
+The need for such a reference point has increased. Popularity-stratified
+analysis shows that neighbourhood and neural recommenders win on different
+regions of the same data~\cite{popstrat2025}, while algorithm-selection work
+shows that per-instance routing closes only part of the gap to an
+oracle~\cite{algselect2025}. At the same time, learned ensembles and LLM
+routing systems can carry substantial serving and energy cost~\cite{
+flame2026,dynamicllm2026,energy2026,green2025}, and evaluation defaults can
+change apparent winners~\cite{defaults2025,seqsplit2026}. A lightweight hybrid
+is therefore useful not only as a practical system, but as a cost floor that
+more elaborate approaches should exceed.
+
+This paper asks three questions: (RQ1) which optional mechanisms survive when
+validation may select their null states; (RQ2) how much of the Amazon ordering
+is caused by semantic metadata rather than fusion; and (RQ3) whether rank
+fusion adds value beyond combining strong external experts. We address the
+third question with a NARM-containing control family, reported as a
+single-artifact diagnostic pending matched-seed replication.
+
+This paper makes four contributions:
+
+\begin{enumerate}
+\item \textbf{Rejection-complete validation gating.} We formulate selection
+      so that every optional component has an explicit off state and every
+      adaptive router competes with a constant alternative. Held-out utility
+      therefore decides both inclusion and exclusion; router complexity is
+      used only to break exact ties.
+\item \textbf{A rank-space instantiation.} Three explicit memories and a
+      compact neural residual are combined without cross-component score
+      calibration. The family includes memory-only and neural-only boundaries,
+      making ``fusion helps'' directly falsifiable.
+\item \textbf{A controlled full-catalogue study.} Three matched-seed domains,
+      eight external baselines, paired inference, constituent ablations, a
+      no-metadata study, and a semantic-fairness rerun separate the system-level
+      result from the fusion-level result. A fourth Tmall diagnostic tests
+      transfer without promoting provisional evidence to the main comparison.
+\item \textbf{Metadata-confound accounting.} Removing semantic initialization
+      and then granting the same initialization to NARM reverses the Amazon
+      ordering. We report this reversal as a primary finding rather than
+      attributing it to the fusion architecture.
+\end{enumerate}
+
+Our claims are deliberately bounded. We report the best result within one
+unified protocol, not a literature-wide state of the art. The strongest
+evidence is that \method{} combines its own constituents successfully across
+all three domains; the Amazon advantage over external baselines additionally
+depends on rich metadata; and broader expert fusion is helpful in some regimes
+but not all.
+
+\section{Related Work}
+\subsection{Sparse sequential recommendation}
+Modern sequential recommenders increasingly use state-space, semantic, and
+tail-aware architectures to improve long-context efficiency or sparse-item
+coverage~\cite{sigma2025,llm2rec2025,longtail2026}. Long-tail accuracy
+nevertheless remains unresolved: stronger sequence modeling does not eliminate
+the core problem that rare items receive weak or noisy evidence. \method{}
+acts earlier in the pipeline. Instead of requiring every tail item to obtain a
+strong learned representation, it allows explicit transition and session
+memories to supply evidence directly.
+
+Recent evaluation work also changes how progress should be interpreted.
+Popularity-stratified analysis finds carefully tuned local methods competitive
+with neural systems on some strata~\cite{popstrat2025}. More sharply, a 2026
+audit demonstrates that a simple graph heuristic explains much of the
+performance on several sequential benchmarks~\cite{graphshortcut2026}. This
+does not make neural modeling unnecessary; it means a neural model should be
+required to add value beyond local memory rather than receive that assumption
+by default.
+
+\subsection{Hybrid ranking and model selection}
+Complementarity between recommenders is often hidden by aggregate metrics.
+Popularity-stratified modeling shows that session-neighbourhood and neural
+methods dominate different item strata~\cite{popstrat2025}. More elaborate
+combinations include compact ensemble distillation and dynamic LLM
+routing~\cite{flame2026,dynamicllm2026}. \method{} takes the opposite route:
+it retains heterogeneous evidence sources but prevents their scores from
+interacting directly. Only ranks are fused, and every profile is selected from
+a finite validation grid.
+
+Per-query selection is attractive but difficult. A 2025 meta-learning study
+reports improvement over a single global algorithm while closing only a small
+part of the oracle gap~\cite{algselect2025}. We therefore treat routing as
+secondary rather than foundational: a global or regime-level $\beta$ remains a
+valid outcome, and finer routing survives only if it wins on a disjoint
+validation fold.
+
+\subsection{Reliability, side information, and cost}
+Semantic item representations are increasingly used to address sparse
+interaction data~\cite{llm2rec2025}. Because semantic information can make an
+unfair comparison appear architectural, we report both a no-metadata ablation
+and a fairness rerun that gives external baselines the same initialization.
+Reliable comparison also requires more than using the same metric. Evaluation
+defaults can change apparent winners~\cite{defaults2025,seqsplit2026}, and
+energy-aware studies show that ensemble gains can carry disproportionate
+computational cost~\cite{energy2026,green2025}. \method{} is designed as an
+auditable reference system whose selected configuration can be reproduced on a
+laptop.
+
+\section{Method}
+A query is the most recent interaction context, truncated to eight items.
+Offline, \method{} builds three memories, trains one compact residual model,
+and selects all discrete choices on validation data. Online, each component
+emits a list of at most 120 candidates; no raw score crosses component
+boundaries.
+
+\subsection{Evidence memories}
+\textbf{Transition memory.} A directed graph counts item transitions within a
+four-step window. Each source retains its 200 most frequent targets. For
+context item $s$ at recency age $a$ and candidate $t$,
+\begin{equation}
+T(t)=\sum_a e^{-0.35a}\frac{\log(1+c(s_a,t))}{\sqrt{1+\mathrm{freq}(t)}}.
+\end{equation}
+The decay privileges recent evidence, while the frequency denominator prevents
+globally popular targets from dominating every context.
+
+\textbf{Session memory.} Candidate training sessions are retrieved by
+IDF-weighted, recency-decayed overlap:
+\begin{equation}
+O(q,j)=\sum_a \mathrm{idf}(i_a)\cdot e^{-0.20a}\cdot \mathbf{1}[i_a\in j].
+\end{equation}
+The top 120 sessions vote for candidates. Items appearing after the last match
+receive weight 1.0; earlier items receive 0.25. Votes are discounted by
+square-root distance and normalized by unique session length.
+
+\textbf{Popularity memory.} Global popularity provides a weak third ranked list
+inside the validation-selected memory profile and also pads a fused list
+containing fewer than twenty candidates. It is therefore both low-weight
+evidence and conservative fallback, but it never dominates context-dependent
+signals because its validation-selected profile weight remains small.
+
+\subsection{Rank-space fusion}
+For memory list $i$, profile weight $w_i$, and reciprocal-rank constant
+$k=20$, the memory score is
+\begin{equation}
+M(t)=\sum_i \frac{w_i}{20+\mathrm{rank}_i(t)}.
+\end{equation}
+Rank space makes the components comparable without calibrating transition
+counts, overlap scores, or frequencies. Six fixed profiles over transition,
+session, and popularity evidence are considered on validation.
+
+A multiplicative agreement bonus was evaluated but changed Recall@20 by
+.00000 on every domain. Because weighted reciprocal-rank fusion already
+rewards items supported by multiple lists, the extra term is retained only to
+match the locked implementation and is interpreted as inert.
+
+\subsection{Neural residual}
+PASGR is a single-layer GRU with hidden size 64 and dropout .2. Item
+embeddings are initialized from a 128-dimensional semantic matrix. On Amazon,
+the matrix is obtained by truncated singular-value decomposition of TF--IDF
+vectors built from titles, categories, features, descriptions, and brands. On
+Diginetica, product names are mostly numeric tokens, reducing the usefulness of
+semantic content and creating a natural weak-metadata contrast.
+
+The residual is trained with cross-entropy. Graph transport, contrastive loss,
+in-batch loss, and prototype transport are optional validation-gated
+components. The prototype transport variant is rejected on every domain; it is
+therefore an evaluated alternative, not part of the final deployed system.
+
+Memory and neural rankings are combined by
+\begin{equation}
+F(t)=\frac{1-\beta}{20+\mathrm{rank}_M(t)}+\frac{\beta}{20+\mathrm{rank}_N(t)},
+\end{equation}
+where $\beta\in\{0,.05,\ldots,1\}$. $\beta=0$ is a valid outcome and yields a
+fully training-free prediction path.
+
+\subsection{Validation-gated selection}
+All choices maximize $.5\cdot\mathrm{Recall}@6+.5\cdot\mathrm{Recall}@20$ on
+5,000 validation queries:
+\begin{enumerate}
+\item six memory profiles, separately for contexts of length at most two and
+      longer contexts;
+\item a 16-cell neural sweep over graph transport, prototype transport,
+      contrastive loss, and in-batch loss;
+\item the 21-value $\beta$ grid;
+\item regime-level, bucketed, and continuous $\beta$ routers.
+\end{enumerate}
+
+\paragraph{Definition (relative rejection-completeness).}
+For validation queries $V$, a declared candidate family $\mathcal{C}_j$ at
+stage $j$ is rejection-complete relative to an optional mechanism $m$ if it
+contains a null candidate $c_j^0$ that is identical at that stage except that
+$m$ is absent. A stagewise protocol is rejection-complete relative to its
+declared families when each optional mechanism has such a null candidate.
+Selection at stage $j$ is
+\begin{equation}
+c_j^\star=\arg\max_{c\in\mathcal{C}_j} U_V(c).
+\end{equation}
+The qualifier ``relative'' is essential: the protocol makes no claim about
+components outside the families declared before evaluation. In this
+instantiation, the families contain $\beta=0$,
+$\beta=1$, an off state for every neural switch, and a constant alternative to
+each adaptive router. This differs from selecting weights inside a mandatory
+hybrid: the validation outcome may reject the neural path, the memory path, an
+auxiliary loss, or adaptation itself. We report those rejections as results.
+
+\paragraph{Proposition.}
+At every stage, $U_V(c_j^\star)\geq U_V(c_j^0)$ for every declared null
+candidate $c_j^0\in\mathcal{C}_j$.
+\emph{Proof.} The inequality follows directly from the argmax definition.
+Consequently, a test loss against the corresponding null candidate is an
+observable validation-to-test generalization failure, not a permitted
+post-hoc design choice.
+
+Router-family selection is nested within validation. Eighty percent of
+validation queries fit and calibrate each router family; the disjoint twenty
+percent selects the family, with simpler routers winning exact ties. The
+selected family is then refit on all validation queries. Test labels are never
+consulted during selection.
+
+For Diginetica, each validation target and its incoming transition are removed
+before any validation memory or model is constructed. Full training sessions
+are restored only after selection for the single test fit. This prevents a
+held-out next item from leaking through the transition graph.
+
+The recency decays (.35 and .20), graph and candidate caps (200 and 120),
+vote weights (1.0 and .25), and rank constant ($k=20$) are fixed
+a priori and lie outside the declared candidate families. Rejection-completeness
+is therefore relative to the switches and alternatives listed above, not to
+every numerical constant in the implementation.
+
+\section{Experimental Setup}
+\subsection{Datasets and protocol}
+\begin{table}[t]
+\caption{Unified full-catalogue protocol.}
+\label{tab:data}\centering\small
+\begin{tabular}{lrrrr}
+\toprule Dataset & Items & Training sequences & Test queries & Short contexts \\
+\midrule
+Amazon Video Games & 25,613 & 94,762 & 94,762 & 0\% \\
+Amazon Baby Products & 36,014 & 150,777 & 150,777 & 0\% \\
+Diginetica & 43,098 & 186,670 & 60,858 & 45\% \\
+Tmall$^\dagger$ & 40,728 & 351,268 & 25,898 & -- \\
+\bottomrule
+\end{tabular}
+\par\raggedright\scriptsize $^\dagger$Exploratory single-artifact transfer
+diagnostic; excluded from matched-seed significance claims.
+\end{table}
+
+The Amazon domains are derived from the public Amazon review corpus~\cite{
+mcauley2015amazon} and use leave-last-out next-item prediction with
+exclude-seen ranking. Diginetica uses the CIKM Cup split and allows repeat
+consumption. Tmall follows the public COTREC preprocessing of the IJCAI-15
+shopping-log data~\cite{xia2021cotrec}.
+Evaluation is full-catalogue: every candidate item is ranked and no sampled
+negatives are introduced. Recall@20 is the primary measure because the target
+objective is coverage within a short recommendation list. All stochastic
+systems in the main comparison use matched seeds 42, 123, and 456. Tmall uses
+351,268 anonymous training sessions and a repeat-consumption protocol; it has
+no usable text metadata and is reported only as a seed-42 transfer diagnostic.
+
+The benchmark is intentionally small but heterogeneous. Video Games and Baby
+Products contain 625,062 and 939,529 training interactions, mean sequence
+lengths 6.60 and 6.23, and about 27.7\% of items occurring at most five
+times. Diginetica contributes 906,140 training interactions, shorter
+session-native contexts (mean length 4.85), and a lower extreme-tail share of
+19.3\%. We therefore interpret the suite as three distinct operating regimes
+rather than as repeated measurements of one regime.
+
+\subsection{Baselines and tuning}
+\textbf{Baselines.} The external comparison contains five neural
+baselines---GRU4Rec~\cite{hidasi2016gru4rec},
+SASRec~\cite{kang2018sasrec}, NARM~\cite{li2017narm},
+SR-GNN~\cite{wu2019srgnn}, and SIGMA~\cite{sigma2025}---and three non-neural
+baselines---V-SKNN~\cite{ludewig2018session}, STAN~\cite{garg2019stan}, and
+a transition-graph retriever. Neural baselines train for at most twelve epochs
+over fifteen validation-selected configurations per seed. The reported
+checkpoint is the epoch maximizing the same validation utility used by
+\method{}. V-SKNN, STAN, and transition retrieval are deterministic. STAN uses
+deterministic sequence order in place of wall-clock recency because the unified
+loader does not retain timestamps.
+
+The twelve-epoch neural budget is a reproducible short-paper constraint rather
+than a claim of exhaustive baseline tuning. In particular, under-converged
+SASRec results should be read as an internal reference point, not as a
+literature-wide estimate of SASRec's best possible accuracy.
+
+\method{} evaluates roughly seventy finite choices, but most profile, $\beta$,
+and router comparisons reuse fixed candidate rankings. Only the sixteen-cell
+neural-component sweep retrains PASGR. Reproducing a selected \method{}
+configuration takes approximately six minutes; the one-off neural search costs
+approximately eighty minutes per domain and seed.
+
+\subsection{Statistical inference}
+Pairwise differences use fingerprint-matched queries. A query-clustered paired
+bootstrap with 20,000 repetitions resamples queries while preserving the three
+matched predictions associated with each query; aggregate randomization uses
+query-level sign flips. Exact per-seed McNemar tests provide a secondary
+check. Diginetica source-session IDs are unavailable in the released HID
+artifact, so a coarser session-level bootstrap cannot be recovered and is
+disclosed as a limitation.
+
+All experiments run on an Apple M2 Pro with 12 CPU cores and 32 GB memory.
+The memory path is single-process CPU code; PASGR uses the available Metal
+backend during training.
+
+\section{Results}
+\subsection{Main comparison}
+\begin{table}[t]
+\caption{Recall@20. Stochastic methods are shown as mean (std); deterministic
+baselines have zero seed variance. Bold marks a clear best point estimate; no
+Baby Products entry is emphasized because its leading gap is small relative
+to seed variation.}
+\label{tab:main}\centering\scriptsize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+Dataset & V-SKNN & STAN & Trans. & GRU & SAS & NARM & SR-GNN & SIGMA & \method{} \\
+\midrule
+Video Games & .11936 & .12115 & .04223 & .10368 (.00089) & .03794 (.00014) & .13705 (.00081) & .12267 (.00060) & .08644 (.00215) & \textbf{.14685 (.00038)} \\
+Baby Products & .05038 & .04944 & .00735 & .04501 (.00056) & .03163 (.00357) & .02990 (.00018) & .05208 (.00127) & .02473 (.00059) & .05346 (.00397) \\
+Diginetica & .50506 & .51502 & .40102 & .41785 (.00108) & .27097 (.00204) & \textbf{.53406 (.00052)} & .49267 (.00468) & .37219 (.01094) & .51681 (.00268) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\method{} ranks first against the evaluated ID-only external baselines on both
+Amazon domains. Relative to the strongest such baseline, the difference is
++7.2\% on Video Games and +2.7\% on Baby Products. The Baby margin over
+SR-GNN is only .00138 and lies near observed seed variation, so we describe
+it as a small numerical improvement rather than a broad dominance claim.
+
+Diginetica produces the opposite ordering. \method{} exceeds six baselines, is
+statistically tied with STAN, and ranks behind NARM. NARM is ahead by .01725,
+corresponding to a relative deficit of 3.2\%. This bounds the claim: the
+proposed architecture is strongest in the sparse, metadata-rich Amazon regime,
+not universally.
+
+\begin{table}[t]
+\caption{Secondary ranking metrics for the strongest external comparator in
+each domain.}
+\label{tab:secondary}\centering\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Domain & Comparator & \method{} NDCG@20 & Comp. NDCG@20 & \method{} MRR@20 & Comp. MRR@20 \\
+\midrule
+Video Games & NARM & .06877 & .06316 & .04693 & .04264 \\
+Baby Products & SR-GNN & .02492 & .02230 & .01699 & .01414 \\
+Diginetica & NARM & .25589 & .26321 & .18159 & .18628 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The same ordering appears on NDCG@20 and MRR@20 for the decisive Amazon
+comparisons, while Diginetica again favours NARM. The conclusions therefore
+do not depend on Recall@20 alone, even though Recall@20 remains the primary
+selection target.
+
+\subsection{Paired comparisons}
+\begin{table}[t]
+\caption{Headline paired comparisons against the strongest external baseline in
+each domain. Intervals are query-clustered 95\% paired bootstrap ranges.}
+\label{tab:headline-paired}\centering\small
+\begin{tabular}{lrrr}
+\toprule Domain & Strongest baseline & $\Delta$ Recall@20 & 95\% interval \\
+\midrule
+Video Games & NARM & +.00980 & [.00824,.01137] \\
+Baby Products & SR-GNN & +.00138 & [.00038,.00236] \\
+Diginetica & NARM & -.01725 & [-.02012,-.01435] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The same paired machinery is used for favourable and unfavourable comparisons.
+This matters because reporting only victories would hide the most important
+boundary condition: on the domain with genuine anonymous sessions and weak
+semantic content, a carefully tuned NARM remains superior.
+
+Stratified analysis from the persisted rank artifacts asks where that ordering
+changes. It does not. On Video Games, \method{} beats ID-only NARM on all
+three target-popularity strata, with the largest Recall@20 gain on the tail
+(+.01260 versus +.01057 on the head). On Baby Products, \method{} again beats
+SR-GNN on head, torso, and tail targets, but only by .00099--.00291. The same
+sign pattern holds across short, medium, and long context-length terciles on
+both Amazon domains. Diginetica shows the opposite result on every slice:
+NARM remains ahead on head, torso, and tail targets and on all context-length
+terciles, with the largest deficit for \method{} on long contexts (-.01907).
+Thus the Amazon advantage is broad within its regime, whereas the Diginetica
+disadvantage is not concentrated in a single subset.
+
+\subsection{What fusion contributes}
+\begin{table}[t]
+\caption{Constituent ablation under one validation-gated configuration and
+three matched seeds.}
+\label{tab:constituents}\centering\small
+\begin{tabular}{lrrr}
+\toprule Dataset & Memory only, $\beta=0$ & Neural only, $\beta=1$ & Validation-gated fusion \\
+\midrule
+Video Games & .11901 & .12571 & \textbf{.14685} \\
+Baby Products & .03879 & .04873 & \textbf{.05346} \\
+Diginetica & .49565 & .44852 & \textbf{.51681} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Fusion improves over both endpoints on every domain. On Diginetica, the
+selected system exceeds memory-only by .02116 with query-clustered 95\% CI
+$[.01942,.02289]$, so the gain is smaller in interpretation than on Amazon but
+not statistically ambiguous in the locked protocol. Unlike the
+external-baseline comparison, this attribution is internally controlled: the
+three columns share preprocessing, candidates, seeds, and selected component
+configuration. The consistent result supports the central fusion claim even
+where \method{} is not the strongest external system.
+
+\subsection{Validation-gated broader expert fusion}
+The constituent ablation above asks whether memory--neural fusion helps
+relative to its own endpoints. A separate systems question is whether
+\method{} should itself be fused with strong external memories. We therefore
+evaluate a second rejection-complete family containing \method{}, STAN,
+V-SKNN, NARM, and every RRF subset of size two or larger. Tmall omits NARM
+because no matched checkpoint is available. The selector uses
+$.5\,\mathrm{Recall}@10+.5\,\mathrm{Recall}@20$ on validation data; test
+metrics are read only after the candidate is fixed.
+
+\begin{table}[t]
+\caption{Broader expert selection from persisted seed-42 rank artifacts.
+$\Delta$R@20 is relative to the strongest individual expert. This diagnostic
+is separate from the matched three-seed main comparison.}
+\label{tab:expert-fusion}\centering\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Validation decision & R@10 & R@20 & NDCG@20 & $\Delta$R@20 \\
+\midrule
+Video Games & RRF(\method{}, STAN, NARM) & .10989 & .15354 & .07366 & +.00655 \\
+Baby Products & RRF(\method{}, STAN, V-SKNN) & .04015 & .05872 & .02786 & +.00834 \\
+Diginetica & RRF(STAN, NARM) & .41234 & .53980 & .26931 & +.00554 \\
+Tmall & RRF(\method{}, STAN) & .23778 & .30751 & .16942 & +.01452 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The decisions are more informative than a fourth average win. Video Games
+admits STAN and NARM but rejects V-SKNN. Baby Products rejects NARM and keeps
+the original three experts. Most importantly, Diginetica selects the control
+RRF(STAN,NARM) and rejects \method{} itself, improving Recall@20 over
+seed-42 NARM by 1.0\%. This converts a system-level loss into a successful
+protocol decision without concealing which instantiation won. On
+metadata-free Tmall, validation selects \method{}+STAN and improves Recall@20
+over STAN by 5.0\%. Its NDCG@20
+(.16942) remains below STAN (.17810), consistent with the recall-based
+selection objective rather than a claim of metric-universal dominance.
+Because these rows reuse one persisted rank artifact rather than three matched
+seeds, they establish transfer behaviour and falsifiability, not significance.
+
+\subsection{What metadata contributes}
+The neural baselines use item identifiers, whereas the full Amazon PASGR
+initialization uses item text. We therefore remove the semantic teacher and
+rerun the complete gated system, then equalize semantic information for two
+external baselines.
+
+\begin{table}[t]
+\caption{Amazon fairness rerun: external neural baselines with the same
+semantic initialization used by PASGR. Values are three-seed means.}
+\label{tab:semantic-fairness}\centering\small
+\begin{tabular}{lrrr}
+\toprule Dataset & GRU4Rec+sem & NARM+sem & \method{} \\
+\midrule
+Video Games & .13428 & \textbf{.15387} & .14685 \\
+Baby Products & .05947 & \textbf{.06628} & .05346 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Full system versus no-metadata rerun and strongest external baseline.}
+\label{tab:nometa}\centering\small
+\begin{tabular}{lrrr}
+\toprule Dataset & Full \method{} & Without metadata & Strongest external baseline \\
+\midrule
+Video Games & .14685 & .13208 & NARM .13705 \\
+Baby Products & .05346 & .05055 & SR-GNN .05208 \\
+Diginetica & .51681 & .51756 (.00122) & NARM .53406 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Without metadata, \method{} loses to the strongest Amazon baseline: -.00497
+on Video Games with interval $[-.0069,-.0030]$, and -.00154 on Baby Products
+with interval $[-.0027,-.0004]$. The fairness rerun goes further: against
+semantic-initialized NARM, \method{} loses by -.00702 on Video Games
+($[-.00847,-.00559]$) and -.01282 on Baby Products
+($[-.01378,-.01185]$). The Amazon headline is therefore a system-level result
+for a metadata-equipped method, not evidence that rank fusion alone defeats
+every architecture under equal information.
+
+Secondary metrics preserve the same fairness conclusion. On Video Games,
+semantic-initialized NARM reaches NDCG@20/MRR@20 of .07112/.04809 against
+\method{} at .06877/.04693; on Baby Products, the corresponding values are
+.02914/.01891 against .02492/.01699. Metadata therefore changes not only the
+hit-rate ordering but the broader top-rank quality picture.
+
+On Diginetica, removing the weak semantic signal changes .51681 to
+.51756$\pm$.00122, a reversal within seed noise. Both variants remain below
+NARM. The Diginetica result is thus independent of useful side information,
+while the Amazon advantage is not.
+
+\subsection{Validation as a rejection mechanism}
+\begin{table}[t]
+\caption{Validation-selected neural switches.}
+\label{tab:switches}\centering\small
+\begin{tabular}{lrrrr}
+\toprule Domain & Graph transport & Prototype transport & Contrastive loss & In-batch loss \\
+\midrule
+Video Games & .35 & Off & .15 & .10 \\
+Baby Products & 0 & Off & .15 & 0 \\
+Diginetica & .35 & Off & 0 & .10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Prototype transport is rejected on every domain. The agreement bonus is also
+effectively null, changing Recall@20 by .00000 in separate ablation checks.
+These negative results are not peripheral: they show that the selection
+procedure can contradict the designer rather than merely accumulate modules.
+
+Router families vary across seeds: Video Games and Diginetica alternate
+between regime-level and bucketed routing, while Baby Products alternates
+between bucketed and continuous routing. No domain selects one family in all
+three seeds: the modal family appears in two of three runs for each domain,
+and three of nine domain--seed decisions differ from their domain mode. We
+therefore do not present fine-
+grained routing as a standalone contribution. The defensible contribution is
+the gate that may retain or discard routing granularity.
+
+\subsection{Efficiency}
+\begin{table}[t]
+\caption{Representative cost profile.}
+\label{tab:efficiency}\centering\small
+\begin{tabular}{lr}
+\toprule Operation & Measured cost \\
+\midrule
+Memory index construction & 1.2--1.8 s, single-process CPU \\
+Three memories plus fusion & 3.1--3.6 ms/query, CPU \\
+PASGR inference & about .3 ms CPU; .05 ms Metal backend \\
+Selected PASGR training & about 5 min \\
+Selected \method{} reproduction & about 6 min \\
+One-off 16-cell neural search & about 80 min per domain and seed \\
+One baseline training run & 5--15 min \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The selected system is comparable to one neural baseline run and requires no
+GPU at inference. The one-off search is substantially larger and is reported
+separately. These costs position \method{} between fully training-free
+retrieval and learned ensembles.
+
+\section{Discussion}
+The results support a simple diagnosis. Sparse recommendation does not lack
+candidate signals; it lacks a reliable rule for deciding which signal deserves
+influence. Memory dominates when local repetition and transition structure are
+sufficient. Neural evidence helps when semantic or sequential generalization
+adds information not already present in those memories. Rank-space fusion
+removes the irrelevant question of how to calibrate incomparable raw scores,
+and validation gating addresses the substantive question of whether the neural
+residual helps in the target regime.
+
+This distinction also locates the novelty precisely. Weighted reciprocal-rank
+fusion, neighbourhood retrieval, and recurrent encoders are established
+ingredients. \method{} contributes neither another score formula nor a claim
+that these ingredients dominate NARM. It contributes a rejection-complete
+decision protocol and an empirical diagnosis produced by that protocol. The
+strong NARM results are therefore informative counterexamples: they delimit
+the regime in which a memory-first residual is justified rather than
+invalidating the method's central claim.
+
+The protocol also reports when the instantiated system loses, rather than
+retaining only configurations or comparisons that produce a win. The
+semantic-matched NARM reversal on Amazon and the ID-only NARM advantage on
+Diginetica are therefore outputs of the same evaluation contract as the
+positive endpoint-fusion results.
+
+This interpretation aligns with current evidence from two directions. First,
+shortcut audits show that expensive sequential modeling is often credited for
+structure already recoverable by simple graphs~\cite{graphshortcut2026}.
+Second, model-selection research shows meaningful complementarity but weak
+per-instance selection~\cite{algselect2025}. \method{} responds by making
+memory explicit, keeping routing optional, and requiring held-out evidence
+before complexity is admitted.
+
+\section{Limitations}
+The first limitation is comparison symmetry. Rich semantic initialization is
+available to \method{} and to the fairness-rerun baselines, but not to every
+external model in the main table. Accordingly, the Amazon result is stated as
+the best result among the evaluated ID-only external baselines, not proof that
+fusion is superior under every information budget.
+
+Second, the Baby Products margin over SR-GNN is small. Third, NARM
+significantly outperforms \method{} on Diginetica, showing that a strong
+neural primary model remains preferable in some dense session regimes. Fourth,
+router-family variation across seeds prevents a universal claim about
+per-query routing. Fifth, the multi-expert extension is not monotone across
+domains: it excludes V-SKNN on Video Games, excludes NARM on Baby Products,
+and excludes \method{} on Diginetica. Sixth, the
+approximately seventy dependent
+validation decisions create selection uncertainty even though all grids are
+fixed and the test split is isolated. A simple Bonferroni-style view would
+treat this search as too wide for isolated marginal validation differences;
+consequently, only stable cross-domain or paired-test effects are used for
+central claims. Seventh, broader fusion with external memories is currently
+based on one persisted rank artifact per domain and lacks the matched-seed
+protocol of the main comparison; Tmall also lacks a completed matched-seed
+neural-baseline suite.
+Finally, the RRF(STAN,NARM) control is currently a single-artifact diagnostic;
+matched-seed replication is necessary before making a significance claim about
+the selected expert family.
+
+\section{Conclusion}
+\method{} combines three explicit memories with a compact neural residual
+entirely in rank space. The design removes score-scale mismatch, allows
+$\beta=0$ as a training-free boundary, and assigns every discrete decision to
+validation rather than to test inspection. Across two sparse Amazon domains
+and Diginetica, fusion improves over both of its own constituents. The
+complete metadata-equipped system ranks first on both Amazon domains, while
+NARM remains significantly stronger on Diginetica.
+
+The most transferable result is methodological. Validation is useful not only
+for choosing a weight, but for rejecting unnecessary complexity: prototype
+transport is removed, the agreement bonus is inert, and unstable fine-grained
+routing is kept outside the central claim. The broader expert diagnostic
+provides a second rejection test: Video Games excludes V-SKNN, Baby Products
+excludes NARM, and Diginetica excludes \method{} itself in favour of
+RRF(STAN,NARM). At the same time, the no-metadata and semantic-fairness
+analyses prevent semantic information from being mistaken for fusion quality.
+
+The broader lesson is more conservative than a single global winner: sparse
+recommendation benefits from validation-gated adaptation across information
+regimes, but the right endpoint may be a memory-first fusion, a stronger
+neural primary model, or a simpler ensemble of external experts.
+
+\paragraph{AI assistance disclosure.}
+OpenAI Codex was used to assist with code review, experiment orchestration,
+statistical-procedure checks, and language editing. The authors remain fully
+responsible for the experiments, claims, accuracy, integrity, and originality
+of the manuscript.
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+\end{document}

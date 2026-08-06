@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Data (too large)
+data/
+archive/
+reference_repos/
+
+# Model/checkpoint files
+*.pt
+*.pth
+*.h5
+*.pkl
+*.pickle
+
+# Logs
+*.log
+
+# Result artifacts (regenerable)
+sparse_bench/*.json
+sparse_bench/*_artifacts/
+sparse_bench/*_results/
+sparse_bench/artifacts/
+sparse_bench/_datasets/
+sparse_bench/_srgnn_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.zip
+.claude/
+
+# Junk
+tmp/
+.worktrees/
+.cursorrules
+b1_fair_tuning.json
+b3_diagnostic.json
+benchmark_results.csv
+c.txt
+v12_v4_plus.py
+v33_oracle_rental_out.txt
+dualtwin_*.py
+multi_domain_eval.py
+compute_grouped_metrics.py
+PIPELINE.MD
+

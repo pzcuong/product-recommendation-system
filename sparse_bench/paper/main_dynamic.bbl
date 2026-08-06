@@ -1,0 +1,75 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{cormack2009rrf}
+Cormack, G.V., Clarke, C.L.A., Buettcher, S.: Reciprocal rank fusion
+  outperforms condorcet and individual rank learning methods. In: SIGIR. pp.
+  758--759 (2009)
+
+\bibitem{diginetica2016}
+{DIGINETICA}: {CIKM Cup 2016 Track 2}: Personalized e-commerce search challenge
+  data. CodaLab, \url{https://competitions.codalab.org/competitions/11161}
+  (2016)
+
+\bibitem{garg2019stan}
+Garg, D., et~al.: Sequence and time aware neighborhood for session-based
+  recommendations: {STAN}. In: SIGIR. pp. 1069--1072 (2019)
+
+\bibitem{multichannelltr2026}
+Gaydhani, A., Xu, G., Kamath, D., Singh, A., Li, A.: Unified learning-to-rank
+  for multi-channel retrieval in large-scale e-commerce search. CoRR
+  \textbf{abs/2602.23530} (2026)
+
+\bibitem{shortcut2026}
+Han, H., Ma, L., Wang, H., et~al.: An embarrassingly simple graph heuristic
+  reveals shortcut-solvable benchmarks for sequential recommendation. CoRR
+  \textbf{abs/2605.07125} (2026)
+
+\bibitem{llm2rec2025}
+He, Y., Liu, X., Zhang, A., Ma, Y., Chua, T.S.: {LLM2Rec}: Large language
+  models are powerful embedding models for sequential recommendation. In: KDD.
+  pp. 896--907 (2025)
+
+\bibitem{hou2024amazonreviews}
+Hou, Y., et~al.: Bridging language and items for retrieval and recommendation.
+  CoRR  \textbf{abs/2403.03952} (2024)
+
+\bibitem{standards2026}
+Jannach, D., Chen, L.: Improving methodological standards in recommender
+  systems offline evaluation. ACM Transactions on Recommender Systems
+  \textbf{4}(3),  34e:1--34e:15 (2026). \doi{10.1145/3800587}, article 34e
+
+\bibitem{li2017narm}
+Li, J., et~al.: Neural attentive session-based recommendation. In: CIKM. pp.
+  1419--1428 (2017)
+
+\bibitem{li2025survey}
+Li, Z., Yang, C., Chen, Y., et~al.: Graph and sequential neural networks in
+  session-based recommendation: A survey. ACM Computing Surveys
+  \textbf{57}(2),  1--37 (2025)
+
+\bibitem{hm2rec2026}
+Liu, Y., Qi, L., Mao, X., et~al.: Hyperbolic-enhanced mixture-of-experts mamba
+  for sequential recommendation. In: AAAI. vol.~40, pp. 15403--15411 (2026)
+
+\bibitem{sigma2025}
+Liu, Z., Liu, Q., Wang, Y., et~al.: {SIGMA}: Selective gated mamba for
+  sequential recommendation. In: AAAI. vol.~39, pp. 12264--12272 (2025)
+
+\bibitem{ludewig2018vsknn}
+Ludewig, M., Jannach, D.: Evaluation of session-based recommendation
+  algorithms. User Modeling and User-Adapted Interaction  \textbf{28}(4--5),
+  331--390 (2018)
+
+\bibitem{wang2022e5}
+Wang, L., Yang, N., Huang, X., et~al.: Text embeddings by weakly-supervised
+  contrastive pre-training. CoRR  \textbf{abs/2212.03533} (2022)
+
+\bibitem{hidlongtail2026}
+Wang, X., et~al.: Bid farewell to seesaw: Towards accurate long-tail
+  session-based recommendation via dual constraints of hybrid intents. In:
+  AAAI. vol.~40, pp. 15895--15903 (2026)
+
+\end{thebibliography}

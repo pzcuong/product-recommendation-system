@@ -1,0 +1,19 @@
+{
+  "batch_size": 256,
+  "device": "auto",
+  "dim": 64,
+  "dropout": 0.3,
+  "eval_batch_size": 256,
+  "gradient_clip": 1.0,
+  "heads": 2,
+  "layers": 1,
+  "learning_rate": 0.001,
+  "max_epochs": 30,
+  "max_seq": 50,
+  "min_delta": 0.00001,
+  "patience": 5,
+  "selection_metric": "ndcg@20",
+  "state": 64,
+  "topk": 20,
+  "weight_decay": 0.00001
+}

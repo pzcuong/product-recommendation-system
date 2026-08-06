@@ -1,0 +1,10 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{wolpert1992stacking}
+Wolpert, D.H.: Stacked generalization. Neural Networks  \textbf{5}(2),
+  241--259 (1992)
+
+\end{thebibliography}

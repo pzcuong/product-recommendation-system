@@ -1,0 +1,798 @@
+\documentclass[runningheads]{llncs}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage[section]{placeins}
+\usepackage[T5,T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=1em
+\newcommand{\method}{CEARF-N}
+\newcommand{\rr}{\rho}
+\input{generated_dynamic_beta_macros}
+\input{generated_dynamic_beta_runtime_macros}
+
+\begin{document}
+\raggedbottom
+\thispagestyle{empty}
+\markboth{P. Q. Cuong et al.}{Supplementary Material for \method{}}
+\begin{center}
+{\Large\bfseries Supplementary Material for \method{}:\\
+Bounded Out-of-Fit Dynamic Rank Allocation\\
+for Sparse Next-Item Recommendation}
+
+\vspace{0.6em}
+Pham Quoc Cuong, Nguyen Ngoc Minh, Le Quang Minh,\\
+and Nguyen Hoai Nguyet An
+
+\vspace{0.35em}
+{\small University of Information Technology, Ho Chi Minh City, Vietnam\\
+Vietnam National University Ho Chi Minh City, Vietnam}
+\end{center}
+
+\vspace{0.6em}
+\noindent This supplement specifies the complete \method{} protocol behind
+the eight-page short paper: expert scoring, source-disjoint OOF construction,
+continuous dynamic-$\beta$ optimization, controls, matched-query statistics,
+and runtime verification. Neither declared-validation nor test labels fit or
+select a fusion coefficient.
+
+\section{Scope and Claim Ledger}
+\begingroup\small
+\begin{longtable}{p{.29\textwidth}p{.63\textwidth}}
+\caption{What the paper does and does not claim.}\\
+\toprule
+Claim & Precise scope\\
+\midrule
+\endfirsthead
+\multicolumn{2}{c}{\tablename\ \thetable{} -- continued}\\
+\toprule
+Claim & Precise scope\\
+\midrule
+\endhead
+Training-only allocation &
+The scalar prior and query-specific $\beta_q$ are fit only from targets of
+source sessions removed before expert fitting. There is no $\beta$ grid.\\
+Use of validation &
+A stable hash first declares 5,000 validation queries from each loader's
+candidate pool. This subset may audit the frozen system, and an earlier study
+used validation to freeze the PASGR cell. It does not train, select, or
+early-stop $\beta$.\\
+Dynamic gain &
+The primary comparison is dynamic versus an OOF-trained global or short/long
+policy on identical expert ranks, not dynamic versus a weak endpoint. Video
+has an interval-above-zero gain; Baby and Diginetica intervals span zero.\\
+Assignment signal &
+One fixed deterministic reassignment of the exact frozen $\beta_q$ multiset breaks
+only query-to-beta matching. Video nDCG@20 and Diginetica nDCG@10 have
+intervals above zero for this negative control; Baby is unresolved. Its
+SHA-256 seed uses only the experiment seed and ordered query IDs, never
+targets.\\
+Metadata attribution &
+PASGR uses a cache documented as E5-small~\cite{wang2022e5} on Video and TF--IDF/SVD teachers
+on Baby and Diginetica. Comparisons with ID-only models are system-level;
+matched-teacher Amazon results are labelled separately.\\
+Expert sensitivity &
+The NARM~\cite{li2017narm} swap changes only the neural expert inside the same allocator and is
+reported as system-level sensitivity, not as metadata-matched architecture
+attribution.\\
+Generality &
+Three domains support a bounded empirical finding, not a literature-wide
+state-of-the-art or universal routing claim.\\
+\bottomrule
+\end{longtable}
+\endgroup
+
+\subsection{Methodological position}
+The contribution is not a new encoder, RRF~\cite{cormack2009rrf}, or validation split. It is the
+combination of frozen heterogeneous experts, source-disjoint OOF supervision,
+target-free inference features, and a verifiable perturbation bound.
+Out-of-fit meta-learning is rooted in stacked generalization
+\cite{wolpert1992stacking}; our contribution is specifically the five-scalar,
+bounded allocation law with a rank-only expert interface and its
+frozen-expert protocol.
+\begin{table}[h]
+\caption{Allocation design space. ``OOF-safe'' means the allocator never
+learns from predictions made on an expert's own fit sources.}
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+Family & Per-query & Frozen experts & OOF-safe & Bounded\\
+\midrule
+Global weighted rank fusion & No & Yes & N/A & N/A\\
+In-fit stacking/router & Yes & Often & No & Usually no\\
+OOF stacking & Yes & Yes & Yes & Usually no\\
+Joint neural MoE & Yes & No & N/A & Usually no\\
+\method{} & Yes & Yes & Yes & Yes\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Question-to-Control Map}
+This section maps each research question to the control that changes only one
+axis of the proposed allocation protocol.
+\begin{table}[h]
+\caption{Each control changes one methodological axis while preserving the
+declared train-only allocation boundary.}
+\label{tab:question-control-map}
+\centering\small
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{.24\textwidth}
+>{\raggedright\arraybackslash}p{.31\textwidth}
+>{\raggedright\arraybackslash}p{.35\textwidth}}
+\toprule
+Question & Control & Interpretation\\
+\midrule
+Is fusion complementary? &
+Memory-only, neural-only, equal mixing &
+Separates evidence complementarity from allocator complexity.\\
+Does per-query allocation matter? &
+OOF global, short/long, head/tail, four buckets &
+Compares one scalar, coarse policies, and continuous $\beta_q$.\\
+Is the assignment itself useful? &
+Fixed reassignment of primary $\beta_q$ &
+Preserves the exact beta multiset while breaking query-to-beta matching.\\
+Is the bound arbitrary? &
+$\Delta\in\{.05,.10,.20\}$; no-prior/no-admission variants &
+Tests modulation capacity and both shrinkage terms.\\
+Which signals matter? &
+Single-feature and drop-one gates; 16-feature linear/MLP &
+Audits context, popularity/tail, and expert diagnostics.\\
+Is the fusion implementation decisive? &
+$k\in\{10,20,60\}$ and normalized CombSUM &
+Tests the rank constant and a fixed-allocation score-space perturbation.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{End-to-End Protocol}
+\begin{enumerate}
+\item Declare 5,000 validation queries per domain by stable hash before any
+allocation fit; exclude their source identifiers from OOF construction.
+\item From the remaining training sources, remove up to 5,000 complete
+sessions: 1,000 for memory-profile locking and 4,000 for gate calibration.
+\item Fit CEARF and PASGR on the inner sessions, then predict the two disjoint
+OOF subsets. Profile selection uses only the first subset.
+\item On actionable gate queries, learn the continuous
+$\beta_{\mathrm{OOF}}$ from reciprocal-rank pairs, then fit the bounded
+three-feature residual around that frozen prior.
+\item Freeze the split fingerprints, expert identities, feature statistics,
+scalar/gate states, and protocol flags before any declared-validation or test
+prediction.
+\item Within the allocation experiment, use declared validation only for
+frozen-policy diagnostics. It cannot
+change $\beta_{\mathrm{OOF}}$, the gate, $\Delta$, or the primary feature set.
+\item Refit experts/indexes on the complete training data permitted for test,
+retain the frozen allocator, rank the full catalogue, and save per-query ranks
+for paired analysis.
+\end{enumerate}
+
+\section{Task, Data Construction, and Evaluation}
+A query is a prefix $q=(i_1,\ldots,i_L)$ with one held-out next item $y_q$.
+The catalogue is $\mathcal I$, and every reported ranking is over the full
+catalogue. For Amazon~\cite{hou2024amazonreviews}, histories are ordered and split leave-last-out; items
+already present in the query are masked. For Diginetica, the public session
+split~\cite{diginetica2016} is retained and repeat consumption is allowed. Candidate generation may
+operate at width 120 internally, but metrics inspect the final top 6, 10, or
+20 positions. No sampled test negatives are used.
+
+Each loader exposes a validation-candidate mapping before this experiment.
+The study declares exactly 5,000 candidates per domain by stable hash before
+any allocation fitting. On Diginetica, those 5,000 target events and incoming
+transitions are removed from the tuning sessions; unselected candidate target
+events remain ordinary training events. On Amazon, validation targets are
+external to training, while source histories corresponding to unselected
+candidates remain OOF-eligible. No unselected candidate is evaluated as part
+of the declared validation subset.
+
+\begin{table}[h]
+\caption{Audited validation boundary. ``Candidate--OOF'' counts source
+overlap with the loader's full candidate mapping; source histories outside the
+declared 5,000 remain OOF-eligible. Declared--OOF is zero.}
+\label{tab:validation-boundary}
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+Domain & Candidate pool & Declared & Removed & Declared--OOF &
+Candidate--OOF\\
+\midrule
+Video Games & \DynamicVideoCandidatePool & \DynamicVideoDeclaredValidation &
+\DynamicVideoTargetsRemoved & \DynamicVideoDeclaredOOFOverlap &
+\DynamicVideoCandidateOOFOverlap\\
+Baby Products & \DynamicBabyCandidatePool & \DynamicBabyDeclaredValidation &
+\DynamicBabyTargetsRemoved & \DynamicBabyDeclaredOOFOverlap &
+\DynamicBabyCandidateOOFOverlap\\
+Diginetica & \DynamicDigiCandidatePool & \DynamicDigiDeclaredValidation &
+\DynamicDigiTargetsRemoved & \DynamicDigiDeclaredOOFOverlap &
+\DynamicDigiCandidateOOFOverlap\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\caption{Dataset and protocol statistics.}
+\centering\small
+\begin{tabular}{lrrrrl}
+\toprule
+Domain & Items & Train seq. & Validation & Test & Seen-item policy\\
+\midrule
+Video Games & 25,613 & 94,762 & 5,000 & 94,762 & mask\\
+Baby Products & 36,014 & 150,777 & 5,000 & 150,777 & mask\\
+Diginetica & 43,098 & 186,670 & 5,000 & 60,858 & retain\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For cutoff $K$, Recall is
+$|\{q:r_q\leq K\}|/|\mathcal Q|$ and nDCG is
+$|\mathcal Q|^{-1}\sum_q\mathbf1[r_q\leq K]/\log_2(r_q+1)$.
+The allocation objective reported in the paper is
+$U=.5\,\mathrm{Recall@6}+.5\,\mathrm{Recall@20}$; Recall@10 and all nDCG
+cutoffs are reported in Tables~9--11.
+
+\section{Complete CEARF Memory}
+\subsection{Transition evidence}
+Only the eight most recent context items are inspected. For context item
+$s_a$ at reverse-recency age $a$ and candidate $x$,
+\begin{equation}
+T_q(x)=\sum_a e^{-.35a}
+\frac{\log(1+c(s_a,x))}{\sqrt{1+\mathrm{freq}(x)}}.
+\end{equation}
+The directed count $c$ sums inverse transition distance within a four-step
+window. Each source retains at most 200 outgoing candidates.
+
+\subsection{Neighbour-session evidence}
+Let $j$ be an indexed training session. It receives overlap
+\begin{equation}
+O(q,j)=\sum_a \mathrm{idf}(i_a)e^{-.20a}
+\mathbf1[i_a\in j],
+\qquad
+\mathrm{idf}(i)=\log\!\left(1+
+\frac{|\mathcal S|}{|\{j:i\in j\}|}\right).
+\end{equation}
+The 120 highest-overlap sessions vote for candidates. The vote is normalized
+by $\sqrt{|\mathrm{unique}(j)|}$. An item after the most recent matched
+position receives direction weight 1; an earlier item receives .25; distance
+from the match contributes an additional inverse-square-root factor.
+
+\subsection{Popularity, profiles, and agreement}
+Global frequency supplies the third top-120 list and pads a short output.
+The declared memory family is:
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+Profile & Transition & Session & Popularity\\
+\midrule
+transition & 1.00 & 0 & 0\\
+session & 0 & 1.00 & 0\\
+balanced & .50 & .40 & .10\\
+transition--session & .60 & .40 & 0\\
+session--transition & .35 & .60 & .05\\
+short-safe & .65 & .20 & .15\\
+\bottomrule
+\end{tabular}
+\end{center}
+Ranks are combined as $\sum_e w_e/(20+r_e(x))$. If at least two active
+memory lists retrieve $x$, its score is multiplied by
+$1+.12(v_x-1)$, where $v_x$ is its support count. Short ($L\leq2$) and
+longer contexts select profiles independently on the 1,000-query
+training-only profile subset. The selected profile is session-only in all
+three domains and both regimes; transition and popularity therefore remain
+evaluated alternatives/fallbacks rather than hidden contributors to the
+primary result.
+
+\section{PASGR Neural Expert}
+PASGR expands to \emph{Prototype-Aligned Semantic Graph Retrieval}. It is a
+one-layer GRU with 64 hidden units, dropout .2, candidate width 120, and four
+training epochs in the dynamic-$\beta$ experiment. For prefix state
+$\mathbf h_q$ and item embedding $\mathbf e_i$, exact full-catalogue inference
+uses
+\[
+s_N(q,i)=
+\operatorname{norm}(W\,\mathrm{GRU}(q))^\top
+\operatorname{norm}(\mathbf e_i).
+\]
+Video Games item embeddings use the cached 384-dimensional teacher documented
+as \texttt{E5-small}. Baby Products uses a
+128-dimensional TF--IDF/SVD teacher constructed from available titles,
+categories, features, descriptions, and brands; Diginetica uses a
+128-dimensional TF--IDF/SVD matrix of product-name tokens. Teacher identity
+is resolved from the loaded matrix before evaluation; its shape and SHA-256
+prefix are reported directly in the provenance table in Section~10 rather
+than inferred from a requested label.
+
+Training contrasts the observed target with 32 negatives drawn from semantic
+prototype neighbours, transition-graph neighbours, and random catalogue
+items. Cross-entropy on that candidate set is augmented by a recency-weighted
+semantic alignment loss and, when enabled, multi-positive in-batch retrieval.
+Graph aggregation mixes adjacent-item representations before GRU training;
+prototype transport pulls poorly observed items toward semantic centroids.
+AdamW uses learning rate $10^{-3}$ and weight decay $10^{-4}$.
+The upstream PASGR family crossed graph weight $\{0,.35\}$, prototype
+transport on/off, contrastive weight $\{0,.15\}$, and in-batch weight
+$\{0,.1\}$. All three frozen cells disable prototype transport, so the
+``prototype-aligned'' mechanism is part of the declared PASGR family but not a
+hidden contributor to the primary cells.
+
+\begin{table}[h]
+\caption{Frozen PASGR cells used by every allocation control. The dynamic
+experiment does not reselect them.}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Domain & Graph & Prototype & Contrastive & In-batch\\
+\midrule
+Video Games & .35 & off & .15 & .10\\
+Baby Products & 0 & off & .15 & 0\\
+Diginetica & .35 & off & 0 & .10\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The earlier study evaluated the full 16-cell family on validation. This is an
+upstream expert-selection decision, not evidence that dynamic $\beta$ used
+validation. A pure
+component-attribution study would need to retrain all cells and evaluate
+neural-only ranks under the new protocol; we do not relabel the older
+fusion-selected grid as such an ablation.
+
+\section{Training-Only Dynamic Allocation}
+\subsection{Rank evidence and hard negatives}
+For expert $e\in\{M,N\}$ and rank $r_e(x)$,
+\begin{equation}
+\rr_e(x)=
+\begin{cases}
+(k+1)/(k+r_e(x)),&x\text{ appears in the top 120},\\
+0,&\text{otherwise},
+\end{cases}
+\qquad k=20.
+\end{equation}
+Each calibration query uses the 32 non-target union candidates with largest
+evidence under either expert, or all candidates when fewer than 32 exist;
+item ID breaks ties deterministically. A query is actionable when its target appears
+in at least one expert list. Non-actionable queries are retained in coverage
+statistics but excluded from optimization because changing $\beta$ cannot
+retrieve their missing target from the union.
+
+The serving implementation uses $1/(k+r)$ rather than $(k+1)/(k+r)$.
+The omitted common positive factor gives $S_q=F_q/(k+1)$ and therefore exactly
+the same ordering. The expert interface is rank-only: each expert enters
+allocation through its top-120 ordering, while query features are target-free
+at inference. Any strictly monotone raw-score transformation that preserves an
+expert's top-120 ordering therefore preserves the OOF training arrays, learned
+allocator, and final ranking.
+
+\subsection{Global prior and bounded query residual}
+The global model learns one unconstrained logit whose sigmoid is
+$\beta_{\mathrm{OOF}}$, initialized at .35. The query model is
+\begin{equation}
+\beta_q=\beta_{\mathrm{OOF}}+
+\Delta_{\mathrm{eff}}\tanh(\mathbf w^\top\widetilde{\mathbf z}_q+b),
+\quad
+\Delta_{\mathrm{eff}}=\min\{.10,\beta_{\mathrm{OOF}},
+1-\beta_{\mathrm{OOF}}\}.
+\end{equation}
+The primary feature vector contains exactly:
+\begin{enumerate}
+\item $\log(1+L)$;
+\item $\log(1+\mathrm{freq}(i_L))$; and
+\item $\mathbf1[i_L\notin\mathcal I_{\mathrm{head}}]$.
+\end{enumerate}
+Features are computable before recommendation and contain neither target
+identity nor a target-hit diagnostic. Mean and standard deviation are fit on
+actionable OOF training rows and frozen.
+
+For target $y_q$ and negative $x$, the fused evidence is
+$F_q(x)=(1-\beta_q)\rr_M(x)+\beta_q\rr_N(x)$. With temperature $\tau=.10$,
+\begin{align}
+\mathcal L_{\mathrm{rank}}
+&=\frac1{|\mathcal Q|}\sum_q\frac1{|\mathcal H_q|}
+\sum_{x\in\mathcal H_q}
+\operatorname{softplus}\!\left(
+\frac{F_q(x)-F_q(y_q)}{\tau}\right),\\
+\mathcal L
+&=\mathcal L_{\mathrm{rank}}
++10^{-3}\overline{\beta_q}
++10^{-3}\overline{(\beta_q-\beta_{\mathrm{OOF}})^2}.
+\end{align}
+The first regularizer is a small neural-admission cost; the second shrinks
+query modulation toward the global policy. AdamW uses learning rate .02 for
+the 80-epoch scalar fit and $10^{-3}$ for the 50-epoch gate, batch size at
+most 512, weight decay $10^{-4}$ for the gate, and deterministic seed order.
+The scalar stage minimizes
+$\mathcal L_{\mathrm{rank}}+10^{-3}\beta$ with
+$\beta_q\equiv\sigma(a)$; only the quadratic residual-prior term is absent.
+It is then frozen while the second stage optimizes only $(\mathbf w,b)$ under
+the full objective.
+For a target--negative pair, define the signed expert-margin advantage
+\[
+A_{qx}=[\rr_N(y_q)-\rr_N(x)]-[\rr_M(y_q)-\rr_M(x)].
+\]
+The derivative of the fused target margin with respect to $\beta_q$ is
+$A_{qx}$: the gate learns from context when neural evidence has the larger
+target-versus-negative margin.
+
+\begin{table}[h]
+\caption{Training-only calibration status, mean (SD) over
+\DynamicSeedCount{} matched seeds.}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Domain & OOF rows & Actionable & Share & $\beta_{\mathrm{OOF}}$\\
+\midrule
+Video Games & \DynamicVideoOOFRows & \DynamicVideoActionable &
+\DynamicVideoActionableShare & \DynamicVideoGlobalBeta\\
+Baby Products & \DynamicBabyOOFRows & \DynamicBabyActionable &
+\DynamicBabyActionableShare & \DynamicBabyGlobalBeta\\
+Diginetica & \DynamicDigiOOFRows & \DynamicDigiActionable &
+\DynamicDigiActionableShare & \DynamicDigiGlobalBeta\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Why the residual is bounded}
+The same bounded three-feature linear form, feature set, and hyperparameters
+are primary across all domains and seeds; fitted coefficients vary by
+replicate. The direct
+16-feature MLP is a capacity stress test. Its gains are small and
+seed-dependent; on Diginetica, three of four MLP variants are lower than the
+primary and the remaining no-memory-certainty MLP is higher by only .00025
+$U$. The primary gate
+treats $\beta_{\mathrm{OOF}}$ as a learned prior and permits only a $\pm.10$
+correction. This does not guarantee improvement or bound ranking loss; it
+limits only per-item fused-score perturbation. The linear inside the $\tanh$
+has four optimized coefficients. Together with the scalar prior, the allocator
+has five optimized coefficients; six feature means/standard deviations are
+frozen preprocessing state, not optimized parameters.
+
+\paragraph{Bounded expert-disagreement certificate.}
+Analytically, finite real logits give $\beta_q\in(0,1)$ because
+$\Delta_{\mathrm{eff}}\leq
+\min(\beta_{\mathrm{OOF}},1-\beta_{\mathrm{OOF}})$ and
+$|\tanh(\cdot)|<1$; the implementation-safe guarantee is $[0,1]$, and all
+persisted allocations are strictly interior. Moreover, with
+$F_{\mathrm{OOF}}(x)=(1-\beta_{\mathrm{OOF}})\rr_M(x)+
+\beta_{\mathrm{OOF}}\rr_N(x)$,
+\[
+|F_q(x)-F_{\mathrm{OOF}}(x)|
+=|\beta_q-\beta_{\mathrm{OOF}}|\,|\rr_N(x)-\rr_M(x)|
+\leq\Delta_{\mathrm{eff}}\leq.10,
+\]
+since each reciprocal-rank evidence lies in $[0,1]$. More sharply, let
+$\delta_q=\beta_q-\beta_{\mathrm{OOF}}$,
+$D_q(x)=\rr_N(x)-\rr_M(x)$, and
+$m_{\mathrm{OOF}}(a,b)=F_{\mathrm{OOF}}(a)-F_{\mathrm{OOF}}(b)$. Then
+\[
+F_q(a)-F_q(b)=m_{\mathrm{OOF}}(a,b)+
+\delta_q\{D_q(a)-D_q(b)\}.
+\]
+The baseline order is certified whenever
+$|m_{\mathrm{OOF}}(a,b)|>
+|\delta_q|\,|D_q(a)-D_q(b)|$, and conservatively whenever
+$|m_{\mathrm{OOF}}(a,b)|>2\Delta_{\mathrm{eff}}$. If
+$D_q(a)=D_q(b)$, the pair is allocation-invariant. For a target--negative
+pair, $D_q(y_q)-D_q(x)=A_{qx}$ and
+\[
+\frac{\partial\ell_{qx}}{\partial\beta_q}
+=-\frac{A_{qx}}{\tau}
+\sigma\!\left(\frac{F_q(x)-F_q(y_q)}{\tau}\right).
+\]
+Thus the same expert-disagreement term determines the learning signal and the
+maximum permitted pair intervention. This is a score-margin certificate, not
+a Recall/nDCG guarantee.
+Conditional on the
+declared source split and frozen
+experts, $\beta_{\mathrm{OOF}},\mathbf w,b$ are functions only of OOF
+training ranks, OOF training targets, and training-derived feature
+statistics. Declared-validation and test targets therefore cannot affect the
+allocator parameters. This construction establishes allocation provenance;
+it does not by itself guarantee test improvement.
+
+\section{Out-of-Fit Split and Leakage Controls}
+Eligible source sessions have at least three events and do not overlap the
+declared 5,000-query validation subset. Their identifiers are ordered by a
+stable BLAKE2 fraction. At most 5,000 (10\% when smaller) are held out:
+\begin{itemize}
+\item the first 1,000 become profile-lock leave-last-out queries;
+\item the remaining 4,000 become gate-calibration leave-last-out queries;
+\item all 5,000 source sessions are entirely absent from the inner CEARF
+index and PASGR training fit.
+\end{itemize}
+Consequently, the target event, its incoming transition, and every earlier
+event from the same source are absent from the experts that predict it. The
+profile/gate fingerprints are SHA-256 hashes computed before
+declared-validation/test prediction.
+
+On Diginetica, declared-validation target events and incoming transitions are
+removed from tuning sessions; on Amazon those targets are already outside the
+training histories. The complete training split is restored only for the
+single final test expert fit. Declared-validation labels are allowed only for
+reporting the frozen system, never as arguments to either beta fitter. We
+separately record candidate-pool size, declared-subset size, and zero source
+overlap between the declared subset and OOF calibration.
+
+\begin{table}[h]
+\caption{Fixed split identities. SHA-256 fingerprints are shown as stable
+abbreviated identity checks.}
+\centering\small
+\begin{tabular}{lrrll}
+\toprule
+Domain & Eligible & Held & Profile hash & Gate hash\\
+\midrule
+Video Games & \DynamicVideoEligible & 5,000 &
+\DynamicVideoProfileHash\ldots & \DynamicVideoGateHash\ldots\\
+Baby Products & \DynamicBabyEligible & 5,000 &
+\DynamicBabyProfileHash\ldots & \DynamicBabyGateHash\ldots\\
+Diginetica & \DynamicDigiEligible & 5,000 &
+\DynamicDigiProfileHash\ldots & \DynamicDigiGateHash\ldots\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Complete Allocation Results}
+\input{generated_dynamic_beta_tables}
+\input{generated_dynamic_beta_full_metrics}
+The first table includes the two endpoints and every principal allocation
+control; the second gives all declared cutoffs for the non-endpoint allocation
+policies. Complete per-cutoff results are reported in Tables~9--11.
+
+\subsection{Per-query rescues and dynamic range}
+\begin{table}[h]
+\caption{Dynamic behavior on full test sets, mean (SD) over matched seeds.
+A rescue is an R@20 miss by memory changed to a hit; damage is the reverse.}
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+Domain & Mean $\beta_q$ & SD & Rescues & Damage & Net\\
+\midrule
+Video Games & \DynamicVideoBetaMean & \DynamicVideoBetaWithinSD &
+\DynamicVideoRescues & \DynamicVideoDamage & \DynamicVideoNetRescues\\
+Baby Products & \DynamicBabyBetaMean & \DynamicBabyBetaWithinSD &
+\DynamicBabyRescues & \DynamicBabyDamage & \DynamicBabyNetRescues\\
+Diginetica & \DynamicDigiBetaMean & \DynamicDigiBetaWithinSD &
+\DynamicDigiRescues & \DynamicDigiDamage & \DynamicDigiNetRescues\\
+\bottomrule
+\end{tabular}
+\end{table}
+The large net counts are mainly a fusion effect. To isolate dynamic
+allocation, compare with the global policy: dynamic changes mean net rescues
+by \DynamicVideoNetVsGlobal{} on Video,
+\DynamicBabyNetVsGlobal{} on Baby, and
+\DynamicDigiNetVsGlobal{} on Diginetica.
+
+\input{generated_dynamic_beta_baseline_audit}
+\FloatBarrier
+
+\subsection{Neural-expert sensitivity}
+This completed 3-domain, 3-seed control replaces PASGR by ID-only NARM while
+holding CEARF memory, OOF split, continuous objective, bounded gate, RRF
+$k=20$, and full-catalogue test protocol fixed. It is not metadata-matched on
+Amazon because PASGR uses semantic initialization; its role is to show that the
+allocator can absorb a stronger ID-only neural expert. The swap closes the
+Diginetica external-baseline gap (dynamic R@20 .53939 versus NARM .53406) but
+reduces Baby relative to the PASGR primary, consistent with Baby's metadata
+benefit.
+\input{generated_dynamic_beta_expert_swap}
+\FloatBarrier
+
+\section{Gate-Capacity Ablation}
+The implementation computes 16 target-free diagnostics for ablation:
+\begin{table}[H]
+\caption{Target-free diagnostics available to gate-capacity ablations. The
+primary gate uses only features 1--3.}
+\label{tab:gate-diagnostics}
+\centering\small
+\begin{tabular}{p{.04\textwidth}p{.39\textwidth}p{.04\textwidth}p{.39\textwidth}}
+\toprule
+ID & Feature & ID & Feature\\
+\midrule
+1 & log context length & 9 & memory top-1 in neural top-5\\
+2 & log last-item training frequency & 10 & neural top-1 in memory top-5\\
+3 & last-item tail indicator & 11 & memory top-1 component support\\
+4 & maximum memory agreement at 5 & 12 & neural top-1 component support\\
+5 & memory/neural top-1 equality & 13 & mean memory Jaccard at 10\\
+6 & memory--neural Jaccard at 5 & 14 & neural novelty outside memory top-120\\
+7 & memory--neural Jaccard at 20 & 15 & log transition branching factor\\
+8 & reciprocal-rank overlap at 20 & 16 & dominant transition share\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\begin{table}[h]
+\caption{Gate-capacity ablation, test $U$ mean (SD) over matched seeds.
+``Primary'' is features 1--3, linear, bounded by .10.}
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+Gate & Video & Baby & Diginetica\\
+\midrule
+Primary context linear & \DynamicVideoPrimaryU & \DynamicBabyPrimaryU &
+\DynamicDigiPrimaryU\\
+Context MLP (16 hidden) & \DynamicVideoContextMLPU &
+\DynamicBabyContextMLPU & \DynamicDigiContextMLPU\\
+All-feature linear & \DynamicVideoFullLinearU & \DynamicBabyFullLinearU &
+\DynamicDigiFullLinearU\\
+All-feature MLP & \DynamicVideoFullMLPU & \DynamicBabyFullMLPU &
+\DynamicDigiFullMLPU\\
+MLP without cross-expert features & \DynamicVideoNoCrossExpertU &
+\DynamicBabyNoCrossExpertU & \DynamicDigiNoCrossExpertU\\
+MLP without memory-certainty features &
+\DynamicVideoNoMemoryCertaintyU & \DynamicBabyNoMemoryCertaintyU &
+\DynamicDigiNoMemoryCertaintyU\\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+No domain-specific post-hoc architecture is selected. The all-feature linear
+gate has a slightly higher mean in each domain but loses to the primary on one
+matched seed in each. On Diginetica, three of four MLP variants are lower than
+the primary and the remaining no-memory-certainty MLP is higher by only .00025
+$U$. The same
+three-feature linear form and hyperparameters therefore remain primary across
+domains and seeds.
+
+\section{Fusion Sensitivity}
+\begin{table}[h]
+\caption{Dynamic test $U$ mean (SD) after refitting the continuous global
+prior and gate on OOF training ranks for each RRF constant.}
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+Constant & Video & Baby & Diginetica\\
+\midrule
+$k=10$ & \DynamicVideoKTenU & \DynamicBabyKTenU & \DynamicDigiKTenU\\
+$k=20$ & \DynamicVideoKTwentyU & \DynamicBabyKTwentyU &
+\DynamicDigiKTwentyU\\
+$k=60$ & \DynamicVideoKSixtyU & \DynamicBabyKSixtyU &
+\DynamicDigiKSixtyU\\
+\bottomrule
+\end{tabular}
+\end{table}
+This is a sensitivity test, not a validation search: primary $k=20$ is held
+fixed across domains and seeds rather than reselected from this table. Raw
+reciprocal ranks are never relabelled as raw
+expert scores. A normalized-score operator control is reported only if frozen
+checkpoint inference exactly reconstructs the persisted top-120 expert IDs.
+CombSUM min--max normalizes each expert per query over the union of those
+persisted top-120 candidates (absent candidates receive zero). It is evaluated
+under frozen $\beta_q$ and parameter-free $\beta=.5$; neither allocation is
+reoptimized for CombSUM. This is not a full-catalogue score-normalization
+claim.
+
+\input{generated_dynamic_beta_fusion_control}
+
+With the frozen dynamic allocation, weighted RRF improves R@20 over normalized
+CombSUM by .00133, .00134, and .00272 on Video, Baby, and Diginetica,
+respectively. The equal-allocation Diginetica result reverses in favor of
+CombSUM. Hence the control supports rank-space RRF for the proposed allocator,
+but it also shows an operator--allocation interaction; it does not establish
+unconditional RRF superiority.
+
+\section{Allocation Controls}
+\input{generated_dynamic_beta_allocation_controls}
+
+\section{Statistical Procedure}
+For each method $m$, seed $s$, and query $q$, the retained per-query result
+contains the top-20 target rank. Recall differences are exact paired values
+$d_{qs}=\mathbf1[r_{m,qs}\leq K]-\mathbf1[r_{b,qs}\leq K]$.
+We first average $d_{qs}$ over matched seeds, then sample query identifiers
+with replacement. Each sampled query carries all three seed outcomes jointly,
+preserving cross-seed pairing within query. Percentile endpoints from 20,000
+replications form the 95\% interval. A sign-flip randomization test flips each
+matched-seed per-query difference jointly. The evaluated HID Diginetica
+representation contains expanded prefix rows but not their original session
+identifier; the query is
+therefore the smallest recoverable cluster and residual within-session
+correlation is not modeled. These intervals describe recoverable-query
+sampling conditional on the three fitted seeds; sample SD across those seeds
+is reported separately.
+The procedure is not a multiple-cutoff familywise test;
+intervals at R@6/R@10/R@20 are descriptive matched analyses.
+
+\section{Inference Runtime and Exact Replay}
+Once the two top-120 expert lists are available, the gate is $O(3)$ and RRF
+scores at most 240 distinct items before sorting that union. The added
+allocation/fusion cost is therefore independent of catalogue size; full
+catalogue scoring remains inside the frozen experts.
+Features+gate and feature+gate+RRF columns in Table~\ref{tab:runtime} are
+newly measured by exact NumPy inference. In a deterministic replay check,
+reconstructed beta values differ from the original inference outputs by at
+most \DynamicRuntimeMaxBetaError{}, and the top-20 rankings are reproduced
+exactly. The total is explicitly a cross-run warm
+component estimate: the newly measured dynamic post-processing is added to raw
+CEARF retrieval and PASGR inference times from the previous audited warm-expert
+run. It excludes every timing from the retired validation router.
+\begin{table}[H]
+\caption{Apple M2 Pro, 32\,GB, seed-42 frozen runs. Features+gate is included
+inside Postproc.; Expert retrieval is CEARF memory retrieval plus PASGR
+prediction from the prior warm-expert component run. Total = Expert retrieval
++ Postproc.; it is a cross-run component estimate, not a co-timed median.}
+\label{tab:runtime}
+\centering\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrrrrr}
+\toprule
+Domain & Queries & Feat.+gate ($\mu$s) & Postproc. ($\mu$s) &
+Expert (ms) & Total (ms)\\
+\midrule
+Video Games & \DynamicRuntimeVideoQueries & \DynamicRuntimeVideoGateUs &
+\DynamicRuntimeVideoPostUs & \DynamicRuntimeVideoExpertMs &
+\DynamicRuntimeVideoTotalMs\\
+Baby Products & \DynamicRuntimeBabyQueries & \DynamicRuntimeBabyGateUs &
+\DynamicRuntimeBabyPostUs & \DynamicRuntimeBabyExpertMs &
+\DynamicRuntimeBabyTotalMs\\
+Diginetica & \DynamicRuntimeDigiQueries & \DynamicRuntimeDigiGateUs &
+\DynamicRuntimeDigiPostUs & \DynamicRuntimeDigiExpertMs &
+\DynamicRuntimeDigiTotalMs\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Additional Implementation Details and Limitations}
+All experiments use seeds 42, 123, and 456. The implementation follows the
+source-disjoint OOF construction, allocator optimization, paired statistical
+analysis, and inference procedures specified in Sections~3--15. All results
+required to support the paper's claims are reported directly in the main
+paper and this supplementary material.
+
+The 5,000-query cap makes calibration affordable but may undersample rare
+regimes. The single deterministic source holdout is out-of-fit, not full
+$K$-fold cross-fitting. The primary gate uses only last-item popularity and
+length context; richer uncertainty estimates may help on larger untouched
+domains, but the current capacity audit warns against assuming that more
+features are automatically safer. Finally, all main domains are
+next-item benchmarks; long-horizon utility and online feedback remain open.
+
+\enlargethispage{4\baselineskip}
+\begin{thebibliography}{18}
+\setlength{\itemsep}{-1pt}
+\bibitem{cormack2009rrf} Cormack, G.V., Clarke, C.L.A., Buettcher, S.:
+Reciprocal rank fusion outperforms Condorcet and individual rank learning
+methods. In: SIGIR, pp. 758--759 (2009)
+\bibitem{diginetica2016} DIGINETICA: CIKM Cup 2016 Track 2: Personalized
+E-Commerce Search Challenge Data. CodaLab (2016)
+\bibitem{garg2019stan} Garg, D., et al.: Sequence and time aware neighborhood
+for session-based recommendations: STAN. In: SIGIR, pp. 1069--1072 (2019)
+\bibitem{multichannelltr2026} Gaydhani, A., et al.: Unified learning-to-rank
+for multi-channel retrieval in large-scale e-commerce search. CoRR
+abs/2602.23530 (2026)
+\bibitem{shortcut2026} Han, H., et al.: An embarrassingly simple graph
+heuristic reveals shortcut-solvable benchmarks for sequential recommendation.
+CoRR abs/2605.07125 (2026)
+\bibitem{llm2rec2025} He, Y., et al.: LLM2Rec: Large language models are
+powerful embedding models for sequential recommendation. In: KDD,
+pp. 896--907 (2025)
+\bibitem{hou2024amazonreviews} Hou, Y., et al.: Bridging language and items
+for retrieval and recommendation. CoRR abs/2403.03952 (2024)
+\bibitem{standards2026} Jannach, D., Chen, L.: Improving methodological
+standards in recommender systems offline evaluation. ACM Trans. Recommender
+Systems 4(3), 34e:1--34e:15 (2026)
+\bibitem{li2017narm} Li, J., et al.: Neural attentive session-based
+recommendation. In: CIKM, pp. 1419--1428 (2017)
+\bibitem{li2025survey} Li, Z., et al.: Graph and sequential neural networks in
+session-based recommendation: A survey. ACM Comput. Surv. 57(2), 1--37 (2025)
+\bibitem{hm2rec2026} Liu, Y., et al.: Hyperbolic-enhanced mixture-of-experts
+Mamba for sequential recommendation. In: AAAI 40, 15403--15411 (2026)
+\bibitem{sigma2025} Liu, Z., et al.: SIGMA: Selective gated Mamba for
+sequential recommendation. In: AAAI 39, 12264--12272 (2025)
+\bibitem{ludewig2018vsknn} Ludewig, M., Jannach, D.: Evaluation of
+session-based recommendation algorithms. UMUAI 28(4--5), 331--390 (2018)
+\bibitem{wang2022e5} Wang, L., et al.: Text embeddings by weakly-supervised
+contrastive pre-training. CoRR abs/2212.03533 (2022)
+\bibitem{hidlongtail2026} Wang, X., et al.: Bid farewell to seesaw: Towards
+accurate long-tail session-based recommendation via dual constraints of
+hybrid intents. In: AAAI 40, 15895--15903 (2026)
+\bibitem{wolpert1992stacking} Wolpert, D.H.: Stacked generalization. Neural
+Networks 5(2), 241--259 (1992)
+\bibitem{hidasi2016gru4rec} Hidasi, B., et al.: Session-based recommendations
+with recurrent neural networks. In: ICLR (2016)
+\bibitem{wu2019srgnn} Wu, S., et al.: Session-based recommendation with graph
+neural networks. In: AAAI 33, 346--353 (2019)
+\end{thebibliography}
+\end{document}

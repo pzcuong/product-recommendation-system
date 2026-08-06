@@ -1,0 +1,107 @@
+\documentclass[runningheads]{llncs}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\begin{document}
+\title{Temporary Ranking Reversals in State-Space Session Recommendation}
+\author{Anonymous Author(s)}
+\institute{Anonymous Institution}
+\maketitle
+
+\begin{abstract}
+We test whether a selective state-space encoder becomes more competitive as
+session-recommendation data grows. On public Diginetica, GRU4Rec and a local
+pure-PyTorch selective-SSM proxy share the same head, loss, validation
+procedure, and training budget. We evaluate four training sizes, three
+independent data draws, and three model seeds. The SSM proxy is slightly ahead
+on all draws at 15K sessions, but every paired interval contains zero. At 30K,
+it wins one draw and loses two, with mean Recall@20 0.0987 versus 0.1093 for
+GRU. Three of nine 30K SSM runs also converge to substantially weaker
+solutions. The evidence supports a temporary, draw-sensitive ranking reversal,
+not a stable scaling crossover. The proxy is not a reproduction of Mamba4Rec
+or SIGMA, and no state-of-the-art claim is made.
+\keywords{Session recommendation \and State-space models \and Reproducibility}
+\end{abstract}
+
+\section{Introduction}
+Architecture comparisons usually vary initialization seeds while holding one
+training split fixed. In sparse recommendation, the sampled sessions also
+change item coverage and transition evidence. We ask whether the relative
+ranking of GRU4Rec and a local selective-SSM proxy persists across both data
+draws and model seeds.
+
+\section{Related Work}
+GRU4Rec introduced recurrent session recommendation; SASRec, BERT4Rec, and
+SR-GNN established attention and graph alternatives. Mamba4Rec and SIGMA apply
+selective state-space components to recommendation. Our proxy is deliberately
+scoped and must not be interpreted as a reproduction of either complete
+architecture.
+
+\section{Protocol}
+Both encoders use the same Diginetica preprocessing, item embeddings,
+full-softmax head, objective, validation queries, early stopping, and budget.
+Training subsets contain 10K, 12K, 15K, or 30K sessions. Each size uses data
+draws 42, 123, and 456 and model seeds 42, 123, and 456, yielding 72 primary
+runs. Query-level paired bootstrap intervals are computed after averaging
+model seeds within each fixed draw. They quantify uncertainty conditional on
+that draw; cross-draw robustness is assessed from the three draw effects.
+
+\section{Results}
+\begin{table}[t]
+\centering
+\caption{Recall@20. Each cell averages model seeds within one data draw.}
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Sessions & D42:G & D42:S & D123:G & D123:S & D456:G & D456:S\\
+\midrule
+10K & .0702 & .0548 & .0747 & .0722 & .0669 & .0536\\
+12K & .0758 & .0622 & .0800 & .0764 & .0773 & .0764\\
+15K & .0858 & .0878 & .0904 & .0907 & .0847 & .0862\\
+30K & .0984 & .0569 & .1118 & .1009 & .1178 & .1382\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Aggregate draw-level summary.}
+\begin{tabular}{rrrrr}
+\toprule
+Sessions & GRU & SSM & $\Delta$ & SSM wins\\
+\midrule
+10K & .0706 & .0602 & -.0104 & 0/3\\
+12K & .0777 & .0717 & -.0060 & 0/3\\
+15K & .0870 & .0882 & +.0012 & 3/3\\
+30K & .1093 & .0987 & -.0106 & 1/3\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At 15K, draw-specific SSM-minus-GRU differences are +.0020, +.0002, and
++.0016; all paired intervals contain zero. At 30K, differences are -.0416
+(95\% CI [-.0502,-.0331]), -.0109 ([-.0189,-.0027]), and +.0204
+([+.0111,+.0298]). All draws temporarily reverse sign between 12K and 15K,
+but only draw 456 remains positive at 30K. This non-monotonic pattern does not
+support a stable scaling crossover.
+
+Six of nine 30K SSM runs reach Recall@20 at least .10; three converge between
+.008 and .016. A bounded contractive recurrence changes seed-level outcomes
+but does not improve aggregate accuracy or robustness.
+
+\section{Discussion and Limitations}
+A single 15K draw could produce a misleading architecture conclusion. The
+result applies only to the evaluated local proxy, not official Mamba4Rec or
+SIGMA. The primary study uses one public dataset and a fixed test set; a
+full-scale official-model comparison on a second public dataset remains
+necessary for external validity. A capped RetailRocket pipeline check is kept
+as an artifact but excluded from scientific comparisons.
+
+\section{Reproducibility}
+The primary factorial matrix contains 72 runs. The audit covers 136 records
+because it also includes architecture and contractive-SSM diagnostics, which
+are not treated as additional primary replications. Manifests, predictions,
+paired inference, crossover analysis, and variance decomposition are included.
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+\end{document}

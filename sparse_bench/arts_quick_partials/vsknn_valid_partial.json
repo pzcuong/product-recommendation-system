@@ -1,0 +1,14 @@
+{
+  "label": "vsknn-valid",
+  "completed_queries": 5000,
+  "total_queries": 5000,
+  "metrics": {
+    "n": 5000,
+    "recall@6": 0.0364,
+    "ndcg@6": 0.024184774001191626,
+    "recall@10": 0.0498,
+    "ndcg@10": 0.028444723327834494,
+    "recall@20": 0.068,
+    "ndcg@20": 0.03304123311914421
+  }
+}

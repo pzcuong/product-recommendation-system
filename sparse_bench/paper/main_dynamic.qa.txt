@@ -1,0 +1,461 @@
+CEARF-N: Bounded Out-of-Fit Dynamic Rank
+Allocation for Sparse Next-Item
+Recommendation
+Pham Quoc Cuong1,2 , Nguyen Ngoc Minh1,2 , Le Quang Minh1,2 , and Nguyen
+Hoai Nguyet An1,2
+1
+
+University of Information Technology, Ho Chi Minh City, Vietnam
+2
+Vietnam National University Ho Chi Minh City, Vietnam
+{cuongpq.20,minhnn.20,minhlq.20,annhv.20}@grad.uit.edu.vn
+
+Abstract. Explicit memory and neural rankers fail on diﬀerent nextitem queries, while rank-level hybrids commonly assign every query
+one global fusion weight. We introduce CEARF-N (Contextual ExpertAllocation Rank Fusion with a Neural residual). It is a constrained
+post-hoc conditional allocator over frozen rankers: a global prior and
+bounded query correction are learned continuously from source-disjoint
+out-of-ﬁt training ranks. A four-parameter gate predicts βq = βOOF +
+∆eﬀ tanh(w⊤ zq + b), ∆eﬀ ≤ .10, from three standardized, target-free
+inference features. No validation/test label ﬁts or selects a mixing weight.
+Its expert interface is rank-only, making it invariant to strictly monotone score transforms, and it has a closed-form pair-intervention bound.
+Full-catalogue, three-seed experiments on two Amazon domains and Diginetica show that equal/dynamic fusion improves R@20 by 4.6–17.2%
+over the stronger constituent, conﬁrming expert complementarity. The
+dynamic-speciﬁc ﬁnding is narrower: against the training-only global
+policy, dynamic allocation has interval-above-zero early-rank gains on
+Video, while Baby and Diginetica shifts are undetectable. A ﬁxed sameβ-multiset reassignment is worse on Video nDCG@20.
+Keywords: next-item recommendation · dynamic rank fusion ·
+bounded rank allocation · sparse recommendation
+
+1
+
+Introduction
+
+Modern next-item models strengthen learned representations through recurrent,
+state-space, semantic, and mixture-of-experts designs [10,12,11,6,15]. Sparse catalogues expose their complement: a rare item may receive few gradient updates
+while an observed transition or near-duplicate session remains decisive. Explicit
+memory cannot generalize beyond observed edges and overlap. The practical
+question is therefore how much each query should trust heterogeneous evidence.
+A global fusion coeﬃcient assigns every query the same trust. A ﬂexible router
+adds another estimation surface; separately, benchmark shortcuts and weak tuning can inﬂate apparent progress [5,8]. We instead learn a continuous global
+
+2
+
+P. Q. Cuong et al.
+
+prior from out-of-ﬁt training ranks and permit only a bounded query correction.
+CEARF-N pairs PASGR, a compact semantic GRU, with a memory expert selected from a declared transition, neighbour-session, and popularity family; the
+training-only lock selects neighbour-session memory in every reported domain.
+The pair is combined by weighted reciprocal-rank fusion [1]. Validation may audit the frozen allocator, and an upstream study had already frozen PASGR, but
+neither role ﬁts or selects β. The proposed object is constrained post-hoc conditional stacking over frozen rankers, not a new sequence encoder: rank-space
+removes raw-score scale, source-disjoint OOF ﬁtting avoids expert self-ﬁt targets,
+and a residual bound limits every query-wise intervention.
+We ask how much gain is endpoint complementarity versus learned allocation
+(RQ1), whether a bounded residual adds conditional value beyond OOF-global
+allocation (RQ2), how robust it is to capacity/operator changes (RQ3), and what
+inference cost it adds (RQ4).
+Our contributions are:
+1. a continuous training-only objective that learns both a global fusion prior
+and a bounded per-query correction from reciprocal-rank pairwise evidence,
+without enumerating β;
+2. a fully speciﬁed rank-interface allocator with ﬁve optimized coeﬃcients—
+one OOF global logit plus a four-parameter residual gate using only context
+length, last-item frequency, and a tail indicator;
+3. a three-level attribution protocol separating endpoint complementarity,
+OOF-global allocation, and query assignment, with capacity and operator
+controls; and
+4. a serving audit decomposing feature+gate, rank-fusion, and expert retrieval
+latency.
+The claim is not that routing always wins, but that a small auditable controller
+recovers a reproducible early-rank allocation signal on Video.
+
+2
+
+Related Work
+
+Experts and fusion. Recent session recommenders use state-space recurrence,
+MoE routing, semantic initialization, and long-tail constraints [12,11,6,15]. VSKNN/STAN retrieve related sessions [13,3]; NARM is an attentive recurrent
+reference [9]. RRF combines incommensurate score spaces through ranks [1]. The
+primitive is established; our contribution is an OOF-trained rank prior plus a
+raw-score-free residual with target-free inference features, frozen experts, and an
+explicit intervention bound.
+Conditional allocation and evaluation. Neural MoE recommenders
+route jointly trained representations [11]; multi-channel retrieval can learn
+query-dependent ranking over channel signals [4]. We instead study a ﬁvescalar bounded composition over frozen explicit and neural rankers. Because
+shortcut-solvable benchmarks and weak oﬄine protocols can inﬂate progress
+
+Bounded Out-of-Fit Dynamic Rank Allocation
+
+3
+
+[5,8], we report tuned transition/V-SKNN/STAN baselines, both fusion endpoints, matched-query intervals, operator controls, and semantic-teacher provenance. A held-out validation gate would consume validation as meta-training;
+our source-disjoint OOF ﬁtting keeps declared validation labels out of allocation.
+The stacking lineage is detailed in the supplement.
+
+3
+
+CEARF-N
+
+3.1
+
+Expert interface: memory and neural ranks
+
+For query q = (i1 , . . . , iL ), the memory expert exposes three top-120 candidate memories: distance/recency-weighted four-step transitions, IDF/recencyweighted neighbour sessions, and global popularity. Six ﬁxed rank-weight proﬁles are evaluated on a disjoint training-only lock subset. The realized primary
+proﬁle is session-only, (0, 1, 0), in every domain and length regime; consequently
+its agreement bonus is inactive, while transition and popularity remain controls.
+The selected proﬁle ﬁrst produces one memory ordering πM . Equation 1
+is then applied afresh to πM and the neural ordering πN , so the ﬁnal expert
+evidences lie in [0, 1]. If ordering e assigns rank re (x) to item x, its evidence is
+ρe (x) =
+
+k+1
+,
+k + re (x)
+
+k = 20,
+
+(1)
+
+with zero evidence when x is absent. PASGR supplies a separate neural top-120
+list; in our locked cells it is a semantic GRU selected from the Prototype-Aligned
+Semantic Graph Retrieval candidate family. It encodes the preﬁx and scores
+the full catalogue by normalized state–item dot product. Its cached semantic
+teacher is documented as E5-small on Video [14] and TF–IDF/SVD otherwise;
+the frozen upstream cell is detailed in the supplement. Prototype transport is
+oﬀ in all three locked cells.
+3.2
+
+Continuous query-conditioned allocation
+
+Let ρM and ρN denote the selected memory and neural evidence. The ﬁnal score
+is
+Fq (x) = (1 − βq )ρM (x) + βq ρN (x).
+(2)
+First, a scalar βOOF ∈ (0, 1) is learned continuously on out-of-ﬁt training queries.
+Then the primary gate predicts
+zq + b),
+βq = βOOF + ∆eﬀ tanh(w>e
+
+∆eﬀ = min{∆, βOOF , 1 − βOOF }, ∆ = .10,
+(3)
+where e
+zq is standardized using training-only statistics. The three target-free features are log(1 + L), log(1 + freq(iL )), and whether iL lies outside the smallest
+most-popular item set covering 80% of training interactions. They are available before expert scoring; rank-overlap diagnostics are reserved for capacity
+ablations. The gate is linear inside the bounded residual; hence it adds four
+
+4
+
+P. Q. Cuong et al.
+training-only calibration
+inner-ﬁt
+training sessions
+
+CEARF memory
++ PASGR
+
+out-of-ﬁt ranks
+and targets
+
+learn βOOF
+then (w, b)
+
+frozen
+gate
+
+frozen inference
+test query q
+
+memory and
+neural ranks
+
+weighted RRF
+top-20
+
+context zq
+7→ βq
+
+Fig. 1. CEARF-N learns allocation from held-out training sources, freezes the gate, and
+then performs query-conditioned rank fusion. Declared-validation/test labels never ﬁt
+or select allocator parameters.
+
+learned parameters, not another sequence model. With δq = βq − βOOF and
+Dq (x) = ρN (x) − ρM (x), a pair’s global-fusion order is certiﬁed whenever
+|mOOF (a, b)| > |δq ||Dq (a) − Dq (b)| (coarsely > 2∆eﬀ ). The gate is therefore a
+bounded expert-disagreement correction. Because experts enter only through
+ranks, strictly monotone raw-score transforms preserving each top-120 ordering
+leave the allocator and ﬁnal ranking unchanged. For target yq and negative x,
+the signed advantage Aqx = [ρN (yq ) − ρN (x)] − [ρM (yq ) − ρM (x)] is both the
+derivative of the target margin with respect to βq and the sign-determining term
+in the pairwise learning signal.
+For calibration query q with target yq , let Hq contain up to 32 highestevidence non-target candidates from the union of both expert lists. We minimize
+
+
+Fq (x) − Fq (yq )
+1 X 1 X
+softplus
+L=
++λa βq +λp (βq − βOOF )2 , (4)
+|Q| q |Hq |
+τ
+x∈Hq
+
+with τ = .10 and λa = λp = 10−3 . Queries whose target is absent from both
+top-120 lists are excluded because no βq can retrieve the missing target from
+their union. The ﬁrst regularizer weakly biases allocation toward lower neural
+mass unless opposed by the pairwise rank loss; the second shrinks query corrections toward the global policy. Increasing βq decreases a pair’s rank-loss term
+exactly when the neural target-versus-negative margin exceeds the memory margin. Stage 1 minimizes rank loss plus λa β for 80 epochs; Stage 2 freezes the scalar
+and ﬁts only (w, b) under Eq. 4 for 50 epochs with AdamW weight decay 10−4 .
+No candidate set of β values exists.
+3.3
+
+Leakage-safe training protocol
+
+Before modeling, a stable hash declares 5,000 validation queries; their sources are
+ineligible for OOF calibration. A second hash removes at most 5,000 remaining
+training source sessions before expert ﬁtting: 1,000 lock the memory proﬁle and
+4,000 produce the ranks used in Eqs. 3–4. Thus proﬁle and gate subsets are
+disjoint, and neither source session contributes events to the index or PASGR ﬁt
+that predicts its OOF target. Diginetica validation target events and incoming
+
+Bounded Out-of-Fit Dynamic Rank Allocation
+
+5
+
+Table 1. Compact allocation result on full-catalogue test queries. Values are matchedseed R@20 means. ∆U is dynamic minus OOF-global with a paired query-level 95%
+bootstrap interval; complete cutoﬀs and seed SD are in the supplement.
+Domain
+Video
+Baby
+Diginetica
+
+Memory Neural Equal .5 OOF global OOF short/long Dynamic
+.11901 .12571
+.03879 .04873
+.49428 .44852
+
+.14610
+.05555
+.51430
+
+.14719
+.05671
+.51702
+
+.14726
+.05655
+.51692
+
+∆U [95% CI]
+
+.14735 +.00022 [+.00009,+.00035]
+.05669 +.00002 [-.00003,+.00006]
+.51701 +.00002 [-.00015,+.00018]
+
+transitions are removed from tuning histories. This is a single OOF holdout, not
+full K-fold cross-ﬁtting; allocator parameters remain frozen for ﬁnal test.
+
+4
+
+Experimental Setup
+
+We derive 5-core leave-last-out histories from Amazon Reviews 2023 for Video
+Games and Baby Products [7]; previously seen items are masked. Diginetica
+uses its public session split and permits repeated items [2]. The domains contain respectively 25,613/36,014/43,098 items, 94,762/150,777/186,670 training
+sequences, and 94,762/150,777/60,858 test queries; 45% of Diginetica queries
+but none of the Amazon queries have L ≤ 2. We use “sparse” for item-frequency
+sparsity: 27.9%, 27.9%, and 19.3% of train-catalogue items occur at most ﬁve
+times in Video, Baby, and Diginetica. No sampled negatives are used at evaluation. We report Recall at 6, 10, and 20, nDCG at the same cutoﬀs, and
+U = .5 R@6 + .5 R@20; R@10 and all nDCG cutoﬀs guard interpretation against
+that utility. Stochastic runs use seeds 42, 123, and 456. Main-table comparators
+are transition-only, V-SKNN, STAN, NARM, and a SIGMA-compatible reimplementation; further baselines are supplementary.
+Allocation controls share identical expert ranks: equal mixing (β = .5), a
+learned OOF-global scalar, two independently learned short/long scalars (L ≤ 2
+versus longer; Amazon test rows use the longer side), and Eq. 3. We additionally
+test a ﬁxed deterministic reassignment of the frozen βq values across test queries
+(preserving their exact multiset), a 16-unit MLP, the 16 target-free diagnostics
+listed in the supplement, k ∈ {10, 20, 60}, a min–max normalized CombSUM
+perturbation under frozen βq and β = .5. The primary three-feature linear gate
+and ∆ = .10 are ﬁxed for all domains.
+Paired per-query diﬀerences are averaged over matched seeds and bootstrapped over query IDs with 20,000 repetitions. Intervals condition on three
+ﬁtted seeds; seed SD is reported separately. Experiments ran on an Apple M2
+Pro with 32 GB memory; CEARF uses one CPU process and PASGR uses
+Metal/MPS.
+
+5
+
+Results
+
+5.1
+
+RQ1–RQ2: endpoints, baselines, and allocation
+
+Table 1 ﬁrst establishes complementarity. On every domain, all fused allocations
+exceed both memory-only and neural-only at R@20. Equal mixing already gives
+
+6
+
+P. Q. Cuong et al.
+
+Table 2. Full-catalogue test R@20. CEARF-N uses 3 seeds and text teachers (cached
+teacher documented as E5-small on Video; TF–IDF/SVD otherwise); comparator rows
+are ID-only, so this is system-level. Transition/V-SKNN/STAN are deterministic; complete baselines and cutoﬀs are supplementary. SIGMA-compatible is our reimplementation, not oﬃcial SIGMA.
+Method
+
+Video
+
+Baby
+
+Diginetica
+
+Transition-only
+V-SKNN
+STAN
+NARM
+SIGMA-compatible
+
+.04223
+.11936
+.12115
+.13705
+.08644
+
+.00735
+.05038
+.04944
+.02990
+.02473
+
+.40102
+.50506
+.51502
+.53406
+.37219
+
+CEARF-N
+
+.14735
+
+.05669
+
+.51701
+
+a large endpoint gain; thus most of the improvement comes from heterogeneous
+evidence rather than gate complexity. The fused system evaluated with dynamic
+allocation exceeds the stronger endpoint by 17.2% on Video, 16.3% on Baby, and
+4.6% on Diginetica. The stricter comparison is against the training-only global
+and short/long policies.
+Table 2 is system-level context, not a metadata-matched architecture comparison. With the same cached teacher, NARM reaches .15387/.06628 R@20
+on Video/Baby, exceeding CEARF-N; hence Amazon claims are allocationorthogonal. Replacing PASGR by ID-only NARM inside the allocator gives
+.14854/.05001/.53939 R@20 on Video/Baby/Diginetica, closing Diginetica but
+losing Baby’s metadata beneﬁt. SIGMA-compatible underperforms transitiononly on Diginetica despite selected epochs 7/9/10, so it is only context from our
+compatible reimplementation.
+The ﬁnal column of Table 1 isolates the query-wise correction. Dynamic
+allocation raises U on Video Games with a paired query-level interval above
+zero. It is not uniformly the best coarse-control row in U : ﬁxed .5, short/long,
+and head/tail are slightly higher on Video, Baby, and Diginetica, respectively.
+Our claim is therefore narrower and more falsiﬁable: a ﬁve-scalar, source-disjoint
+residual exposes query-level expert advantage when it is stable while staying
+near the training-only global prior when it is not. Baby has a much smaller
+positive mean shift whose interval spans zero; Diginetica is likewise not detectably diﬀerent from global. The gate can move the global coeﬃcient by at
+most .10. Video improves most at early ranks; Baby’s R@20 mean is slightly
+lower, so the correction is not uniform across cutoﬀs. On Video, dynamicminus-global intervals are also above zero for R@6/R@10 (+.000278/+.000405)
+and nDCG@6/@10/@20 (+.000198/+.000238/+.000182), whereas R@20 is not;
+bounded correction changes early ordering more clearly than broad top-20
+coverage.
+The ﬁxed same-multiset reassignment control holds the distribution of βq
+ﬁxed while changing only query assignment. Relative to a ﬁxed target-free reassignment, the learned policy raises Video nDCG@20 by .000146 [.000082,.000210];
+Diginetica has a supporting nDCG@10 diﬀerence of .000126 [.000033,.000221],
+while Baby intervals overlap zero. On Video, realized neural-minus-memory
+nDCG@20 also changes from -.01026 in beta deciles 1–3 to .00589 in deciles 8–10,
+
+Bounded Out-of-Fit Dynamic Rank Allocation
+
+7
+
+a .01614 separation. Its standardized length/frequency coeﬃcients are negative
+across all seeds and the tail coeﬃcient is nonnegative, assigning more neural
+mass to shorter, lower-frequency contexts. Together, the ﬁxed-reassignment
+and coeﬃcient diagnostics are consistent with heterogeneous expert-advantage
+regimes, beyond merely changing the marginal weight distribution.
+5.2
+
+RQ3: parsimony and sensitivity controls
+
+Capacity variants diﬀer from the primary gate by only O(10−4 ) in mean U : the
+all-feature linear gate loses on one matched seed in each domain, and Diginetica’s
+best MLP is higher by only .00025. We keep the ﬁve-scalar form instead of
+selecting a larger gate post hoc. Relaxing the residual bound also does not explain
+the two null domains: ∆ = .20 gives the same Baby U (.04343) and essentially
+the same Diginetica U (.41329 versus .41332).
+For each k ∈ {10, 20, 60}, the continuous prior and gate are reﬁt on the same
+OOF training ranks; no setting is selected on validation or test. The primary k =
+20 has the highest mean U on Video and Diginetica and lies within 1.1 × 10−4 of
+k = 60 on Baby. Complete sensitivity and ﬁxed-allocation operator tables are in
+the supplement. Under frozen dynamic allocation, weighted RRF exceeds normalized CombSUM in R@20 by .00133/.00134/.00272 on Video/Baby/Diginetica;
+equal allocation reverses on Diginetica, indicating operator–allocation compatibility rather than unconditional RRF superiority.
+5.3
+
+RQ4: inference cost
+
+For the timed seed-42 runs, the sum of separately measured warm medians for
+feature construction and gate evaluation is 1.171 µs/query on Video, 1.184 on
+Baby, and .774 on Diginetica. The jointly timed feature+gate+RRF pipeline
+costs 85.89, 87.57, and 80.60 µs/query, respectively. The supplement reports
+the expert-inclusive cross-run estimate. In a deterministic replay check, reconstructed βq values diﬀer from the original inference outputs by at most 5.96 ×
+10−8 , and the top-20 rankings are reproduced exactly. Expert retrieval dominates
+latency; the four-parameter residual gate is not the serving bottleneck.
+
+6
+
+Conclusion and Limitations
+
+CEARF-N replaces validation-selected coarse mixing weights with a sourcedisjoint query-invariant prior and a bounded query-wise residual law. CEARFN’s main accuracy gain comes from expert complementarity; the residual asks the
+harder, narrower question of whether any source-disjoint query signal remains after a strong global prior. It does on Video’s early ranks, while Baby/Diginetica
+are reported as boundary cases. The ﬁve-scalar allocator is cheap, bounded,
+score-scale invariant, and auditable.
+Three domains do not establish universal transfer, and Diginetica lacks original session IDs beyond expanded query rows for bootstrap clustering. Only
+
+8
+
+P. Q. Cuong et al.
+
+41.7%, 21.1%, and 82.5% of OOF calibration queries are actionable on Video,
+Baby, and Diginetica; the allocator is therefore trained conditionally on expertunion coverage, especially narrowly on Baby. The PASGR cell was frozen by an
+upstream validation study; our “training-only” claim applies speciﬁcally to allocation β, not to every expert hyperparameter. Semantic metadata makes external comparisons system-level; matched-teacher evidence exists only on Amazon.
+Finally, the bounded query-wise residual gain over global fusion is small and
+undetectable on two domains; larger untouched domains and temporal crossﬁtting remain necessary. Complete implementation details, allocation controls,
+and statistical procedures are provided in the supplementary material.
+
+References
+1. Cormack, G.V., Clarke, C.L.A., Buettcher, S.: Reciprocal rank fusion outperforms
+condorcet and individual rank learning methods. In: SIGIR. pp. 758–759 (2009)
+2. DIGINETICA: CIKM Cup 2016 Track 2: Personalized e-commerce search challenge data. CodaLab, https://competitions.codalab.org/competitions/11161
+(2016)
+3. Garg, D., et al.: Sequence and time aware neighborhood for session-based recommendations: STAN. In: SIGIR. pp. 1069–1072 (2019)
+4. Gaydhani, A., Xu, G., Kamath, D., Singh, A., Li, A.: Uniﬁed learning-to-rank for
+multi-channel retrieval in large-scale e-commerce search. CoRR abs/2602.23530
+(2026)
+5. Han, H., Ma, L., Wang, H., et al.: An embarrassingly simple graph heuristic reveals shortcut-solvable benchmarks for sequential recommendation. CoRR
+abs/2605.07125 (2026)
+6. He, Y., Liu, X., Zhang, A., Ma, Y., Chua, T.S.: LLM2Rec: Large language models
+are powerful embedding models for sequential recommendation. In: KDD. pp. 896–
+907 (2025)
+7. Hou, Y., et al.: Bridging language and items for retrieval and recommendation.
+CoRR abs/2403.03952 (2024)
+8. Jannach, D., Chen, L.: Improving methodological standards in recommender systems oﬄine evaluation. ACM Transactions on Recommender Systems 4(3), 34e:1–
+34e:15 (2026). https://doi.org/10.1145/3800587, article 34e
+9. Li, J., et al.: Neural attentive session-based recommendation. In: CIKM. pp. 1419–
+1428 (2017)
+10. Li, Z., Yang, C., Chen, Y., et al.: Graph and sequential neural networks in sessionbased recommendation: A survey. ACM Computing Surveys 57(2), 1–37 (2025)
+11. Liu, Y., Qi, L., Mao, X., et al.: Hyperbolic-enhanced mixture-of-experts mamba
+for sequential recommendation. In: AAAI. vol. 40, pp. 15403–15411 (2026)
+12. Liu, Z., Liu, Q., Wang, Y., et al.: SIGMA: Selective gated mamba for sequential
+recommendation. In: AAAI. vol. 39, pp. 12264–12272 (2025)
+13. Ludewig, M., Jannach, D.: Evaluation of session-based recommendation algorithms.
+User Modeling and User-Adapted Interaction 28(4–5), 331–390 (2018)
+14. Wang, L., Yang, N., Huang, X., et al.: Text embeddings by weakly-supervised
+contrastive pre-training. CoRR abs/2212.03533 (2022)
+15. Wang, X., et al.: Bid farewell to seesaw: Towards accurate long-tail session-based
+recommendation via dual constraints of hybrid intents. In: AAAI. vol. 40, pp.
+15895–15903 (2026)
+
+

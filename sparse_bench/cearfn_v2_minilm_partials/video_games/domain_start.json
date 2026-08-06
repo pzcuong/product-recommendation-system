@@ -1,0 +1,15 @@
+{
+  "domain": "Video_Games",
+  "status": "started",
+  "n_train_sessions": 94762,
+  "n_valid_queries": 5000,
+  "n_test_queries": 94762,
+  "n_items": 25613,
+  "gated_config": {
+    "graph_weight": 0.0,
+    "prototype_transport": false,
+    "contrastive_weight": 0.15,
+    "inbatch_weight": 0.0
+  },
+  "semantic_matrix": "/Users/macbook/Desktop/product-recommendation-system/sparse_bench/semantic_teacher_artifacts/video_games_minilm.npy"
+}

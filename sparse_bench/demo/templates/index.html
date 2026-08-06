@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEARF-N Demo</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #2166ac, #4393c3); color: white; padding: 20px 32px; }
+.header h1 { font-size: 22px; font-weight: 700; }
+.header p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.row { display: flex; gap: 16px; }
+.col-main { flex: 2; }
+.col-side { flex: 1; min-width: 300px; }
+.card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 16px; }
+.card h2 { font-size: 15px; color: #2166ac; margin-bottom: 12px; border-bottom: 2px solid #e8edf2; padding-bottom: 6px; }
+.form-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
+.form-group { flex: 1; }
+.form-group label { display: block; font-size: 11px; font-weight: 600; color: #666; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group select, .form-group input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+.btn { padding: 8px 20px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #2166ac; color: white; }
+.btn-primary:hover { background: #1a5276; }
+.btn-success { background: #28a745; color: white; }
+.btn-success:hover { background: #218838; }
+.btn-warning { background: #ffc107; color: #333; }
+.btn-warning:hover { background: #e0a800; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.metric { text-align: center; padding: 10px; background: #f8f9fb; border-radius: 8px; }
+.metric .value { font-size: 22px; font-weight: 700; color: #2166ac; }
+.metric .label { font-size: 10px; color: #888; margin-top: 2px; }
+
+.beta-bar { height: 18px; background: linear-gradient(90deg, #92c5de, #2166ac); border-radius: 4px; position: relative; margin: 8px 0; }
+.beta-marker { position: absolute; top: -2px; width: 4px; height: 22px; background: #d6604d; border-radius: 2px; transition: left 0.3s; }
+.beta-labels { display: flex; justify-content: space-between; font-size: 10px; color: #888; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #f0f4f8; padding: 6px 10px; text-align: left; font-weight: 600; color: #555; }
+td { padding: 6px 10px; border-bottom: 1px solid #eee; }
+tr:hover { background: #f8f9fb; }
+.rank { color: #2166ac; font-weight: 700; }
+.tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.tag-mem { background: #d4edda; color: #155724; }
+.tag-neu { background: #cce5ff; color: #004085; }
+.tag-both { background: #fff3cd; color: #856404; }
+
+.cart-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 12px; }
+.cart-item .name { flex: 1; }
+.cart-item .price { color: #28a745; font-weight: 600; }
+.cart-item .remove { color: #dc3545; cursor: pointer; font-size: 14px; }
+.cart-item .remove:hover { color: #a71d2a; }
+
+.history-item { padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
+.history-item .time { color: #888; }
+
+.example-btn { padding: 3px 8px; margin: 2px; font-size: 10px; background: #e8f4f8; border: 1px solid #b8daff; border-radius: 4px; cursor: pointer; }
+.example-btn:hover { background: #cce5ff; }
+
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.feature-item { padding: 6px; background: #f8f9fb; border-radius: 4px; font-size: 11px; }
+.feature-item .fn { font-weight: 600; color: #555; }
+.feature-item .fv { color: #2166ac; font-weight: 700; }
+
+.section-title { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.empty { text-align: center; padding: 20px; color: #aaa; font-style: italic; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🔬 CEARF-N Demo</h1>
+<p>Query-Conditioned Cross-Evidence Weighting — Memory + Neural Fusion</p>
+</div>
+
+<div class="container">
+<!-- Input Row -->
+<div class="card">
+<h2>🛒 Session Input</h2>
+<div class="form-row">
+<div class="form-group">
+<label>Dataset</label>
+<select id="domain">
+<option value="Baby Products">Baby Products (Amazon)</option>
+<option value="Video Games">Video Games (Amazon)</option>
+<option value="Diginetica">Diginetica (CIKM 2016)</option>
+</select>
+</div>
+<div class="form-group" style="flex:3">
+<label>Session Context (comma-separated item IDs)</label>
+<input type="text" id="context" placeholder="e.g. 2048, 3500, 1234, 5678">
+</div>
+<div>
+<button class="btn btn-primary" onclick="recommend()">🔍 Recommend</button>
+<button class="btn btn-warning" onclick="clearSession()">🔄 Reset Session</button>
+</div>
+</div>
+<div>
+<span class="section-title">Examples:</span>
+<button class="example-btn" onclick="loadExample('baby_short')">Baby: short (2)</button>
+<button class="example-btn" onclick="loadExample('baby_long')">Baby: long (8)</button>
+<button class="example-btn" onclick="loadExample('video')">Video: short (3)</button>
+<button class="example-btn" onclick="loadExample('digi_short')">Diginetica: short (2)</button>
+<button class="example-btn" onclick="loadExample('digi_long')">Diginetica: long (10)</button>
+</div>
+</div>
+
+<div class="row">
+<!-- Main column -->
+<div class="col-main">
+<!-- Metrics -->
+<div class="metrics" id="metrics" style="display:none;">
+<div class="metric"><div class="value" id="m-len">-</div><div class="label">Context Len</div></div>
+<div class="metric"><div class="value" id="m-regime">-</div><div class="label">Regime</div></div>
+<div class="metric"><div class="value" id="m-beta">-</div><div class="label">β (dynamic)</div></div>
+<div class="metric"><div class="value" id="m-overlap">-</div><div class="label">Memory ∩ Neural</div></div>
+</div>
+
+<!-- Beta bar -->
+<div class="card" id="beta-card" style="display:none;">
+<h2>⚡ β Allocation</h2>
+<div class="beta-bar"><div class="beta-marker" id="beta-marker" style="left:50%"></div></div>
+<div class="beta-labels"><span>← Memory (β=0)</span><span>Neural (β=1) →</span></div>
+</div>
+
+<!-- Recommendations -->
+<div class="card" id="rec-card" style="display:none;">
+<h2>🎯 Recommendations <span id="rec-count" style="font-size:12px;color:#888;"></span></h2>
+<table>
+<thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th>Mem</th><th>Neu</th><th>Source</th><th>Action</th></tr></thead>
+<tbody id="rec-body"></tbody>
+</table>
+</div>
+
+<!-- Features -->
+<div class="card" id="feat-card" style="display:none;">
+<h2>📋 Query Features (for dynamic β gate)</h2>
+<div class="feature-grid" id="features-grid"></div>
+</div>
+</div>
+
+<!-- Side column: Cart + History -->
+<div class="col-side">
+<!-- Cart -->
+<div class="card">
+<h2>🛒 Cart (<span id="cart-count">0</span>)</h2>
+<div id="cart-items">
+<div class="empty">Cart is empty</div>
+</div>
+<div style="margin-top:10px; display:flex; gap:8px;">
+<button class="btn btn-success btn-sm" onclick="simulatePurchase()">✅ Purchase</button>
+<button class="btn btn-warning btn-sm" onclick="clearCart()">🗑️ Clear</button>
+</div>
+</div>
+
+<!-- Session History -->
+<div class="card">
+<h2>📜 Session History</h2>
+<div id="history-items">
+<div class="empty">No interactions yet</div>
+</div>
+</div>
+
+<!-- Stats -->
+<div class="card">
+<h2>📊 Stats</h2>
+<div style="font-size:12px;">
+<div>Total recommendations: <strong id="stat-recs">0</strong></div>
+<div>Cart items: <strong id="stat-cart">0</strong></div>
+<div>Purchases: <strong id="stat-purchases">0</strong></div>
+<div>Memory-only picks: <strong id="stat-mem">0</strong></div>
+<div>Neural-only picks: <strong id="stat-neu">0</strong></div>
+<div>Both sources: <strong id="stat-both">0</strong></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- About -->
+<div class="card">
+<h2>ℹ️ About CEARF-N</h2>
+<p style="font-size:12px;line-height:1.5;color:#555;">
+<strong>CEARF-N</strong> fuses memory (transition + session + popularity) with
+neural evidence (GRU4Rec) via a query-conditioned β gate. The gate predicts
+per-query blend coefficients from 14 features, trained on out-of-fold data.
+On heterogeneous domains (Diginetica, 45% short context), the gate outperforms
+fixed mixing. On homogeneous domains (Amazon, 0% short context), a global β suffices.
+Try different session lengths to see how β adapts!
+</p>
+</div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let cart = [];
+let history = [];
+let stats = { recs: 0, cart: 0, purchases: 0, mem: 0, neu: 0, both: 0 };
+let currentSession = []; // Track the live session for auto-recommend
+
+const EXAMPLES = {
+    baby_short: { domain: 'Baby Products', context: '2048, 3500' },
+    baby_long: { domain: 'Baby Products', context: '2048, 3500, 1234, 5678, 9012, 3456, 7890, 1111' },
+    video: { domain: 'Video Games', context: '1024, 2048, 3072' },
+    digi_short: { domain: 'Diginetica', context: '123, 456' },
+    digi_long: { domain: 'Diginetica', context: '123, 456, 789, 101, 202, 303, 404, 505, 606, 707' },
+};
+
+function loadExample(name) {
+    const ex = EXAMPLES[name];
+    document.getElementById('domain').value = ex.domain;
+    document.getElementById('context').value = ex.context;
+    currentSession = ex.context.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+    recommend();
+}
+
+async function recommend() {
+    const domain = document.getElementById('domain').value;
+    // Use live session if available, otherwise parse input
+    let context = currentSession.length > 0 ? currentSession :
+        document.getElementById('context').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+    if (!context.length) { alert('Enter at least 1 item ID'); return; }
+
+    // Update input field to show current session
+    document.getElementById('context').value = context.join(', ');
+
+    try {
+        const [recRes, anaRes] = await Promise.all([
+            fetch(`${API}/api/recommend`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({domain, context}) }).then(r => r.json()),
+            fetch(`${API}/api/analyze`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({domain, context}) }).then(r => r.json())
+        ]);
+
+        // Update metrics
+        document.getElementById('m-len').textContent = recRes.context_length;
+        document.getElementById('m-regime').textContent = recRes.regime;
+        document.getElementById('m-beta').textContent = recRes.beta.toFixed(2);
+        document.getElementById('m-overlap').textContent = `${recRes.memory_neural_overlap}/5`;
+        document.getElementById('metrics').style.display = 'grid';
+
+        // Beta bar
+        document.getElementById('beta-marker').style.left = `${recRes.beta * 100}%`;
+        document.getElementById('beta-card').style.display = 'block';
+
+        // Recommendations
+        const tbody = document.getElementById('rec-body');
+        tbody.innerHTML = '';
+        stats.recs += recRes.recommendations.length;
+        document.getElementById('stat-recs').textContent = stats.recs;
+
+        for (const r of recRes.recommendations) {
+            const inMem = r.memory_rank !== null;
+            const inNeu = r.neural_rank !== null;
+            let tag = '';
+            if (inMem && inNeu) { tag = '<span class="tag tag-both">Both</span>'; stats.both++; }
+            else if (inMem) { tag = '<span class="tag tag-mem">Memory</span>'; stats.mem++; }
+            else { tag = '<span class="tag tag-neu">Neural</span>'; stats.neu++; }
+            document.getElementById('stat-mem').textContent = stats.mem;
+            document.getElementById('stat-neu').textContent = stats.neu;
+            document.getElementById('stat-both').textContent = stats.both;
+
+            tbody.innerHTML += `<tr>
+                <td class="rank">${r.rank}</td>
+                <td>${r.item_name} <span style="color:#aaa;font-size:10px;">#${r.item_id}</span></td>
+                <td style="font-size:11px;color:#666;">${r.brand || '—'}</td>
+                <td style="font-size:10px;color:#888;">${r.category || '—'}</td>
+                <td>${r.memory_rank || '—'}</td>
+                <td>${r.neural_rank || '—'}</td>
+                <td>${tag}</td>
+                <td><button class="btn btn-success btn-sm" onclick="addToCart(${r.item_id}, '${r.item_name.replace(/'/g, "\\'")}')">+ Cart</button></td>
+            </tr>`;
+        }
+        document.getElementById('rec-card').style.display = 'block';
+
+        // Features
+        const fgrid = document.getElementById('features-grid');
+        fgrid.innerHTML = '';
+        for (const [k, v] of Object.entries(anaRes.features)) {
+            fgrid.innerHTML += `<div class="feature-item"><span class="fn">${k}:</span> <span class="fv">${v}</span></div>`;
+        }
+        document.getElementById('feat-card').style.display = 'block';
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+function addToCart(itemId, itemName) {
+    const price = (Math.random() * 50 + 5).toFixed(2);
+    cart.push({ id: itemId, name: itemName, price });
+    stats.cart = cart.length;
+    document.getElementById('cart-count').textContent = cart.length;
+    document.getElementById('stat-cart').textContent = cart.length;
+    renderCart();
+    addHistory(`Added "${itemName}" to cart ($${price})`, 'cart');
+
+    // Add item to live session and re-recommend
+    if (!currentSession.includes(itemId)) {
+        currentSession.push(itemId);
+        addHistory(`Session updated: ${currentSession.length} items`, 'session');
+        recommend(); // Auto re-recommend with new session
+    }
+}
+
+function renderCart() {
+    const div = document.getElementById('cart-items');
+    if (!cart.length) { div.innerHTML = '<div class="empty">Cart is empty</div>'; return; }
+    div.innerHTML = cart.map((item, i) =>
+        `<div class="cart-item">
+            <span class="name">${item.name}</span>
+            <span class="price">$${item.price}</span>
+            <span class="remove" onclick="removeFromCart(${i})">✕</span>
+        </div>`
+    ).join('');
+    document.getElementById('stat-cart').textContent = cart.length;
+}
+
+function removeFromCart(i) {
+    cart.splice(i, 1);
+    renderCart();
+    addHistory(`Removed item from cart`, 'remove');
+}
+
+function simulatePurchase() {
+    if (!cart.length) { alert('Cart is empty!'); return; }
+    const total = cart.reduce((s, i) => s + parseFloat(i.price), 0).toFixed(2);
+    const items = cart.map(i => i.name).join(', ');
+    addHistory(`Purchased ${cart.length} items: $${total}`, 'purchase');
+    stats.purchases += cart.length;
+    document.getElementById('stat-purchases').textContent = stats.purchases;
+
+    // Add all purchased items to session
+    for (const item of cart) {
+        if (!currentSession.includes(item.id)) {
+            currentSession.push(item.id);
+        }
+    }
+    addHistory(`Session updated: ${currentSession.length} items (after purchase)`, 'session');
+
+    cart = [];
+    renderCart();
+    alert(`✅ Purchase complete!\nItems: ${items}\nTotal: $${total}\n\nSession updated — getting new recommendations...`);
+
+    // Auto re-recommend with updated session
+    recommend();
+}
+
+function clearCart() {
+    cart = [];
+    renderCart();
+    addHistory('Cart cleared', 'clear');
+}
+
+function clearSession() {
+    currentSession = [];
+    document.getElementById('context').value = '';
+    document.getElementById('metrics').style.display = 'none';
+    document.getElementById('beta-card').style.display = 'none';
+    document.getElementById('rec-card').style.display = 'none';
+    document.getElementById('feat-card').style.display = 'none';
+    addHistory('Session reset', 'session');
+}
+
+function addHistory(text, type) {
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+    history.unshift({ text, type, time });
+    if (history.length > 20) history.pop();
+    renderHistory();
+}
+
+function renderHistory() {
+    const div = document.getElementById('history-items');
+    if (!history.length) { div.innerHTML = '<div class="empty">No interactions yet</div>'; return; }
+    const icons = { cart: '🛒', purchase: '✅', remove: '🗑️', clear: '🗑️', recommend: '🔍', session: '📝' };
+    div.innerHTML = history.map(h =>
+        `<div class="history-item">
+            <span class="time">${h.time}</span>
+            ${icons[h.type] || ''} ${h.text}
+        </div>`
+    ).join('');
+}
+</script>
+</body>
+</html>

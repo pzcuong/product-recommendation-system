@@ -1,0 +1,10 @@
+artifacts/
+__pycache__/
+tests/__pycache__/
+*.pyc
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.pdf
