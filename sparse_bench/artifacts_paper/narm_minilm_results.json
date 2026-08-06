@@ -1,0 +1,136 @@
+{
+  "domains": {
+    "Video_Games": {
+      "gate_vs_equal": {
+        "delta_r20": 0.0023,
+        "ci95": [
+          0.0012,
+          0.0035
+        ],
+        "p": 0.004,
+        "sign_flip": "none"
+      },
+      "gate_vs_uniform": {
+        "delta_r20": 0.01,
+        "ci95": [
+          0.006,
+          0.014
+        ],
+        "p": 0.001,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_minilm": {
+        "delta_r20": 0.0006,
+        "ci95": [
+          0.0002,
+          0.001
+        ],
+        "p": 0.01,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_tfidf": {
+        "delta_r20": 0.001,
+        "ci95": [
+          0.0004,
+          0.0017
+        ],
+        "p": 0.005,
+        "sign_flip": "none"
+      }
+    },
+    "Baby_Products": {
+      "gate_vs_equal": {
+        "delta_r20": 0.0021,
+        "ci95": [
+          0.0009,
+          0.0033
+        ],
+        "p": 0.01,
+        "sign_flip": "none"
+      },
+      "gate_vs_uniform": {
+        "delta_r20": 0.004,
+        "ci95": [
+          0.002,
+          0.006
+        ],
+        "p": 0.001,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_minilm": {
+        "delta_r20": 0.0007,
+        "ci95": [
+          0.0002,
+          0.0012
+        ],
+        "p": 0.008,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_tfidf": {
+        "delta_r20": 0.0018,
+        "ci95": [
+          0.0009,
+          0.0027
+        ],
+        "p": 0.002,
+        "sign_flip": "none"
+      }
+    },
+    "Diginetica": {
+      "gate_vs_equal": {
+        "delta_r20": 0.0184,
+        "ci95": [
+          0.0121,
+          0.0247
+        ],
+        "p": 0.001,
+        "sign_flip": "none"
+      },
+      "gate_vs_uniform": {
+        "delta_r20": 0.034,
+        "ci95": [
+          0.022,
+          0.046
+        ],
+        "p": 0.001,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_minilm": {
+        "delta_r20": 0.002,
+        "ci95": [
+          0.0008,
+          0.0032
+        ],
+        "p": 0.003,
+        "sign_flip": "none"
+      },
+      "cearfn_minilm_vs_narm_tfidf": {
+        "delta_r20": 0.0039,
+        "ci95": [
+          0.0021,
+          0.0057
+        ],
+        "p": 0.001,
+        "sign_flip": "none"
+      }
+    }
+  },
+  "protocol": "full-catalogue, 3 seeds, paired bootstrap 20000 reps",
+  "narm_minilm": {
+    "Video_Games": {
+      "R@6": 0.0791,
+      "R@20": 0.1543,
+      "NDCG@20": 0.0724
+    },
+    "Baby_Products": {
+      "R@6": 0.0358,
+      "R@20": 0.0674,
+      "NDCG@20": 0.0307
+    },
+    "Diginetica": {
+      "R@6": 0.5125,
+      "R@20": 0.536,
+      "NDCG@20": 0.2625
+    }
+  }
+}
