@@ -4,20 +4,24 @@
       "gate_vs_equal": {
         "delta_r20": 0.0023,
         "ci95": [
-          0.00047,
+          0.00046,
           0.00411
         ],
-        "p": 0.013943049830243165,
-        "sign_flip": "none"
+        "p": 0.014046099571653078,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "gate_vs_uniform": {
         "delta_r20": 0.01,
         "ci95": [
           0.00819,
-          0.01183
+          0.01181
         ],
-        "p": 3.169683286397814e-27,
-        "sign_flip": "none"
+        "p": 3.839743126080729e-27,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nm": {
         "delta_r20": 0.001,
@@ -25,17 +29,21 @@
           -0.00085,
           0.00285
         ],
-        "p": 0.29302301055826163,
-        "sign_flip": "none"
+        "p": 0.2930031591477355,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nt": {
         "delta_r20": 0.00199,
         "ci95": [
-          0.00014,
-          0.00384
+          0.00015,
+          0.00386
         ],
-        "p": 0.03546380698891057,
-        "sign_flip": "none"
+        "p": 0.03536740482033332,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       }
     },
     "Baby_Products": {
@@ -43,10 +51,12 @@
         "delta_r20": 0.0021,
         "ci95": [
           0.00117,
-          0.00303
+          0.00304
         ],
-        "p": 1.180856146965291e-05,
-        "sign_flip": "none"
+        "p": 1.1813613037443238e-05,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "gate_vs_uniform": {
         "delta_r20": 0.00401,
@@ -54,26 +64,32 @@
           0.00308,
           0.00494
         ],
-        "p": 3.2046933414840995e-17,
-        "sign_flip": "none"
+        "p": 3.3851852091872275e-17,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nm": {
         "delta_r20": 0.0007,
         "ci95": [
-          -0.00032,
+          -0.00031,
           0.0017
         ],
-        "p": 0.17819693938677164,
-        "sign_flip": "none"
+        "p": 0.17770991173648248,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nt": {
         "delta_r20": 0.0015,
         "ci95": [
-          0.00049,
+          0.0005,
           0.0025
         ],
-        "p": 0.0035667739242330344,
-        "sign_flip": "none"
+        "p": 0.003580980392464502,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       }
     },
     "Diginetica": {
@@ -83,54 +99,62 @@
           0.0152,
           0.02161
         ],
-        "p": 9.454746085295736e-29,
-        "sign_flip": "none"
+        "p": 9.085900281978926e-29,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "gate_vs_uniform": {
         "delta_r20": 0.034,
         "ci95": [
-          0.0308,
-          0.03717
+          0.03081,
+          0.0372
         ],
-        "p": 1.856121353049953e-94,
-        "sign_flip": "none"
+        "p": 5.178339378967176e-94,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nm": {
         "delta_r20": -0.00049,
         "ci95": [
-          -0.00372,
-          0.00269
+          -0.00369,
+          0.00271
         ],
-        "p": 0.7680239932197117,
-        "sign_flip": "none"
+        "p": 0.7677040691151136,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       },
       "cm_vs_nt": {
         "delta_r20": 0.0025,
         "ci95": [
-          -0.00071,
-          0.00571
+          -0.00069,
+          0.00572
         ],
-        "p": 0.13094863615938562,
-        "sign_flip": "none"
+        "p": 0.1309825897414375,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
       }
     }
   },
   "protocol": "full-catalogue, 3 seeds, paired bootstrap 20000 reps",
   "narm_minilm": {
     "Video_Games": {
-      "R@6": 0.13845,
+      "R@6": 0.13853,
       "R@20": 0.15,
-      "NDCG@20": 0.66949
+      "NDCG@20": 0.10057
     },
     "Baby_Products": {
-      "R@6": 0.05895,
+      "R@6": 0.05892,
       "R@20": 0.0638,
-      "NDCG@20": 0.66936
+      "NDCG@20": 0.0426
     },
     "Diginetica": {
-      "R@6": 0.49311,
+      "R@6": 0.49333,
       "R@20": 0.534,
-      "NDCG@20": 0.66927
+      "NDCG@20": 0.35833
     }
   }
 }

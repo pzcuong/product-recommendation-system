@@ -1,0 +1,29 @@
+{
+  "encoder": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_dim": 384,
+  "reduction": {
+    "method": "PCA",
+    "output_dim": 128,
+    "fit_scope": "per-domain item catalogue",
+    "whiten": false,
+    "random_state": 42
+  },
+  "text_fields_by_domain": {
+    "Video_Games": [
+      "title",
+      "brand",
+      "category_path"
+    ],
+    "Baby_Products": [
+      "title",
+      "brand",
+      "category_path"
+    ],
+    "Diginetica": [
+      "product_name"
+    ]
+  },
+  "normalized": true,
+  "frozen": true,
+  "note": "Frozen pretrained encoder; no fine-tuning on target domains."
+}
