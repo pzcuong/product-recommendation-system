@@ -8,7 +8,7 @@
 - `narm_minilm_results.json` — paired bootstrap CIs (R@20 and U)
 - `method_config.json` — array → method mapping (bounded 3-feature gate)
 - `minilm_config.json` — MiniLM semantic-teacher configuration
-- `manifest.json` — file checksums, shapes, query counts
+- `manifest.json` — rank-array checksums, shapes, query counts
 - `verify_artifacts.py` — artifact verifier
 
 ## Key numbers (R@20, mean over 3 seeds)
@@ -29,16 +29,15 @@
 
 ### Gate vs OOF global (primary outcome U)
 
-| Domain | Δ U | 95% CI | p |
-|---|---:|---|---:|
-| Video Games | +.0005 | [−.0013, +.0023] | .60 |
-| Baby Products | +.0006 | [−.0004, +.0015] | .30 |
-| Diginetica | **+.0053** | **[+.0021, +.0084]** | **.003** |
+| Domain | Δ U | paired 95% CI |
+|---|---:|---|
+| Video Games | +.0005 | [−.0013, +.0023] |
+| Baby Products | +.0006 | [−.0004, +.0015] |
+| **Diginetica** | **+.0053** | **[+.0021, +.0084]** |
 
-Dynamic gate beats equal mixing on 3/3 domains. Against the training-learned
-OOF-global policy, the gate is significantly better on Diginetica on the
-declared primary outcome (U = 0.5·R@6 + 0.5·R@20); Amazon domains are
-not detectably different.
+Dynamic allocation is detectably better than the training-only OOF-global
+policy on the declared primary utility (U = 0.5·R@6 + 0.5·R@20) on
+Diginetica; the Video Games and Baby Products intervals span zero.
 
 ### MiniLM matched-teacher control
 

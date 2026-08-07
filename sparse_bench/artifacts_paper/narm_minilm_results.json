@@ -35,11 +35,9 @@
         "boot": "paired multinomial bootstrap, 20000 reps",
         "delta_u": 0.00052,
         "ci95_u": [
-          -0.00128,
-          0.00229
-        ],
-        "p_u": 0.60046816953231,
-        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
+          -0.00126,
+          0.00234
+        ]
       },
       "cm_vs_nm": {
         "delta_r20": 0.001,
@@ -100,10 +98,8 @@
         "delta_u": 0.00056,
         "ci95_u": [
           -0.00036,
-          0.00147
-        ],
-        "p_u": 0.2984439832382799,
-        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
+          0.00148
+        ]
       },
       "cm_vs_nm": {
         "delta_r20": 0.0007,
@@ -163,11 +159,9 @@
         "boot": "paired multinomial bootstrap, 20000 reps",
         "delta_u": 0.00525,
         "ci95_u": [
-          0.00211,
-          0.00842
-        ],
-        "p_u": 0.002517860289344949,
-        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
+          0.00204,
+          0.00848
+        ]
       },
       "cm_vs_nm": {
         "delta_r20": -0.00049,
