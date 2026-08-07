@@ -1,0 +1,195 @@
+{
+  "domains": {
+    "Video_Games": {
+      "vs_narm": {
+        "delta_r20": 0.00893,
+        "ci95": [
+          0.00778,
+          0.01006
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sr_gnn": {
+        "delta_r20": 0.02331,
+        "ci95": [
+          0.02214,
+          0.0245
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_gru4rec": {
+        "delta_r20": 0.0423,
+        "ci95": [
+          0.04115,
+          0.04345
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sasrec": {
+        "delta_r20": 0.10804,
+        "ci95": [
+          0.10669,
+          0.10938
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sigma": {
+        "delta_r20": 0.05953,
+        "ci95": [
+          0.05832,
+          0.06073
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_memory": {
+        "delta_r20": 0.02696,
+        "ci95": [
+          0.02604,
+          0.02788
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_neural": {
+        "delta_r20": 0.01972,
+        "ci95": [
+          0.01889,
+          0.02054
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      }
+    },
+    "Baby_Products": {
+      "vs_narm": {
+        "delta_r20": 0.024,
+        "ci95": [
+          0.02327,
+          0.02474
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sr_gnn": {
+        "delta_r20": 0.00182,
+        "ci95": [
+          0.00109,
+          0.00255
+        ],
+        "p": 1e-06,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_gru4rec": {
+        "delta_r20": 0.00889,
+        "ci95": [
+          0.00815,
+          0.00963
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sasrec": {
+        "delta_r20": 0.02227,
+        "ci95": [
+          0.02153,
+          0.023
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sigma": {
+        "delta_r20": 0.02917,
+        "ci95": [
+          0.02844,
+          0.0299
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_memory": {
+        "delta_r20": 0.01511,
+        "ci95": [
+          0.01461,
+          0.01561
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_neural": {
+        "delta_r20": 0.00891,
+        "ci95": [
+          0.00843,
+          0.0094
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      }
+    },
+    "Diginetica_HID": {
+      "vs_narm": {
+        "delta_r20": 0.00762,
+        "ci95": [
+          0.0057,
+          0.00955
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sr_gnn": {
+        "delta_r20": 0.05808,
+        "ci95": [
+          0.0561,
+          0.06005
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "continuous_vs_regime": {
+        "delta_r20": 0.00279,
+        "ci95": [
+          0.00227,
+          0.00331
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "continuous_vs_bucketed": {
+        "delta_r20": 0.00271,
+        "ci95": [
+          0.0022,
+          0.00322
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      }
+    }
+  },
+  "statistical_caveats": {
+    "diginetica_session_dependence": "Diginetica prefix queries do not retain original session identifiers; paired intervals are query-level, not session-clustered.",
+    "bootstrap_level": "query-level paired bootstrap",
+    "sources": "Amazon CEARF-N/memory/neural: cearfn_evidence_artifacts. Diginetica routers: cearfn_v2_artifacts. Baselines: paper_baseline_artifacts."
+  }
+}

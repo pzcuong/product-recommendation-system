@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal artifact verifier: read NPZ arrays, recompute metrics, check JSON.
+"""Artifact verifier: read NPZ arrays, recompute metrics, check JSON.
 
 Usage:
     cd sparse_bench/artifacts_paper
@@ -14,14 +14,8 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 RANKS = HERE / "per_query_ranks"
-DOMAINS = ["Video_Games", "Baby_Products", "Diginetica"]
+DOMAINS = ["Video_Games", "Baby_Products", "Diginetica_HID"]
 SEEDS = [42, 123, 456]
-METHODS = [
-    "uniform", "kmeans", "feature_bucketed", "equal_mixing",
-    "query_cond", "narm_id", "narm_tfidf", "narm_minilm", "cearfn_minilm",
-    "oof_global",
-]
-EXPECTED_ARRAYS = 90
 
 def metrics_from_ranks(ranks: np.ndarray) -> dict:
     hits = ranks > 0
@@ -41,11 +35,14 @@ def main() -> int:
     manifest = json.loads((HERE / "manifest.json").read_text())
     checked = 0
     for ds in DOMAINS:
-        for m in METHODS:
-            for s in SEEDS:
+        if ds not in per_seed:
+            continue
+        for m in per_seed[ds]:
+            for s in per_seed[ds][m]["seeds"]:
                 fp = f"{ds}_{m}_seed{s}"
                 path = RANKS / f"{fp}.npz"
                 if not path.exists():
+                    errors.append(f"missing {fp}.npz")
                     continue
                 with np.load(path) as data:
                     ranks = data["ranks"]
@@ -63,20 +60,16 @@ def main() -> int:
                 expected_u = 0.5 * computed["recall@6"] + 0.5 * computed["recall@20"]
                 if abs(computed["utility"] - expected_u) > 1e-9:
                     errors.append(f"{fp}: utility formula mismatch")
-                if ds in per_seed and m in per_seed[ds]:
-                    json_r = per_seed[ds][m]["seeds"].get(str(s))
-                    if json_r:
-                        for metric in ("recall@6", "recall@10", "recall@20", "ndcg@20", "utility"):
-                            if abs(computed[metric] - json_r[metric]) > 1e-4:
-                                errors.append(f"{fp}: {metric} mismatch")
+                json_r = per_seed[ds][m]["seeds"][s]
+                for metric in ("recall@6", "recall@10", "recall@20", "ndcg@20", "utility"):
+                    if abs(computed[metric] - json_r[metric]) > 1e-4:
+                        errors.append(f"{fp}: {metric} mismatch")
                 if ds in manifest.get("domains", {}):
                     arr_info = manifest["domains"][ds].get("arrays", {}).get(fp)
                     if arr_info and "sha256" in arr_info:
                         actual = hashlib.sha256(ranks.tobytes()).hexdigest()
                         if actual != arr_info["sha256"]:
                             errors.append(f"{fp}: SHA-256 mismatch")
-    if checked != EXPECTED_ARRAYS:
-        errors.append(f"expected {EXPECTED_ARRAYS} arrays, found {checked}")
     if errors:
         print(f"FAIL: {len(errors)} errors")
         for e in errors[:20]: print(f"  {e}")

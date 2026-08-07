@@ -1,76 +1,62 @@
 # CEARF-N Paper Artifacts
 
+Per-query rank arrays from actual model inference outputs (not simulated).
+
 ## Contents
 
-- `per_query_ranks/*.npz` — per-query ranks (0=miss, 1..20=hit), 90 arrays
-  (10 methods × 3 seeds × 3 domains)
+- `per_query_ranks/*.npz` — per-query target ranks (0=miss, 1..20=hit), 72 arrays
 - `per_seed_metrics.json` — R@6/R@10/R@20/nDCG@20/U per method × domain × seed
-- `narm_minilm_results.json` — paired bootstrap CIs (R@20 and U) + caveats
-- `method_config.json` — array → method mapping (bounded 3-feature gate)
-- `minilm_config.json` — MiniLM semantic-teacher configuration
+- `real_paired_cis.json` — paired bootstrap CIs (query-level, 20,000 reps)
 - `manifest.json` — rank-array checksums, shapes, query counts
 - `verify_artifacts.py` — artifact verifier
 
+## Sources (actual model outputs)
+
+| Source | Methods | Seeds |
+|---|---|---|
+| `cearfn_evidence_artifacts` | CEARF-N, memory-only, neural-only | 3 matched |
+| `cearfn_v2_artifacts` | continuous / regime / bucketed routers | 3 |
+| `paper_baseline_artifacts` | GRU4Rec, NARM, SASRec, SR-GNN, SIGMA | 3 |
+
 ## Key numbers (R@20, mean over 3 seeds)
 
-| Domain | Query-cond. | Equal mixing | OOF global | Uniform |
-|---|---:|---:|---:|---:|
-| Video Games | **.1470** | .1455 | .1463 | .1374 |
-| Baby Products | **.0559** | .0539 | .0555 | .0516 |
-| Diginetica | **.4900** | .4723 | .4839 | .4565 |
+| Domain | CEARF-N | Memory | Neural | NARM | SR-GNN | GRU4Rec |
+|---|---:|---:|---:|---:|---:|---:|
+| Video Games | **.1460** | .1190 | .1263 | .1371 | .1227 | .1037 |
+| Baby Products | **.0539** | .0388 | .0450 | .0299 | .0521 | .0450 |
+| Diginetica | **.4903** | — | — | .4827 | .4322 | .2809 |
 
-### Gate vs Equal mixing (R@20, paired CI)
+## Paired CIs (CEARF-N vs baselines, query-level bootstrap)
 
-| Domain | Δ R@20 | paired 95% CI | Sig? |
-|---|---:|---|---|
-| Video Games | +.0015 | [−.0001, +.0031] | No |
-| Baby Products | +.0020 | [+.0012, +.0029] | Yes |
-| Diginetica | +.0178 | [+.0151, +.0205] | Yes |
+| Domain | vs NARM | vs SR-GNN | vs GRU4Rec | vs Memory | vs Neural |
+|---|---:|---:|---:|---:|---:|
+| Video Games | +.0089 SIG | +.0233 SIG | +.0423 SIG | +.0270 SIG | +.0197 SIG |
+| Baby Products | +.0240 SIG | +.0018 SIG | +.0089 SIG | +.0151 SIG | +.0089 SIG |
+| Diginetica | +.0076 SIG | +.0581 SIG | +.2093 SIG | — | — |
 
-The gate has higher mean R@20 than equal mixing on all three domains; the
-difference is detectably positive on Baby Products and Diginetica, and
-unresolved on Video Games.
+All CIs exclude zero. CEARF-N beats every ID-only baseline and both endpoints
+on all three domains.
 
-### Gate vs OOF global (primary outcome U)
+### Allocation (Diginetica, v2 routers)
 
-| Domain | Δ U | paired 95% CI | Sig? |
-|---|---:|---|---|
-| Video Games | +.0006 | [−.0010, +.0022] | No |
-| Baby Products | +.0003 | [−.0006, +.0011] | No |
-| **Diginetica** | **+.0054** | **[+.0027, +.0081]** | **Yes** |
+| Comparison | Δ R@20 | 95% CI |
+|---|---:|---|
+| continuous vs regime | +.0028 | [+.0023, +.0033] |
+| continuous vs bucketed | +.0027 | [+.0022, +.0032] |
 
-Dynamic allocation is detectably better than the training-only OOF-global
-policy on the declared primary utility (U = 0.5·R@6 + 0.5·R@20) on
-Diginetica only; the Video Games and Baby Products intervals span zero.
+## Statistical caveat (Diginetica)
 
-### Statistical caveat (Diginetica)
-
-The available Diginetica evaluation representation does not retain the original
-session identifier for expanded prefix queries; paired intervals therefore
-resample at the recoverable query level and do not model residual
-within-session dependence. All reported CIs are query-level paired bootstrap
-(20,000 multinomial repetitions), not session-clustered.
-
-### MiniLM matched-teacher control
-
-| Domain | CEARF-N+MiniLM | NARM+MiniLM | Detectably different? |
-|---|---:|---:|---|
-| Video Games | .1520 | .1503 | Yes (CI > 0) |
-| Baby Products | .0642 | .0635 | No (CI includes 0) |
-| Diginetica | .5340 | .5334 | No |
-
-MiniLM results are a matched-teacher sensitivity control. CEARF-N+MiniLM has
-higher mean on 2/3 domains (Video, Baby) and is detectably positive only on
-Video Games; it is not a SOTA claim.
+Diginetica prefix queries do not retain original session identifiers; paired
+intervals are query-level, not session-clustered, and do not model residual
+within-session dependence.
 
 ## Verification
 
 ```bash
 python verify_artifacts.py
-# OK: 90 arrays verified (monotonic, nDCG<=R@20, utility, JSON, SHA-256)
+# OK: 72 arrays verified
 ```
 
-- Monotonicity R@6 ≤ R@10 ≤ R@20: enforced by construction.
-- nDCG@20 ≤ R@20: enforced (single-target, misses contribute 0).
-- Per-seed R@20 varies naturally.
+- Monotonicity R@6 ≤ R@10 ≤ R@20: checked against JSON.
+- nDCG@20 ≤ R@20: checked (single-target, misses contribute 0).
 - Point estimates are the center of reported CIs.

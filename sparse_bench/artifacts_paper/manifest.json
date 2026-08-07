@@ -2,243 +2,194 @@
   "domains": {
     "Video_Games": {
       "n_queries": 94762,
-      "ordered_query_sha256": "1ed250e62df38252287aed4ef75a7733f0a9293bb7645ec38d1aeec3f05e662e",
       "arrays": {
-        "Video_Games_uniform_seed42": {
-          "path": "per_query_ranks/Video_Games_uniform_seed42.npz",
-          "sha256": "6fd110870f05f608b6200dba3349e7952657104cf2ec0a83ad1823c7af4cef78",
+        "Video_Games_cearfn_seed42": {
+          "path": "per_query_ranks/Video_Games_cearfn_seed42.npz",
+          "sha256": "cbcf6c36b297945a998d5e2e97a4d326a42c6cd52e8900ce6b5607bdac254d55",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_uniform_seed123": {
-          "path": "per_query_ranks/Video_Games_uniform_seed123.npz",
-          "sha256": "8f345edb4fd16909cbc95de4452376353d5effe6d6ea60b2cbb99dc5249d87e5",
+        "Video_Games_cearfn_seed123": {
+          "path": "per_query_ranks/Video_Games_cearfn_seed123.npz",
+          "sha256": "077da3f05984e520243c2b61cc6fd7eeec9e0b00a2037418c59c3c143ee138fa",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_uniform_seed456": {
-          "path": "per_query_ranks/Video_Games_uniform_seed456.npz",
-          "sha256": "06262fc842b634fc9776c4184ddf3797193a0499352d5b7a7a4682cb50672c39",
+        "Video_Games_cearfn_seed456": {
+          "path": "per_query_ranks/Video_Games_cearfn_seed456.npz",
+          "sha256": "8c40deee7e368205a8eb1558ba598249bb218534f07f6904bfe34afc34146641",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_kmeans_seed42": {
-          "path": "per_query_ranks/Video_Games_kmeans_seed42.npz",
-          "sha256": "03ece98dd2629357619fc2b87754594c5f48212c267053498cc2e4c4b4ee3813",
+        "Video_Games_memory_seed42": {
+          "path": "per_query_ranks/Video_Games_memory_seed42.npz",
+          "sha256": "79f1f1cbc3959ef407418227949c2d5294f53c35199fa41fe7026e1fd61b7b72",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_kmeans_seed123": {
-          "path": "per_query_ranks/Video_Games_kmeans_seed123.npz",
-          "sha256": "b4555fd2d362610a3db6108435997ecfd8b42cf278c982f351b32c23b0222c11",
+        "Video_Games_memory_seed123": {
+          "path": "per_query_ranks/Video_Games_memory_seed123.npz",
+          "sha256": "79f1f1cbc3959ef407418227949c2d5294f53c35199fa41fe7026e1fd61b7b72",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_kmeans_seed456": {
-          "path": "per_query_ranks/Video_Games_kmeans_seed456.npz",
-          "sha256": "8735141594bd1b6496bf56e7b0f928543e0081603052c2e7cf2359627c833b3d",
+        "Video_Games_memory_seed456": {
+          "path": "per_query_ranks/Video_Games_memory_seed456.npz",
+          "sha256": "79f1f1cbc3959ef407418227949c2d5294f53c35199fa41fe7026e1fd61b7b72",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_feature_bucketed_seed42": {
-          "path": "per_query_ranks/Video_Games_feature_bucketed_seed42.npz",
-          "sha256": "b5d858518d6e096154bb8cf9fbb807e15e4dc8615fc5d134e745dffe81bd84aa",
+        "Video_Games_neural_seed42": {
+          "path": "per_query_ranks/Video_Games_neural_seed42.npz",
+          "sha256": "91364cf5f4ff3a8363f493a803903e3a4bcb944694bf6cd1aaf6ef7cf47175f5",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_feature_bucketed_seed123": {
-          "path": "per_query_ranks/Video_Games_feature_bucketed_seed123.npz",
-          "sha256": "1687d64578249e45d07abc3dea5ebfd86e748d767412d378e9ee4a46dcc60e08",
+        "Video_Games_neural_seed123": {
+          "path": "per_query_ranks/Video_Games_neural_seed123.npz",
+          "sha256": "7855743297b402fee374087aa0fc48826d554f61061dae16b18de7db3f07c5ce",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_feature_bucketed_seed456": {
-          "path": "per_query_ranks/Video_Games_feature_bucketed_seed456.npz",
-          "sha256": "6e9a4431e6b7b708b1f7a299ff16b7b54e0b0a5ea7c947a87a2bb69353d5c577",
+        "Video_Games_neural_seed456": {
+          "path": "per_query_ranks/Video_Games_neural_seed456.npz",
+          "sha256": "ba9678f36a53079a12d15d3aca6d01b26671a25db8b9bfd04696832c359cae60",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_equal_mixing_seed42": {
-          "path": "per_query_ranks/Video_Games_equal_mixing_seed42.npz",
-          "sha256": "668cd83d3b6ce02b4dcd5c1b825f61d88399fdbf4c7a68680ca9f48ac679d7de",
+        "Video_Games_gru4rec_seed42": {
+          "path": "per_query_ranks/Video_Games_gru4rec_seed42.npz",
+          "sha256": "544d9aaf5fe3b10a43152f14355a9176ad60cffd1ff60341ca52ec8c75161af2",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_equal_mixing_seed123": {
-          "path": "per_query_ranks/Video_Games_equal_mixing_seed123.npz",
-          "sha256": "2a6223343da3559b4046b92955a950caa617129c14b57a74272f918f4d1e7cfd",
+        "Video_Games_gru4rec_seed123": {
+          "path": "per_query_ranks/Video_Games_gru4rec_seed123.npz",
+          "sha256": "299f1a08222b5ce29f649ee01ab99b279cdfca7c9b7b56f0dcbea89ad487db70",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_equal_mixing_seed456": {
-          "path": "per_query_ranks/Video_Games_equal_mixing_seed456.npz",
-          "sha256": "ae6800649a9f936558ff003ca90309ee32c7d76b3c33e675fd0f98a49cf7760d",
+        "Video_Games_gru4rec_seed456": {
+          "path": "per_query_ranks/Video_Games_gru4rec_seed456.npz",
+          "sha256": "82893f25eaeca7442c39a9319c65805e350b462fc6797b2b0a9e188f59709cdc",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_query_cond_seed42": {
-          "path": "per_query_ranks/Video_Games_query_cond_seed42.npz",
-          "sha256": "dcd8fc799f60f5fee3a0329155a92257b4de80a1611b16cda2cb93bea3322792",
+        "Video_Games_narm_seed42": {
+          "path": "per_query_ranks/Video_Games_narm_seed42.npz",
+          "sha256": "22d74d057a7284003dfd865efbf93f74cbb9fe6d831965bb8355d35eb5e4fef4",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_query_cond_seed123": {
-          "path": "per_query_ranks/Video_Games_query_cond_seed123.npz",
-          "sha256": "a4b47dddf5e7b1e1e36687c0f721955940efe4e7ac5dcf0d3e9058e39fee9fc4",
+        "Video_Games_narm_seed123": {
+          "path": "per_query_ranks/Video_Games_narm_seed123.npz",
+          "sha256": "360008cc4f6429e1481984ef58242ecf3c9c48ad1bfd3a1efc8cc749a8746350",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_query_cond_seed456": {
-          "path": "per_query_ranks/Video_Games_query_cond_seed456.npz",
-          "sha256": "da7dc219d15350e8eab80025682baed1befda3c75bf5f872946332dd42a079e8",
+        "Video_Games_narm_seed456": {
+          "path": "per_query_ranks/Video_Games_narm_seed456.npz",
+          "sha256": "ead4ce855d32e566b809db5ac49ddbd11d113c92c678eabc7c6ef3f2d00a3bda",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_id_seed42": {
-          "path": "per_query_ranks/Video_Games_narm_id_seed42.npz",
-          "sha256": "abe657dcee0b89b9edc684ad669b46423e14c2425c8b0432e58bdbafae4852ad",
+        "Video_Games_sasrec_seed42": {
+          "path": "per_query_ranks/Video_Games_sasrec_seed42.npz",
+          "sha256": "5f32dc7e81c4c26623cca3bafe2844a46e7d2c75a5466ef363a0a057fdd65357",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_id_seed123": {
-          "path": "per_query_ranks/Video_Games_narm_id_seed123.npz",
-          "sha256": "10e51714837cfad4860528bd675839bf18c946ef007d8eaf42d2df71d62a3aed",
+        "Video_Games_sasrec_seed123": {
+          "path": "per_query_ranks/Video_Games_sasrec_seed123.npz",
+          "sha256": "05b03fe5e9a68ca9275873f992e1d94f7de0b74806844fdcf9ed7be1021c6424",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_id_seed456": {
-          "path": "per_query_ranks/Video_Games_narm_id_seed456.npz",
-          "sha256": "882867be222828f330f44da969a761edda4474d5f82e206497c4b1313a928093",
+        "Video_Games_sasrec_seed456": {
+          "path": "per_query_ranks/Video_Games_sasrec_seed456.npz",
+          "sha256": "05b35cbeef318a9d36546aeaac92e0e4cb6c26e0f762b8e82e708e3b653edcfb",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_tfidf_seed42": {
-          "path": "per_query_ranks/Video_Games_narm_tfidf_seed42.npz",
-          "sha256": "e00090539510fed3a32e51a07a234764b82328b9454ba7e9896d863ecbc4dfde",
+        "Video_Games_sr_gnn_seed42": {
+          "path": "per_query_ranks/Video_Games_sr_gnn_seed42.npz",
+          "sha256": "8c7437e9eb60c893dae3ce77886302e7343548a60dfe6a5164752801ea0ac344",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_tfidf_seed123": {
-          "path": "per_query_ranks/Video_Games_narm_tfidf_seed123.npz",
-          "sha256": "909ec3bb5d053ebc99a78a8146d9cd75144945af0a286392f6fc6a203b49251b",
+        "Video_Games_sr_gnn_seed123": {
+          "path": "per_query_ranks/Video_Games_sr_gnn_seed123.npz",
+          "sha256": "0546402683cd78da52f44cf56a51a2e0a2facd8919cfecf8b2c89df5c649290c",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_tfidf_seed456": {
-          "path": "per_query_ranks/Video_Games_narm_tfidf_seed456.npz",
-          "sha256": "70997489d6800b6ac593aba6fae73dc336ee5399e0d7eec4f523d847e631a2c5",
+        "Video_Games_sr_gnn_seed456": {
+          "path": "per_query_ranks/Video_Games_sr_gnn_seed456.npz",
+          "sha256": "3a636de51fe4d9e9fc452cff1394422e6c4abb0c3d049a9ac0174b636434aa2a",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_minilm_seed42": {
-          "path": "per_query_ranks/Video_Games_narm_minilm_seed42.npz",
-          "sha256": "65ffbd7f3d653e57e1c55c45fcc2bfd2e154a518383286407a04d204072c6d9c",
+        "Video_Games_sigma_compatible_seed42": {
+          "path": "per_query_ranks/Video_Games_sigma_compatible_seed42.npz",
+          "sha256": "d207a747fab48a600e4cf269df1e5e4880e1b75b14ea4e96085a58da9e8dbfb9",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_minilm_seed123": {
-          "path": "per_query_ranks/Video_Games_narm_minilm_seed123.npz",
-          "sha256": "a583350faee884d2641f9d2d59b5ed570c84e5c5682807ceb40101b17118442e",
+        "Video_Games_sigma_compatible_seed123": {
+          "path": "per_query_ranks/Video_Games_sigma_compatible_seed123.npz",
+          "sha256": "5f951513d506111c8b5ce9b03af6ef24104563b6c1042a84ed917db2ac752bd1",
           "shape": [
             94762
           ],
           "dtype": "uint8"
         },
-        "Video_Games_narm_minilm_seed456": {
-          "path": "per_query_ranks/Video_Games_narm_minilm_seed456.npz",
-          "sha256": "fd776beda067011a1244260a765175aae8d06746ece5b6055f798c76c5d14a3b",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_cearfn_minilm_seed42": {
-          "path": "per_query_ranks/Video_Games_cearfn_minilm_seed42.npz",
-          "sha256": "57bec94e64968ea01bbee8d9963d44d98ca0b6ffdf0f37e03a46a4fc5ca5f293",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_cearfn_minilm_seed123": {
-          "path": "per_query_ranks/Video_Games_cearfn_minilm_seed123.npz",
-          "sha256": "aa0917cc85c35555135cdfea5a3979774942644659559b7094b3c0fa8b372378",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_cearfn_minilm_seed456": {
-          "path": "per_query_ranks/Video_Games_cearfn_minilm_seed456.npz",
-          "sha256": "269d8faf88960619a85025f9937b8a111061fcdc409cafd30b1543713256fbed",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_oof_global_seed42": {
-          "path": "per_query_ranks/Video_Games_oof_global_seed42.npz",
-          "sha256": "caa4d69fbd0658ec57698a2e95fc0f14b059429df358a0aebfc924860259d01a",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_oof_global_seed123": {
-          "path": "per_query_ranks/Video_Games_oof_global_seed123.npz",
-          "sha256": "ab574347f9b9a28da7a489e032268f4b796bc1fadd9eaf93d0af825d536fae86",
-          "shape": [
-            94762
-          ],
-          "dtype": "uint8"
-        },
-        "Video_Games_oof_global_seed456": {
-          "path": "per_query_ranks/Video_Games_oof_global_seed456.npz",
-          "sha256": "a39c439fd3d116ff18f0de9b3a3c449caff60c2dac0e457d4dc19f31fcf553b9",
+        "Video_Games_sigma_compatible_seed456": {
+          "path": "per_query_ranks/Video_Games_sigma_compatible_seed456.npz",
+          "sha256": "f609aac94b15702117f094ff8e905296b6830191d9817086d859682b7a35d93d",
           "shape": [
             94762
           ],
@@ -248,243 +199,194 @@
     },
     "Baby_Products": {
       "n_queries": 150777,
-      "ordered_query_sha256": "2f4e5f8a82bbc87b9f69c811066f0e6477996f2e584d732f6a8ef2263d4bfde7",
       "arrays": {
-        "Baby_Products_uniform_seed42": {
-          "path": "per_query_ranks/Baby_Products_uniform_seed42.npz",
-          "sha256": "f08bb1228650a731f029eadd452db8597b71cea2d6df8ecac8de913b89e64e60",
+        "Baby_Products_cearfn_seed42": {
+          "path": "per_query_ranks/Baby_Products_cearfn_seed42.npz",
+          "sha256": "ab6f7eaf4c0cb2b07c692bc47404197520363c78bc0d40fc8ba403e533736710",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_uniform_seed123": {
-          "path": "per_query_ranks/Baby_Products_uniform_seed123.npz",
-          "sha256": "7f5cdf7a8d6f2e6c3226a734cf9538d39b131013a75b73242e213de8b24d0aca",
+        "Baby_Products_cearfn_seed123": {
+          "path": "per_query_ranks/Baby_Products_cearfn_seed123.npz",
+          "sha256": "eea4d6ec70d64ab7e9233de6b69b877f55661d2b75380b3a6a3aab16aa6ef043",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_uniform_seed456": {
-          "path": "per_query_ranks/Baby_Products_uniform_seed456.npz",
-          "sha256": "073fd0505a1e9c04e33a3f6d16bc8739a21a1751091c59f1f273dcfdcfff54e6",
+        "Baby_Products_cearfn_seed456": {
+          "path": "per_query_ranks/Baby_Products_cearfn_seed456.npz",
+          "sha256": "4cc443f778d9ab17330d688ee46257f46b401544b917ab9986282e2565ee786f",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_kmeans_seed42": {
-          "path": "per_query_ranks/Baby_Products_kmeans_seed42.npz",
-          "sha256": "1bf4bac19bda78b3f86fd8612452f2f87b720cd000ced1b6bef07bbbdf5ee29e",
+        "Baby_Products_memory_seed42": {
+          "path": "per_query_ranks/Baby_Products_memory_seed42.npz",
+          "sha256": "639878efd85dc6ba047bf3a13bbcb5090d222c95c245b6f568eb4b0dfdc2628a",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_kmeans_seed123": {
-          "path": "per_query_ranks/Baby_Products_kmeans_seed123.npz",
-          "sha256": "dcd45bd6d728c9d9f1bc7aa1624bf2dbd194bc7fe2998509f0ed254af709904b",
+        "Baby_Products_memory_seed123": {
+          "path": "per_query_ranks/Baby_Products_memory_seed123.npz",
+          "sha256": "639878efd85dc6ba047bf3a13bbcb5090d222c95c245b6f568eb4b0dfdc2628a",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_kmeans_seed456": {
-          "path": "per_query_ranks/Baby_Products_kmeans_seed456.npz",
-          "sha256": "d9b982876468a4cdedcaf1e08bf1d4182d680df27d3706f09b9a51468a1711a0",
+        "Baby_Products_memory_seed456": {
+          "path": "per_query_ranks/Baby_Products_memory_seed456.npz",
+          "sha256": "639878efd85dc6ba047bf3a13bbcb5090d222c95c245b6f568eb4b0dfdc2628a",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_feature_bucketed_seed42": {
-          "path": "per_query_ranks/Baby_Products_feature_bucketed_seed42.npz",
-          "sha256": "2cecf2886518da174800d126e7a0b06d08b9bf62483650476fff78241fa2f500",
+        "Baby_Products_neural_seed42": {
+          "path": "per_query_ranks/Baby_Products_neural_seed42.npz",
+          "sha256": "72bfc9fa37e0b0d01b74aca512250df07dcae2ae256e9c0d9e99b9162989a9b1",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_feature_bucketed_seed123": {
-          "path": "per_query_ranks/Baby_Products_feature_bucketed_seed123.npz",
-          "sha256": "8bcfddb734c611a089ae2c8b94019f0562f1bf6ff2b46e7c4f28d518f343ab3b",
+        "Baby_Products_neural_seed123": {
+          "path": "per_query_ranks/Baby_Products_neural_seed123.npz",
+          "sha256": "85d718ee6e7f3072201867a00a7b5e4fec3bec16ccb2c013b3b02ad0c813677e",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_feature_bucketed_seed456": {
-          "path": "per_query_ranks/Baby_Products_feature_bucketed_seed456.npz",
-          "sha256": "aa89af0059d305ffe5df9a6aa355b5238b39385be92fe3e10ebe5d988cbd686f",
+        "Baby_Products_neural_seed456": {
+          "path": "per_query_ranks/Baby_Products_neural_seed456.npz",
+          "sha256": "3887207727966b633854f4b9fc6e7d07bcb481403ecdb3a0b0014bb7f6fc927d",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_equal_mixing_seed42": {
-          "path": "per_query_ranks/Baby_Products_equal_mixing_seed42.npz",
-          "sha256": "561587b2bc29adb453f516a26daa31cd97f79e38dad753012386ec20a6537800",
+        "Baby_Products_gru4rec_seed42": {
+          "path": "per_query_ranks/Baby_Products_gru4rec_seed42.npz",
+          "sha256": "4f9c97c9992195e022588e14f365b4137c3480a0edd2ef5fb3929606371f981a",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_equal_mixing_seed123": {
-          "path": "per_query_ranks/Baby_Products_equal_mixing_seed123.npz",
-          "sha256": "13da2fef58d0e4bce0b3d7f30b5db9f9ae241bcc8b760f98a3512e125603f92d",
+        "Baby_Products_gru4rec_seed123": {
+          "path": "per_query_ranks/Baby_Products_gru4rec_seed123.npz",
+          "sha256": "6573c1d454432273a28256b01b9d4072ed1a80a89f6485cfc0353f917d0dd2bc",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_equal_mixing_seed456": {
-          "path": "per_query_ranks/Baby_Products_equal_mixing_seed456.npz",
-          "sha256": "3866ebe945faaf251b73ba15a919e0f25512d3f13f4197b77b5a8f276902d44e",
+        "Baby_Products_gru4rec_seed456": {
+          "path": "per_query_ranks/Baby_Products_gru4rec_seed456.npz",
+          "sha256": "19a241d06c9113901bd972d989669263aea1102bd182866920abfd74b1303a41",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_query_cond_seed42": {
-          "path": "per_query_ranks/Baby_Products_query_cond_seed42.npz",
-          "sha256": "b3bd80153dd895658bc8c542b6496ef8e8ecd33051008ebcf694ce0008f4dd92",
+        "Baby_Products_narm_seed42": {
+          "path": "per_query_ranks/Baby_Products_narm_seed42.npz",
+          "sha256": "46ea9b92d6b4612b4ed18bd8cd99c47e9d3b975a3283c932c1168e08c1eec774",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_query_cond_seed123": {
-          "path": "per_query_ranks/Baby_Products_query_cond_seed123.npz",
-          "sha256": "32cad759b575e6b54e4ce3302b0626b70050ff8d55669998f6646de5764d10c1",
+        "Baby_Products_narm_seed123": {
+          "path": "per_query_ranks/Baby_Products_narm_seed123.npz",
+          "sha256": "82a3ce9a07cc184a3a81b98b4b8698fbd76b6478035f73d2844140fc56317c35",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_query_cond_seed456": {
-          "path": "per_query_ranks/Baby_Products_query_cond_seed456.npz",
-          "sha256": "0ce5ed8b7524451c528ee08bb0ac1576515cc7b04b4ee221ee44c2bf3c467666",
+        "Baby_Products_narm_seed456": {
+          "path": "per_query_ranks/Baby_Products_narm_seed456.npz",
+          "sha256": "6aacf368adcd2f7a9151182dde73036c2743d9e5c0d8cf226e4ccb38e819f1f2",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_id_seed42": {
-          "path": "per_query_ranks/Baby_Products_narm_id_seed42.npz",
-          "sha256": "66423547bbba01eeeab1649222be463860ab8b19171397b13d46e9a579b582c0",
+        "Baby_Products_sasrec_seed42": {
+          "path": "per_query_ranks/Baby_Products_sasrec_seed42.npz",
+          "sha256": "b81d80e1dda03df69a1b30ea2f79d4e0e1375cdf0e7f8b19a77161ea37f7f22e",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_id_seed123": {
-          "path": "per_query_ranks/Baby_Products_narm_id_seed123.npz",
-          "sha256": "35de78aea4c0dc3627a876bbf400c1b9e1f4e9be45499409d994756509145fe3",
+        "Baby_Products_sasrec_seed123": {
+          "path": "per_query_ranks/Baby_Products_sasrec_seed123.npz",
+          "sha256": "bd484c35bf3480cb479287aae99a33c9b3fddc7c246e64e03287223cae4db6d5",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_id_seed456": {
-          "path": "per_query_ranks/Baby_Products_narm_id_seed456.npz",
-          "sha256": "f30560d237e647134971b2fd1c3381389db61a64c5e30f97435d75fdc530a5ec",
+        "Baby_Products_sasrec_seed456": {
+          "path": "per_query_ranks/Baby_Products_sasrec_seed456.npz",
+          "sha256": "1dc6dc94c2916cb7ace90ee70bb54bbf9720da02678ed504d6f10a6092a4b577",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_tfidf_seed42": {
-          "path": "per_query_ranks/Baby_Products_narm_tfidf_seed42.npz",
-          "sha256": "951ce82ec51615be0ec1e5da16c3330cd36771f86926e31a84b9210bf3eb96d1",
+        "Baby_Products_sr_gnn_seed42": {
+          "path": "per_query_ranks/Baby_Products_sr_gnn_seed42.npz",
+          "sha256": "8d0577db55d4f09859dc17ed3a08aabf47733fdedd77871253df9588740c06da",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_tfidf_seed123": {
-          "path": "per_query_ranks/Baby_Products_narm_tfidf_seed123.npz",
-          "sha256": "f097b4d0b317a7b9986458360a3a609a536bf695ef9f7b67d793da8002580e11",
+        "Baby_Products_sr_gnn_seed123": {
+          "path": "per_query_ranks/Baby_Products_sr_gnn_seed123.npz",
+          "sha256": "6a6665b8996adc2d9d279660b65a887682f72caf650cf2cdc486284cce56982d",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_tfidf_seed456": {
-          "path": "per_query_ranks/Baby_Products_narm_tfidf_seed456.npz",
-          "sha256": "a6fa1b27858261a15c4e06ac8273b6c0c9c53cb59b997755815d6a6bacf52915",
+        "Baby_Products_sr_gnn_seed456": {
+          "path": "per_query_ranks/Baby_Products_sr_gnn_seed456.npz",
+          "sha256": "3f9f1df437071dfcf40911154662e937089ef0f638c2f9967efc56318765b4ad",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_minilm_seed42": {
-          "path": "per_query_ranks/Baby_Products_narm_minilm_seed42.npz",
-          "sha256": "6beca54ea746a12cda1caff0990868457c9c64c15d31ba7857083a8b7948b876",
+        "Baby_Products_sigma_compatible_seed42": {
+          "path": "per_query_ranks/Baby_Products_sigma_compatible_seed42.npz",
+          "sha256": "8512ec88e0e0cd88ac06621e8b2a1017775d8a6270ba4dd687e917c680472ae6",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_minilm_seed123": {
-          "path": "per_query_ranks/Baby_Products_narm_minilm_seed123.npz",
-          "sha256": "7a1e57c927a982ac0d790a6e577cb2cececb3a50c0b767df82e0cd278d8acb21",
+        "Baby_Products_sigma_compatible_seed123": {
+          "path": "per_query_ranks/Baby_Products_sigma_compatible_seed123.npz",
+          "sha256": "7ec3c9ced9e1911c0a9d305b030d6a8dc38b6e748d0e8c46109b56d8b12f222f",
           "shape": [
             150777
           ],
           "dtype": "uint8"
         },
-        "Baby_Products_narm_minilm_seed456": {
-          "path": "per_query_ranks/Baby_Products_narm_minilm_seed456.npz",
-          "sha256": "f36c43dfd3a6b7f717f34f7282c4f6a4eb0cd17c68d0cbe2aa0a422a59345652",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_cearfn_minilm_seed42": {
-          "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed42.npz",
-          "sha256": "58b82bb1039f0a6bff8f9934f454844a92d4ea702997d52161bdd914dace8f5f",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_cearfn_minilm_seed123": {
-          "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed123.npz",
-          "sha256": "7e4f9fb737a1246f3fcb89eff69549537cbc3be60dabf594eb419249c8c7731d",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_cearfn_minilm_seed456": {
-          "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed456.npz",
-          "sha256": "908f1a048232ab4eed86f462a6a47cf3045200849bb8f79599666d08a524b9de",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_oof_global_seed42": {
-          "path": "per_query_ranks/Baby_Products_oof_global_seed42.npz",
-          "sha256": "9207973cb1dbf7b81244390992f0c41647a72e85113a81b438bd0aba9548ce57",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_oof_global_seed123": {
-          "path": "per_query_ranks/Baby_Products_oof_global_seed123.npz",
-          "sha256": "cefd1c0324ca9800b6887a545e46ea26fa88e2c6f35cada9d175cd308e22ce33",
-          "shape": [
-            150777
-          ],
-          "dtype": "uint8"
-        },
-        "Baby_Products_oof_global_seed456": {
-          "path": "per_query_ranks/Baby_Products_oof_global_seed456.npz",
-          "sha256": "6e8a73bed269c006d5c621ae95a2c80410018dd8acf7a7419e6de44950f3d613",
+        "Baby_Products_sigma_compatible_seed456": {
+          "path": "per_query_ranks/Baby_Products_sigma_compatible_seed456.npz",
+          "sha256": "7e076126b1fcfec8f0bcba929f823322ae0399545007ac2e1f76deb222137755",
           "shape": [
             150777
           ],
@@ -492,245 +394,196 @@
         }
       }
     },
-    "Diginetica": {
+    "Diginetica_HID": {
       "n_queries": 60858,
-      "ordered_query_sha256": "657fed423ef365d5a249545c90a63797e9f2b9451cb97b25b6edbe163ddbbe60",
       "arrays": {
-        "Diginetica_uniform_seed42": {
-          "path": "per_query_ranks/Diginetica_uniform_seed42.npz",
-          "sha256": "7c9bd8dc3e9f35fe2b1d9e58db90ecae8a9f121d7a7c348b12a28f5310baf38d",
+        "Diginetica_HID_continuous_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_continuous_seed42.npz",
+          "sha256": "d343d9a7769b40a99c90064dd16cbaeb6fbf3a7ec79d59ed54c1dc027129b316",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_uniform_seed123": {
-          "path": "per_query_ranks/Diginetica_uniform_seed123.npz",
-          "sha256": "f703164beffaa43aa899c4b940fbb98298323d18d5a3dde3c2a71e23e9297eb8",
+        "Diginetica_HID_continuous_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_continuous_seed123.npz",
+          "sha256": "71a6069c5fb963b24899ab7deb954d4e621db7c58e54a1e19fdb308a0e0301e3",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_uniform_seed456": {
-          "path": "per_query_ranks/Diginetica_uniform_seed456.npz",
-          "sha256": "25fd0b997175ddbbd2747a64a1ccf2d190f87110478fd4d6c73a01d715bdec37",
+        "Diginetica_HID_continuous_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_continuous_seed456.npz",
+          "sha256": "28fb0ce777326d82b7c0a468a48b5abb83e72d0cd91f101f3d142f8323848dd9",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_kmeans_seed42": {
-          "path": "per_query_ranks/Diginetica_kmeans_seed42.npz",
-          "sha256": "9fadf5d7621fc0f37a39516f6af3e8231686b4f39238c057d11561e455eb7b27",
+        "Diginetica_HID_regime_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_regime_seed42.npz",
+          "sha256": "e9e372f356cf275f5c9dddfef52cf2e49e6ed07734cd1eff0936303f4c3f0b9b",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_kmeans_seed123": {
-          "path": "per_query_ranks/Diginetica_kmeans_seed123.npz",
-          "sha256": "9de7d4e3806bd8c2352611c3f46e63bfe17fbeab2bccc531b72f21a5e9ee48f7",
+        "Diginetica_HID_regime_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_regime_seed123.npz",
+          "sha256": "ff4bc9809100829df5fd5256ba58c2b26f43eb6f86dcefd8dcec666c21449794",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_kmeans_seed456": {
-          "path": "per_query_ranks/Diginetica_kmeans_seed456.npz",
-          "sha256": "55d8f98ac5574856ed55163a05cf81d755b9c4ebff4c238fdd87ffa3f0ff57df",
+        "Diginetica_HID_regime_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_regime_seed456.npz",
+          "sha256": "a4bf30383ffbf7277e152cf0e7449962958007ebed481ede82094ab5d1ea1398",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_feature_bucketed_seed42": {
-          "path": "per_query_ranks/Diginetica_feature_bucketed_seed42.npz",
-          "sha256": "7f34fb73c153dec1d4012ac8d7a000b4cb9d1917e2fd8ff688110fbf3d416135",
+        "Diginetica_HID_bucketed_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_bucketed_seed42.npz",
+          "sha256": "696bf05a04d1a8fd76a38a22e8e29c0b0935360dd3883a6ae5d7602dd583537c",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_feature_bucketed_seed123": {
-          "path": "per_query_ranks/Diginetica_feature_bucketed_seed123.npz",
-          "sha256": "255397509496bec77c4db6ed128de36336441787d9ce3002ee9e077628793b64",
+        "Diginetica_HID_bucketed_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_bucketed_seed123.npz",
+          "sha256": "88d79a34217db111eb1b29300cd999a60dd363cf144e0dcece10551ff6724bc4",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_feature_bucketed_seed456": {
-          "path": "per_query_ranks/Diginetica_feature_bucketed_seed456.npz",
-          "sha256": "30d56ce82acda3c132900a4820a68fc2128317ff059aea83e9d51866df2384d0",
+        "Diginetica_HID_bucketed_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_bucketed_seed456.npz",
+          "sha256": "80b028cfc5e014096c6cd458f8ed821f7561e886543bf305c556b9d9dbb22cd0",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_equal_mixing_seed42": {
-          "path": "per_query_ranks/Diginetica_equal_mixing_seed42.npz",
-          "sha256": "9fbe91c282b99157bcc954ece6024505b0fa2cfd186b0bdaa29e4de98ff59f6d",
+        "Diginetica_HID_gru4rec_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_gru4rec_seed42.npz",
+          "sha256": "69fc772c78d63aaf2b3310d190b9f2c80b9c01bbb3450bac4089c46a8f30631d",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_equal_mixing_seed123": {
-          "path": "per_query_ranks/Diginetica_equal_mixing_seed123.npz",
-          "sha256": "fefe9b90b7f2f6a4da4cecb215eb726dc8f70d29541df4c35f947c4e06b1bccd",
+        "Diginetica_HID_gru4rec_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_gru4rec_seed123.npz",
+          "sha256": "ca5c0b9c942300a665191e9b6b3d94ab00b40de5051240280075c9dc016dcb62",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_equal_mixing_seed456": {
-          "path": "per_query_ranks/Diginetica_equal_mixing_seed456.npz",
-          "sha256": "302e7093bf6a7a08f87e03029a2070b5fa877e0087470b2d4e32ead82260d11e",
+        "Diginetica_HID_gru4rec_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_gru4rec_seed456.npz",
+          "sha256": "1683420d1e4d881d152631c9afde8b5824ad22f106c91f764f4adb43452e6bff",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_query_cond_seed42": {
-          "path": "per_query_ranks/Diginetica_query_cond_seed42.npz",
-          "sha256": "f872beb8c423fb742d0ca7acd714ce62dc0c76954d38fbc96cded67675e45fd2",
+        "Diginetica_HID_narm_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_narm_seed42.npz",
+          "sha256": "04a4642120e7663ac6c7f19fb493139a2cb54415588e24f67367148ede3ad18c",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_query_cond_seed123": {
-          "path": "per_query_ranks/Diginetica_query_cond_seed123.npz",
-          "sha256": "a781bb66b018ede3e9062cfbb3cb8ca1f7b650150e9bd21e4df14cc64eb48a48",
+        "Diginetica_HID_narm_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_narm_seed123.npz",
+          "sha256": "b5ce89cf3a9b2de86fc7d1067818c99e1089819785dd1ffad8f57b1b4dae290c",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_query_cond_seed456": {
-          "path": "per_query_ranks/Diginetica_query_cond_seed456.npz",
-          "sha256": "bb6a89826455f0b310d8d14f62f50ff7a2f180e711e1be4741609a57ef300786",
+        "Diginetica_HID_narm_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_narm_seed456.npz",
+          "sha256": "e69e838c9a9c0055505477b6e987d937b93858a3df00e4549a4ef17dd8b8a587",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_id_seed42": {
-          "path": "per_query_ranks/Diginetica_narm_id_seed42.npz",
-          "sha256": "6ad2e8b3bd2a740d63e6473f6a346048d03c6822b055b8e5c8a15cec9f3eab15",
+        "Diginetica_HID_sasrec_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_sasrec_seed42.npz",
+          "sha256": "8a66ae85de653f9c1527ae2f0a6f846372690943bca778b1026adf8c48fc5844",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_id_seed123": {
-          "path": "per_query_ranks/Diginetica_narm_id_seed123.npz",
-          "sha256": "a1bdaca5cebebd2e1114488ab10d50d623499a5badf31d5f83271b93c7d4ce37",
+        "Diginetica_HID_sasrec_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_sasrec_seed123.npz",
+          "sha256": "b45584eff477b5258bea55c047f942193941d045118f95c2609f81e389685c6b",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_id_seed456": {
-          "path": "per_query_ranks/Diginetica_narm_id_seed456.npz",
-          "sha256": "4cf8ae8c639ae4525f63c198ce16682b3223937572546adcc69ac53226ca2ff1",
+        "Diginetica_HID_sasrec_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_sasrec_seed456.npz",
+          "sha256": "19cbcf2d89c16609bcff0d125b6baccb4bd60803a65682c8664e9786fac61795",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_tfidf_seed42": {
-          "path": "per_query_ranks/Diginetica_narm_tfidf_seed42.npz",
-          "sha256": "16df8c001677bd637fa51ef6e31ea31273bc5e1070c1527565138bf60bf1bd23",
+        "Diginetica_HID_sr_gnn_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_sr_gnn_seed42.npz",
+          "sha256": "2d96dde26167861b7eaf016f27f5f0d4945a8d5b2cc2ffd38107c21974501ab6",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_tfidf_seed123": {
-          "path": "per_query_ranks/Diginetica_narm_tfidf_seed123.npz",
-          "sha256": "080877b8265b80495475e64490f2d272e6ba334da8cf560d8d308ff4241ef76d",
+        "Diginetica_HID_sr_gnn_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_sr_gnn_seed123.npz",
+          "sha256": "8ce4d02d93c8538ee18859b19033f36589cb0129b0c88a98cac3dafe52554d0c",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_tfidf_seed456": {
-          "path": "per_query_ranks/Diginetica_narm_tfidf_seed456.npz",
-          "sha256": "8fe34f63fd6e0f6b5bcf5a2c8b8536f15a63b54503bdd935535a3b45543dbff3",
+        "Diginetica_HID_sr_gnn_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_sr_gnn_seed456.npz",
+          "sha256": "7b300fe793564a0ed01bbcbf425110e9a01655ac659368b16c0fe81580fea274",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_minilm_seed42": {
-          "path": "per_query_ranks/Diginetica_narm_minilm_seed42.npz",
-          "sha256": "1ef4391ba9bb8e415334151372f8f4d358f484443bcb8133efde9daf216a5b42",
+        "Diginetica_HID_sigma_compatible_seed42": {
+          "path": "per_query_ranks/Diginetica_HID_sigma_compatible_seed42.npz",
+          "sha256": "52340df3d7595089dde44163fdeef9e90e34be765b5fbeb68a941186284d1220",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_minilm_seed123": {
-          "path": "per_query_ranks/Diginetica_narm_minilm_seed123.npz",
-          "sha256": "3cb252f4b67b1cccce713b47970fffeb51445d5efafe8cfae29a16d6204a0d9a",
+        "Diginetica_HID_sigma_compatible_seed123": {
+          "path": "per_query_ranks/Diginetica_HID_sigma_compatible_seed123.npz",
+          "sha256": "eed7176662cd10fa8929d56cba498a5a0e3655686728a8a0e1ea8ceb71119f19",
           "shape": [
             60858
           ],
           "dtype": "uint8"
         },
-        "Diginetica_narm_minilm_seed456": {
-          "path": "per_query_ranks/Diginetica_narm_minilm_seed456.npz",
-          "sha256": "c1855ba497588726bd2f8ce3ec38776995ebea96024748e46a2a28959afba7b5",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_cearfn_minilm_seed42": {
-          "path": "per_query_ranks/Diginetica_cearfn_minilm_seed42.npz",
-          "sha256": "f5a6c399910e572dff74c95059fadefbc2b121e8cfbd934a5e1fc571b78e4dd5",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_cearfn_minilm_seed123": {
-          "path": "per_query_ranks/Diginetica_cearfn_minilm_seed123.npz",
-          "sha256": "da504a126c075005e7a22d85f054fa3c2b6bb82112046e54d5b97c7e142f9c55",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_cearfn_minilm_seed456": {
-          "path": "per_query_ranks/Diginetica_cearfn_minilm_seed456.npz",
-          "sha256": "ac7cd7db7344f5b3ec367e7054953c4c5668af5f3f36254a2b7d2e65c1fc6c8b",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_oof_global_seed42": {
-          "path": "per_query_ranks/Diginetica_oof_global_seed42.npz",
-          "sha256": "210c85234f0ab9bdc7ab0d91ab76d014fb0ef39cb8812fd90b4b09a448ef9ee7",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_oof_global_seed123": {
-          "path": "per_query_ranks/Diginetica_oof_global_seed123.npz",
-          "sha256": "5f1a50dbbdd4fc2e5b108d29df145accd232bd5e02f64aa3c517f45471379310",
-          "shape": [
-            60858
-          ],
-          "dtype": "uint8"
-        },
-        "Diginetica_oof_global_seed456": {
-          "path": "per_query_ranks/Diginetica_oof_global_seed456.npz",
-          "sha256": "d52cd01236ff237c998668383437e4a2c476a2195675fe80c309b29658cd1dfe",
+        "Diginetica_HID_sigma_compatible_seed456": {
+          "path": "per_query_ranks/Diginetica_HID_sigma_compatible_seed456.npz",
+          "sha256": "45035ba141213486d953b682c9a3e99632f57e334b9831116fdc374b610e2f6d",
           "shape": [
             60858
           ],
@@ -740,6 +593,5 @@
     }
   },
   "rank_encoding": "0=miss; 1..20=target rank",
-  "boot_reps": 20000,
-  "seed": 2026
+  "boot_reps": 20000
 }
