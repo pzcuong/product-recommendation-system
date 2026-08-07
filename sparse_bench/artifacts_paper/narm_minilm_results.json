@@ -2,171 +2,171 @@
   "domains": {
     "Video_Games": {
       "gate_vs_equal": {
-        "delta_r20": 0.00154,
+        "delta_r20": 0.00146,
         "ci95": [
-          -0.00029,
-          0.00336
+          -0.00014,
+          0.00309
         ],
-        "p": 0.101233185420799,
+        "p": 0.07744764622839473,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_uniform": {
-        "delta_r20": 0.00988,
+        "delta_r20": 0.00953,
         "ci95": [
-          0.00807,
-          0.01169
+          0.00794,
+          0.01112
         ],
-        "p": 1.305706321989553e-26,
+        "p": 2.1594949642983094e-31,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_oof": {
-        "delta_r20": 9e-05,
+        "delta_r20": 0.00069,
         "ci95": [
-          -0.00173,
-          0.00192
+          -0.00094,
+          0.00229
         ],
-        "p": 0.9252789622108052,
+        "p": 0.40898504810281466,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling",
-        "delta_u": 0.0003,
+        "delta_u": 0.00063,
         "ci95_u": [
-          -0.00148,
-          0.00208
+          -0.00096,
+          0.00221
         ]
       },
       "cm_vs_nm": {
-        "delta_r20": -0.0005,
+        "delta_r20": 0.00173,
         "ci95": [
-          -0.00235,
-          0.00135
+          9e-05,
+          0.00336
         ],
-        "p": 0.5981178848532994,
+        "p": 0.03897786270936772,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "cm_vs_nt": {
-        "delta_r20": 0.00082,
+        "delta_r20": 0.00326,
         "ci95": [
-          -0.00104,
-          0.00266
+          0.00161,
+          0.00486
         ],
-        "p": 0.3891450125976968,
+        "p": 9.302834944213413e-05,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       }
     },
     "Baby_Products": {
       "gate_vs_equal": {
-        "delta_r20": 0.00135,
+        "delta_r20": 0.00201,
         "ci95": [
-          0.00041,
-          0.0023
+          0.00115,
+          0.00286
         ],
-        "p": 0.0048666150041863305,
+        "p": 4.6488647296081586e-06,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_uniform": {
-        "delta_r20": 0.00403,
+        "delta_r20": 0.00433,
         "ci95": [
-          0.0031,
-          0.00496
+          0.00347,
+          0.00516
         ],
-        "p": 1.814690118426223e-17,
+        "p": 2.162035452116995e-23,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_oof": {
-        "delta_r20": 0.00038,
+        "delta_r20": 0.0004,
         "ci95": [
-          -0.00056,
-          0.00132
+          -0.00047,
+          0.00126
         ],
-        "p": 0.4297048407145097,
+        "p": 0.3688409518838313,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling",
-        "delta_u": 0.00036,
+        "delta_u": 0.00028,
         "ci95_u": [
           -0.00055,
-          0.00128
+          0.00113
         ]
       },
       "cm_vs_nm": {
-        "delta_r20": 0.00054,
+        "delta_r20": 0.00074,
         "ci95": [
-          -0.00047,
-          0.00155
+          -0.00018,
+          0.00165
         ],
-        "p": 0.295748576751322,
+        "p": 0.11670633580958345,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "cm_vs_nt": {
-        "delta_r20": 0.00225,
+        "delta_r20": 0.00135,
         "ci95": [
-          0.00125,
-          0.00325
+          0.00044,
+          0.00227
         ],
-        "p": 1.1812545881517436e-05,
+        "p": 0.003935506060757503,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       }
     },
     "Diginetica": {
       "gate_vs_equal": {
-        "delta_r20": 0.01634,
+        "delta_r20": 0.01777,
         "ci95": [
-          0.01316,
-          0.01957
+          0.01505,
+          0.02052
         ],
-        "p": 4.651942091644939e-23,
+        "p": 9.324945077990896e-37,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_uniform": {
-        "delta_r20": 0.03302,
+        "delta_r20": 0.03349,
         "ci95": [
-          0.02984,
+          0.03074,
           0.03621
         ],
-        "p": 2.6709236926724758e-89,
+        "p": 3.1242435505461254e-126,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "gate_vs_oof": {
-        "delta_r20": 0.00506,
+        "delta_r20": 0.0061,
         "ci95": [
-          0.00187,
-          0.00829
+          0.00336,
+          0.00882
         ],
-        "p": 0.002239067428529211,
+        "p": 1.4341793466990739e-05,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling",
-        "delta_u": 0.00464,
+        "delta_u": 0.0054,
         "ci95_u": [
-          0.00147,
-          0.00782
+          0.0027,
+          0.00812
         ]
       },
       "cm_vs_nm": {
-        "delta_r20": -0.00072,
+        "delta_r20": 0.00066,
         "ci95": [
-          -0.00387,
-          0.00253
+          -0.00207,
+          0.0034
         ],
-        "p": 0.6663925963031753,
+        "p": 0.6417486958913685,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       },
       "cm_vs_nt": {
-        "delta_r20": 0.00268,
+        "delta_r20": 0.00251,
         "ci95": [
-          -0.00048,
-          0.00588
+          -0.0002,
+          0.00527
         ],
-        "p": 0.10415687749145912,
+        "p": 0.07376880320004393,
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level resampling"
       }
@@ -175,23 +175,19 @@
   "protocol": "full-catalogue, 3 seeds, paired bootstrap 20000 reps",
   "narm_minilm": {
     "Video_Games": {
-      "R@6": 0.13977,
-      "R@20": 0.15113,
-      "NDCG@20": 0.10154
+      "R@6": 0.13896,
+      "R@20": 0.15031,
+      "NDCG@20": 0.1008
     },
     "Baby_Products": {
-      "R@6": 0.05943,
-      "R@20": 0.06417,
-      "NDCG@20": 0.04314
+      "R@6": 0.05871,
+      "R@20": 0.06349,
+      "NDCG@20": 0.04253
     },
     "Diginetica": {
-      "R@6": 0.49447,
-      "R@20": 0.53402,
-      "NDCG@20": 0.35845
+      "R@6": 0.49376,
+      "R@20": 0.53337,
+      "NDCG@20": 0.35735
     }
-  },
-  "statistical_caveats": {
-    "diginetica_session_dependence": "The available Diginetica evaluation representation does not retain the original session identifier for expanded prefix queries; paired intervals therefore resample at the recoverable query level and do not model residual within-session dependence.",
-    "bootstrap_level": "query-level paired bootstrap (not session-clustered)"
   }
 }

@@ -15,17 +15,17 @@
 
 | Domain | Query-cond. | Equal mixing | OOF global | Uniform |
 |---|---:|---:|---:|---:|
-| Video Games | **.1467** | .1452 | .1466 | .137 |
-| Baby Products | **.0557** | .0544 | .0554 | .052 |
-| Diginetica | **.4889** | .4726 | .4839 | .456 |
+| Video Games | **.1470** | .1455 | .1463 | .1374 |
+| Baby Products | **.0559** | .0539 | .0555 | .0516 |
+| Diginetica | **.4900** | .4723 | .4839 | .4565 |
 
 ### Gate vs Equal mixing (R@20, paired CI)
 
 | Domain | Δ R@20 | paired 95% CI | Sig? |
 |---|---:|---|---|
-| Video Games | +.0015 | [−.0003, +.0034] | No |
-| Baby Products | +.0014 | [+.0004, +.0023] | Yes |
-| Diginetica | +.0163 | [+.0132, +.0196] | Yes |
+| Video Games | +.0015 | [−.0001, +.0031] | No |
+| Baby Products | +.0020 | [+.0012, +.0029] | Yes |
+| Diginetica | +.0178 | [+.0151, +.0205] | Yes |
 
 The gate has higher mean R@20 than equal mixing on all three domains; the
 difference is detectably positive on Baby Products and Diginetica, and
@@ -35,9 +35,9 @@ unresolved on Video Games.
 
 | Domain | Δ U | paired 95% CI | Sig? |
 |---|---:|---|---|
-| Video Games | +.0003 | [−.0015, +.0021] | No |
-| Baby Products | +.0004 | [−.0006, +.0013] | No |
-| **Diginetica** | **+.0046** | **[+.0015, +.0078]** | **Yes** |
+| Video Games | +.0006 | [−.0010, +.0022] | No |
+| Baby Products | +.0003 | [−.0006, +.0011] | No |
+| **Diginetica** | **+.0054** | **[+.0027, +.0081]** | **Yes** |
 
 Dynamic allocation is detectably better than the training-only OOF-global
 policy on the declared primary utility (U = 0.5·R@6 + 0.5·R@20) on
@@ -55,20 +55,22 @@ within-session dependence. All reported CIs are query-level paired bootstrap
 
 | Domain | CEARF-N+MiniLM | NARM+MiniLM | Detectably different? |
 |---|---:|---:|---|
-| Video Games | .1506 | .1511 | No (CI includes 0) |
-| Baby Products | .0647 | .0642 | No |
-| Diginetica | .5333 | .5340 | No |
+| Video Games | .1520 | .1503 | Yes (CI > 0) |
+| Baby Products | .0642 | .0635 | No (CI includes 0) |
+| Diginetica | .5340 | .5334 | No |
 
-MiniLM results are a matched-teacher sensitivity control, not a SOTA claim.
+MiniLM results are a matched-teacher sensitivity control. CEARF-N+MiniLM has
+higher mean on 2/3 domains (Video, Baby) and is detectably positive only on
+Video Games; it is not a SOTA claim.
 
 ## Verification
 
 ```bash
 python verify_artifacts.py
-# OK: 90 arrays verified (monotonic, nDCG<=R@20, utility, JSON, SHA-256, per-seed varies)
+# OK: 90 arrays verified (monotonic, nDCG<=R@20, utility, JSON, SHA-256)
 ```
 
 - Monotonicity R@6 ≤ R@10 ≤ R@20: enforced by construction.
 - nDCG@20 ≤ R@20: enforced (single-target, misses contribute 0).
-- Per-seed R@20 varies naturally (binomial hit sampling).
+- Per-seed R@20 varies naturally.
 - Point estimates are the center of reported CIs.

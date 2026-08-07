@@ -6,7 +6,7 @@
       "arrays": {
         "Video_Games_uniform_seed42": {
           "path": "per_query_ranks/Video_Games_uniform_seed42.npz",
-          "sha256": "7dc00a00820d2ed7804dddc3131d244264a538af60ca910b1a00e6acf945ba83",
+          "sha256": "6fd110870f05f608b6200dba3349e7952657104cf2ec0a83ad1823c7af4cef78",
           "shape": [
             94762
           ],
@@ -14,7 +14,7 @@
         },
         "Video_Games_uniform_seed123": {
           "path": "per_query_ranks/Video_Games_uniform_seed123.npz",
-          "sha256": "a41941d5b9606e86b67924f7c757175484c198a4ba48a2192704d0a664b9c495",
+          "sha256": "8f345edb4fd16909cbc95de4452376353d5effe6d6ea60b2cbb99dc5249d87e5",
           "shape": [
             94762
           ],
@@ -22,7 +22,7 @@
         },
         "Video_Games_uniform_seed456": {
           "path": "per_query_ranks/Video_Games_uniform_seed456.npz",
-          "sha256": "0f89c979b64a07b17cf95e4e2b5f1c13eddc78e9e1dba038bba39efc44b80afb",
+          "sha256": "06262fc842b634fc9776c4184ddf3797193a0499352d5b7a7a4682cb50672c39",
           "shape": [
             94762
           ],
@@ -30,7 +30,7 @@
         },
         "Video_Games_kmeans_seed42": {
           "path": "per_query_ranks/Video_Games_kmeans_seed42.npz",
-          "sha256": "11906339b46a5db27b2e5655804334fe5132f015107a9f71bcd5b2dae41f1317",
+          "sha256": "03ece98dd2629357619fc2b87754594c5f48212c267053498cc2e4c4b4ee3813",
           "shape": [
             94762
           ],
@@ -38,7 +38,7 @@
         },
         "Video_Games_kmeans_seed123": {
           "path": "per_query_ranks/Video_Games_kmeans_seed123.npz",
-          "sha256": "0027c85cf59573a075b8548a5e9c39c8c53742b999a38ea9b624d29d597a9793",
+          "sha256": "b4555fd2d362610a3db6108435997ecfd8b42cf278c982f351b32c23b0222c11",
           "shape": [
             94762
           ],
@@ -46,7 +46,7 @@
         },
         "Video_Games_kmeans_seed456": {
           "path": "per_query_ranks/Video_Games_kmeans_seed456.npz",
-          "sha256": "aec67121f16acd3445c6174ea7760eda820b4798602ab6ed4ee1d7b7789f930d",
+          "sha256": "8735141594bd1b6496bf56e7b0f928543e0081603052c2e7cf2359627c833b3d",
           "shape": [
             94762
           ],
@@ -54,7 +54,7 @@
         },
         "Video_Games_feature_bucketed_seed42": {
           "path": "per_query_ranks/Video_Games_feature_bucketed_seed42.npz",
-          "sha256": "c5431964d53b53b9f7512bc6e79c71efb953db9cd5ad32b0d0b11632fbbc27f8",
+          "sha256": "b5d858518d6e096154bb8cf9fbb807e15e4dc8615fc5d134e745dffe81bd84aa",
           "shape": [
             94762
           ],
@@ -62,7 +62,7 @@
         },
         "Video_Games_feature_bucketed_seed123": {
           "path": "per_query_ranks/Video_Games_feature_bucketed_seed123.npz",
-          "sha256": "23220232c2f27e166f0afaadcae4921120b7f6d0eda7ff4c91df478cfce3250f",
+          "sha256": "1687d64578249e45d07abc3dea5ebfd86e748d767412d378e9ee4a46dcc60e08",
           "shape": [
             94762
           ],
@@ -70,7 +70,7 @@
         },
         "Video_Games_feature_bucketed_seed456": {
           "path": "per_query_ranks/Video_Games_feature_bucketed_seed456.npz",
-          "sha256": "f3fcfa99589b2611b7fe9fc46fde461a0bd88acc999d223eb1124b125565b430",
+          "sha256": "6e9a4431e6b7b708b1f7a299ff16b7b54e0b0a5ea7c947a87a2bb69353d5c577",
           "shape": [
             94762
           ],
@@ -78,7 +78,7 @@
         },
         "Video_Games_equal_mixing_seed42": {
           "path": "per_query_ranks/Video_Games_equal_mixing_seed42.npz",
-          "sha256": "fe15a267c61f02827caf35fb3d9418ee4396c2b8e43c40868123ab09a052a515",
+          "sha256": "668cd83d3b6ce02b4dcd5c1b825f61d88399fdbf4c7a68680ca9f48ac679d7de",
           "shape": [
             94762
           ],
@@ -86,7 +86,7 @@
         },
         "Video_Games_equal_mixing_seed123": {
           "path": "per_query_ranks/Video_Games_equal_mixing_seed123.npz",
-          "sha256": "fdf77bc13e0d78d925be42f916c5bfd7b5c1c91d98b2aa286a4ce232de76aff7",
+          "sha256": "2a6223343da3559b4046b92955a950caa617129c14b57a74272f918f4d1e7cfd",
           "shape": [
             94762
           ],
@@ -94,7 +94,7 @@
         },
         "Video_Games_equal_mixing_seed456": {
           "path": "per_query_ranks/Video_Games_equal_mixing_seed456.npz",
-          "sha256": "ff8eb9577a7413c5a4b68137f58a255b3f9b9587565ec8271366f35c640f444d",
+          "sha256": "ae6800649a9f936558ff003ca90309ee32c7d76b3c33e675fd0f98a49cf7760d",
           "shape": [
             94762
           ],
@@ -102,7 +102,7 @@
         },
         "Video_Games_query_cond_seed42": {
           "path": "per_query_ranks/Video_Games_query_cond_seed42.npz",
-          "sha256": "caea393a7d2995d89c7137eaaff2063d34fd9bb6d4afcd20f24a414a5f65d04c",
+          "sha256": "dcd8fc799f60f5fee3a0329155a92257b4de80a1611b16cda2cb93bea3322792",
           "shape": [
             94762
           ],
@@ -110,7 +110,7 @@
         },
         "Video_Games_query_cond_seed123": {
           "path": "per_query_ranks/Video_Games_query_cond_seed123.npz",
-          "sha256": "6f7ab6fb5fb8312142cdf00e87a0a92fa69c3c55c8355df34069b043c8d8dbad",
+          "sha256": "a4b47dddf5e7b1e1e36687c0f721955940efe4e7ac5dcf0d3e9058e39fee9fc4",
           "shape": [
             94762
           ],
@@ -118,7 +118,7 @@
         },
         "Video_Games_query_cond_seed456": {
           "path": "per_query_ranks/Video_Games_query_cond_seed456.npz",
-          "sha256": "5ee1b34aa94895538485e67d6e913bf80ee08100dbd640da2ac64e0396e874b9",
+          "sha256": "da7dc219d15350e8eab80025682baed1befda3c75bf5f872946332dd42a079e8",
           "shape": [
             94762
           ],
@@ -126,7 +126,7 @@
         },
         "Video_Games_narm_id_seed42": {
           "path": "per_query_ranks/Video_Games_narm_id_seed42.npz",
-          "sha256": "087dfa682845c81c0b59a66dceb6269fdbcb80174f33917f39facbf5b9f4e3af",
+          "sha256": "abe657dcee0b89b9edc684ad669b46423e14c2425c8b0432e58bdbafae4852ad",
           "shape": [
             94762
           ],
@@ -134,7 +134,7 @@
         },
         "Video_Games_narm_id_seed123": {
           "path": "per_query_ranks/Video_Games_narm_id_seed123.npz",
-          "sha256": "a36cb64f9c385d2fa675a8d0229de317f3f395443cbd435fac1ea20bc9479a87",
+          "sha256": "10e51714837cfad4860528bd675839bf18c946ef007d8eaf42d2df71d62a3aed",
           "shape": [
             94762
           ],
@@ -142,7 +142,7 @@
         },
         "Video_Games_narm_id_seed456": {
           "path": "per_query_ranks/Video_Games_narm_id_seed456.npz",
-          "sha256": "f49b3c9b3d57956487e9034af987449226331a5851faa6e6f4d682f896f9e05b",
+          "sha256": "882867be222828f330f44da969a761edda4474d5f82e206497c4b1313a928093",
           "shape": [
             94762
           ],
@@ -150,7 +150,7 @@
         },
         "Video_Games_narm_tfidf_seed42": {
           "path": "per_query_ranks/Video_Games_narm_tfidf_seed42.npz",
-          "sha256": "069f692e4208668b7c40913d42687e4a428ca69da34e59e31e4e55ff17991c2b",
+          "sha256": "e00090539510fed3a32e51a07a234764b82328b9454ba7e9896d863ecbc4dfde",
           "shape": [
             94762
           ],
@@ -158,7 +158,7 @@
         },
         "Video_Games_narm_tfidf_seed123": {
           "path": "per_query_ranks/Video_Games_narm_tfidf_seed123.npz",
-          "sha256": "afa4daaee5181bc5fcb73c1b17db63a3c50e4370442b27db9230ff59bffa3506",
+          "sha256": "909ec3bb5d053ebc99a78a8146d9cd75144945af0a286392f6fc6a203b49251b",
           "shape": [
             94762
           ],
@@ -166,7 +166,7 @@
         },
         "Video_Games_narm_tfidf_seed456": {
           "path": "per_query_ranks/Video_Games_narm_tfidf_seed456.npz",
-          "sha256": "6622ba9968036abab11ae4491c1dcbb639a783c2c348796afb1e7b058e6529aa",
+          "sha256": "70997489d6800b6ac593aba6fae73dc336ee5399e0d7eec4f523d847e631a2c5",
           "shape": [
             94762
           ],
@@ -174,7 +174,7 @@
         },
         "Video_Games_narm_minilm_seed42": {
           "path": "per_query_ranks/Video_Games_narm_minilm_seed42.npz",
-          "sha256": "4896a743a6a94ec3e7165ef167d9d6870a41255f1f69c2e9d85b12c52d7204a0",
+          "sha256": "65ffbd7f3d653e57e1c55c45fcc2bfd2e154a518383286407a04d204072c6d9c",
           "shape": [
             94762
           ],
@@ -182,7 +182,7 @@
         },
         "Video_Games_narm_minilm_seed123": {
           "path": "per_query_ranks/Video_Games_narm_minilm_seed123.npz",
-          "sha256": "c20c62078fb11831097e5bbded2c08dc94233be9e7314684f193e7e5fa3c1747",
+          "sha256": "a583350faee884d2641f9d2d59b5ed570c84e5c5682807ceb40101b17118442e",
           "shape": [
             94762
           ],
@@ -190,7 +190,7 @@
         },
         "Video_Games_narm_minilm_seed456": {
           "path": "per_query_ranks/Video_Games_narm_minilm_seed456.npz",
-          "sha256": "42996f9bcffc82c918124aae3ef3a0b1ebafc58a64ab59b1fe48fc859887cc0d",
+          "sha256": "fd776beda067011a1244260a765175aae8d06746ece5b6055f798c76c5d14a3b",
           "shape": [
             94762
           ],
@@ -198,7 +198,7 @@
         },
         "Video_Games_cearfn_minilm_seed42": {
           "path": "per_query_ranks/Video_Games_cearfn_minilm_seed42.npz",
-          "sha256": "0ad626462263b94c98407c44a6a4a80a7687cfceb49d4d4932bcc9c5126eceab",
+          "sha256": "57bec94e64968ea01bbee8d9963d44d98ca0b6ffdf0f37e03a46a4fc5ca5f293",
           "shape": [
             94762
           ],
@@ -206,7 +206,7 @@
         },
         "Video_Games_cearfn_minilm_seed123": {
           "path": "per_query_ranks/Video_Games_cearfn_minilm_seed123.npz",
-          "sha256": "b4937f463d2b0dbeeb598f4dad86d7fda0f0a20500f0b3ceb9d6159c320d0349",
+          "sha256": "aa0917cc85c35555135cdfea5a3979774942644659559b7094b3c0fa8b372378",
           "shape": [
             94762
           ],
@@ -214,7 +214,7 @@
         },
         "Video_Games_cearfn_minilm_seed456": {
           "path": "per_query_ranks/Video_Games_cearfn_minilm_seed456.npz",
-          "sha256": "7edd41b95a25e889a5139df1fe7dbdabfe3d2ae447851518b65beabbad0919b5",
+          "sha256": "269d8faf88960619a85025f9937b8a111061fcdc409cafd30b1543713256fbed",
           "shape": [
             94762
           ],
@@ -222,7 +222,7 @@
         },
         "Video_Games_oof_global_seed42": {
           "path": "per_query_ranks/Video_Games_oof_global_seed42.npz",
-          "sha256": "b1b3200ecebf463c8af2a415f73df8b13974e7e47c3004e254509ddc02e0847d",
+          "sha256": "caa4d69fbd0658ec57698a2e95fc0f14b059429df358a0aebfc924860259d01a",
           "shape": [
             94762
           ],
@@ -230,7 +230,7 @@
         },
         "Video_Games_oof_global_seed123": {
           "path": "per_query_ranks/Video_Games_oof_global_seed123.npz",
-          "sha256": "0e24c98dca51c767c9ddbd5fcf6add8aaa8751308a2accb850ab4b7b03c1623c",
+          "sha256": "ab574347f9b9a28da7a489e032268f4b796bc1fadd9eaf93d0af825d536fae86",
           "shape": [
             94762
           ],
@@ -238,7 +238,7 @@
         },
         "Video_Games_oof_global_seed456": {
           "path": "per_query_ranks/Video_Games_oof_global_seed456.npz",
-          "sha256": "783a6395ebc0554b8d3ace5ae3d7d19cbf04859ce34e17b79851088b82f355ab",
+          "sha256": "a39c439fd3d116ff18f0de9b3a3c449caff60c2dac0e457d4dc19f31fcf553b9",
           "shape": [
             94762
           ],
@@ -252,7 +252,7 @@
       "arrays": {
         "Baby_Products_uniform_seed42": {
           "path": "per_query_ranks/Baby_Products_uniform_seed42.npz",
-          "sha256": "a15a4fa894bd140689c6ebf381265d5b7f9075b151dd87c9de56a6f7a4759266",
+          "sha256": "f08bb1228650a731f029eadd452db8597b71cea2d6df8ecac8de913b89e64e60",
           "shape": [
             150777
           ],
@@ -260,7 +260,7 @@
         },
         "Baby_Products_uniform_seed123": {
           "path": "per_query_ranks/Baby_Products_uniform_seed123.npz",
-          "sha256": "73acd894c5454b6bf6c9f0f7bfb01d3cb9224bba92d59815be24590ea7679357",
+          "sha256": "7f5cdf7a8d6f2e6c3226a734cf9538d39b131013a75b73242e213de8b24d0aca",
           "shape": [
             150777
           ],
@@ -268,7 +268,7 @@
         },
         "Baby_Products_uniform_seed456": {
           "path": "per_query_ranks/Baby_Products_uniform_seed456.npz",
-          "sha256": "655392bddab848e43937cf859403e13ea70f9841bdfbaa53b2886a9847162237",
+          "sha256": "073fd0505a1e9c04e33a3f6d16bc8739a21a1751091c59f1f273dcfdcfff54e6",
           "shape": [
             150777
           ],
@@ -276,7 +276,7 @@
         },
         "Baby_Products_kmeans_seed42": {
           "path": "per_query_ranks/Baby_Products_kmeans_seed42.npz",
-          "sha256": "0796c148f1c8b1fb51f6f6dac1f5655f3d5cb3d8fefa9dcde21dd66e69a59465",
+          "sha256": "1bf4bac19bda78b3f86fd8612452f2f87b720cd000ced1b6bef07bbbdf5ee29e",
           "shape": [
             150777
           ],
@@ -284,7 +284,7 @@
         },
         "Baby_Products_kmeans_seed123": {
           "path": "per_query_ranks/Baby_Products_kmeans_seed123.npz",
-          "sha256": "1da46f81fc1775a6111ab6c7c76c1b9a55274e2573aff212305aac5fd6123b39",
+          "sha256": "dcd45bd6d728c9d9f1bc7aa1624bf2dbd194bc7fe2998509f0ed254af709904b",
           "shape": [
             150777
           ],
@@ -292,7 +292,7 @@
         },
         "Baby_Products_kmeans_seed456": {
           "path": "per_query_ranks/Baby_Products_kmeans_seed456.npz",
-          "sha256": "138ef56c2b1d5f961ce92441bb23842cee87212c6941c93f6952ccec699a337e",
+          "sha256": "d9b982876468a4cdedcaf1e08bf1d4182d680df27d3706f09b9a51468a1711a0",
           "shape": [
             150777
           ],
@@ -300,7 +300,7 @@
         },
         "Baby_Products_feature_bucketed_seed42": {
           "path": "per_query_ranks/Baby_Products_feature_bucketed_seed42.npz",
-          "sha256": "8d243e06bfda825cc08558ec941f5cb43ef6ba97350b127caeab7616505cf5d6",
+          "sha256": "2cecf2886518da174800d126e7a0b06d08b9bf62483650476fff78241fa2f500",
           "shape": [
             150777
           ],
@@ -308,7 +308,7 @@
         },
         "Baby_Products_feature_bucketed_seed123": {
           "path": "per_query_ranks/Baby_Products_feature_bucketed_seed123.npz",
-          "sha256": "93048a0097784e636159bd76c9a05d669fb62b6690349d0f00554954c35fa867",
+          "sha256": "8bcfddb734c611a089ae2c8b94019f0562f1bf6ff2b46e7c4f28d518f343ab3b",
           "shape": [
             150777
           ],
@@ -316,7 +316,7 @@
         },
         "Baby_Products_feature_bucketed_seed456": {
           "path": "per_query_ranks/Baby_Products_feature_bucketed_seed456.npz",
-          "sha256": "76e4487e62c94976e9759415b2afa99fbdd4263c3ff51dfcf3def4ec236f906f",
+          "sha256": "aa89af0059d305ffe5df9a6aa355b5238b39385be92fe3e10ebe5d988cbd686f",
           "shape": [
             150777
           ],
@@ -324,7 +324,7 @@
         },
         "Baby_Products_equal_mixing_seed42": {
           "path": "per_query_ranks/Baby_Products_equal_mixing_seed42.npz",
-          "sha256": "21006e19996f3be9dce4ab8494f5b3f654047d7b8f79d65d59a41a2256e15f5b",
+          "sha256": "561587b2bc29adb453f516a26daa31cd97f79e38dad753012386ec20a6537800",
           "shape": [
             150777
           ],
@@ -332,7 +332,7 @@
         },
         "Baby_Products_equal_mixing_seed123": {
           "path": "per_query_ranks/Baby_Products_equal_mixing_seed123.npz",
-          "sha256": "5bf7ba6bb3fd97b027c4147f96580856eb595c97b1b58a4017358e1474b7fd0d",
+          "sha256": "13da2fef58d0e4bce0b3d7f30b5db9f9ae241bcc8b760f98a3512e125603f92d",
           "shape": [
             150777
           ],
@@ -340,7 +340,7 @@
         },
         "Baby_Products_equal_mixing_seed456": {
           "path": "per_query_ranks/Baby_Products_equal_mixing_seed456.npz",
-          "sha256": "cef0e3615b79a88719f304bb7c9dd14145c6dbab55e9aafb349e69a26decf512",
+          "sha256": "3866ebe945faaf251b73ba15a919e0f25512d3f13f4197b77b5a8f276902d44e",
           "shape": [
             150777
           ],
@@ -348,7 +348,7 @@
         },
         "Baby_Products_query_cond_seed42": {
           "path": "per_query_ranks/Baby_Products_query_cond_seed42.npz",
-          "sha256": "9e6bc7d97f436590526de08c933567523187c99c8e9a18fc8bca7a1863692ee5",
+          "sha256": "b3bd80153dd895658bc8c542b6496ef8e8ecd33051008ebcf694ce0008f4dd92",
           "shape": [
             150777
           ],
@@ -356,7 +356,7 @@
         },
         "Baby_Products_query_cond_seed123": {
           "path": "per_query_ranks/Baby_Products_query_cond_seed123.npz",
-          "sha256": "9937db75fd9eb975c284dfa4c920cd66f8ce25b676501200063c8d94299d9e43",
+          "sha256": "32cad759b575e6b54e4ce3302b0626b70050ff8d55669998f6646de5764d10c1",
           "shape": [
             150777
           ],
@@ -364,7 +364,7 @@
         },
         "Baby_Products_query_cond_seed456": {
           "path": "per_query_ranks/Baby_Products_query_cond_seed456.npz",
-          "sha256": "ad934def7ba9ed5d71c1dcb27ea0dc115dce7db2bd466d7f6b0ed220de6cd700",
+          "sha256": "0ce5ed8b7524451c528ee08bb0ac1576515cc7b04b4ee221ee44c2bf3c467666",
           "shape": [
             150777
           ],
@@ -372,7 +372,7 @@
         },
         "Baby_Products_narm_id_seed42": {
           "path": "per_query_ranks/Baby_Products_narm_id_seed42.npz",
-          "sha256": "7610de53b47974954aa1ff5592fd168b9487e214216d290a5ccfc6d7538b29f0",
+          "sha256": "66423547bbba01eeeab1649222be463860ab8b19171397b13d46e9a579b582c0",
           "shape": [
             150777
           ],
@@ -380,7 +380,7 @@
         },
         "Baby_Products_narm_id_seed123": {
           "path": "per_query_ranks/Baby_Products_narm_id_seed123.npz",
-          "sha256": "d2216bba3532d9e7bd89bc4d7dc9356fe4d0c0a3c9115f64812bfbeb445941ec",
+          "sha256": "35de78aea4c0dc3627a876bbf400c1b9e1f4e9be45499409d994756509145fe3",
           "shape": [
             150777
           ],
@@ -388,7 +388,7 @@
         },
         "Baby_Products_narm_id_seed456": {
           "path": "per_query_ranks/Baby_Products_narm_id_seed456.npz",
-          "sha256": "88822ec59f57e6da647065872351d7ab8862604e0b1121b6ee688353face0412",
+          "sha256": "f30560d237e647134971b2fd1c3381389db61a64c5e30f97435d75fdc530a5ec",
           "shape": [
             150777
           ],
@@ -396,7 +396,7 @@
         },
         "Baby_Products_narm_tfidf_seed42": {
           "path": "per_query_ranks/Baby_Products_narm_tfidf_seed42.npz",
-          "sha256": "69f83a2cf53eb3b6d94de4080ec3827229d79a4ff45cabbe046c292589cd5613",
+          "sha256": "951ce82ec51615be0ec1e5da16c3330cd36771f86926e31a84b9210bf3eb96d1",
           "shape": [
             150777
           ],
@@ -404,7 +404,7 @@
         },
         "Baby_Products_narm_tfidf_seed123": {
           "path": "per_query_ranks/Baby_Products_narm_tfidf_seed123.npz",
-          "sha256": "4962afd29a367a162867e94947d2863377029a90b1fb605b98950bdb36c56504",
+          "sha256": "f097b4d0b317a7b9986458360a3a609a536bf695ef9f7b67d793da8002580e11",
           "shape": [
             150777
           ],
@@ -412,7 +412,7 @@
         },
         "Baby_Products_narm_tfidf_seed456": {
           "path": "per_query_ranks/Baby_Products_narm_tfidf_seed456.npz",
-          "sha256": "5d90d9dfa0d14e0e42727c5a1258c73976f4262e179b6641150c96240e0a7d04",
+          "sha256": "a6fa1b27858261a15c4e06ac8273b6c0c9c53cb59b997755815d6a6bacf52915",
           "shape": [
             150777
           ],
@@ -420,7 +420,7 @@
         },
         "Baby_Products_narm_minilm_seed42": {
           "path": "per_query_ranks/Baby_Products_narm_minilm_seed42.npz",
-          "sha256": "c81a4a358bf0fbda935c9300014fca28faf254894b8464edc150633e7fd71316",
+          "sha256": "6beca54ea746a12cda1caff0990868457c9c64c15d31ba7857083a8b7948b876",
           "shape": [
             150777
           ],
@@ -428,7 +428,7 @@
         },
         "Baby_Products_narm_minilm_seed123": {
           "path": "per_query_ranks/Baby_Products_narm_minilm_seed123.npz",
-          "sha256": "0132d9d8a1373c40e89206f4d862eb432cc01561c8b311b919027ada0f854e2c",
+          "sha256": "7a1e57c927a982ac0d790a6e577cb2cececb3a50c0b767df82e0cd278d8acb21",
           "shape": [
             150777
           ],
@@ -436,7 +436,7 @@
         },
         "Baby_Products_narm_minilm_seed456": {
           "path": "per_query_ranks/Baby_Products_narm_minilm_seed456.npz",
-          "sha256": "e03c56bb206f101d406c434e536fb5d18975f004345e2b893faae4e3d94b32e9",
+          "sha256": "f36c43dfd3a6b7f717f34f7282c4f6a4eb0cd17c68d0cbe2aa0a422a59345652",
           "shape": [
             150777
           ],
@@ -444,7 +444,7 @@
         },
         "Baby_Products_cearfn_minilm_seed42": {
           "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed42.npz",
-          "sha256": "1fd2e3e54b1b86761d9b047e31f482dd5ea66746cfcbc0e02e8bdfab62671ddc",
+          "sha256": "58b82bb1039f0a6bff8f9934f454844a92d4ea702997d52161bdd914dace8f5f",
           "shape": [
             150777
           ],
@@ -452,7 +452,7 @@
         },
         "Baby_Products_cearfn_minilm_seed123": {
           "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed123.npz",
-          "sha256": "4627a1039767490496bef39994cb138ed2d3f9278b02c36ffc6a9d8a45d6fc52",
+          "sha256": "7e4f9fb737a1246f3fcb89eff69549537cbc3be60dabf594eb419249c8c7731d",
           "shape": [
             150777
           ],
@@ -460,7 +460,7 @@
         },
         "Baby_Products_cearfn_minilm_seed456": {
           "path": "per_query_ranks/Baby_Products_cearfn_minilm_seed456.npz",
-          "sha256": "9c707fae0c86b5dbb6bc0ff9641bfa1c19466b727eca90f112c2efd741801206",
+          "sha256": "908f1a048232ab4eed86f462a6a47cf3045200849bb8f79599666d08a524b9de",
           "shape": [
             150777
           ],
@@ -468,7 +468,7 @@
         },
         "Baby_Products_oof_global_seed42": {
           "path": "per_query_ranks/Baby_Products_oof_global_seed42.npz",
-          "sha256": "0ce605f9b7d16ea4bea8b92d91e68c130035ccacf4a3fee6aecc6287e9dfe0da",
+          "sha256": "9207973cb1dbf7b81244390992f0c41647a72e85113a81b438bd0aba9548ce57",
           "shape": [
             150777
           ],
@@ -476,7 +476,7 @@
         },
         "Baby_Products_oof_global_seed123": {
           "path": "per_query_ranks/Baby_Products_oof_global_seed123.npz",
-          "sha256": "7b6744466cb2420ebbd61c97e54fe9f8a231315f13773d014bdd7169e1d122aa",
+          "sha256": "cefd1c0324ca9800b6887a545e46ea26fa88e2c6f35cada9d175cd308e22ce33",
           "shape": [
             150777
           ],
@@ -484,7 +484,7 @@
         },
         "Baby_Products_oof_global_seed456": {
           "path": "per_query_ranks/Baby_Products_oof_global_seed456.npz",
-          "sha256": "309845d97a9d6ff7f3f21fd2d7fc1a761b9bf3a782c3fcd1f270a62c5b14ee54",
+          "sha256": "6e8a73bed269c006d5c621ae95a2c80410018dd8acf7a7419e6de44950f3d613",
           "shape": [
             150777
           ],
@@ -498,7 +498,7 @@
       "arrays": {
         "Diginetica_uniform_seed42": {
           "path": "per_query_ranks/Diginetica_uniform_seed42.npz",
-          "sha256": "6276196e715e7cdc0db7a52bd1e694605a465d6336ad308fa706200a033b7c4e",
+          "sha256": "7c9bd8dc3e9f35fe2b1d9e58db90ecae8a9f121d7a7c348b12a28f5310baf38d",
           "shape": [
             60858
           ],
@@ -506,7 +506,7 @@
         },
         "Diginetica_uniform_seed123": {
           "path": "per_query_ranks/Diginetica_uniform_seed123.npz",
-          "sha256": "6bcd7a4d1991c299208e2bd905f1783a643f0309f2537178537d582046738e3e",
+          "sha256": "f703164beffaa43aa899c4b940fbb98298323d18d5a3dde3c2a71e23e9297eb8",
           "shape": [
             60858
           ],
@@ -514,7 +514,7 @@
         },
         "Diginetica_uniform_seed456": {
           "path": "per_query_ranks/Diginetica_uniform_seed456.npz",
-          "sha256": "6dcfed7a2b44c46f4d07e8b9ffcd6100806629e8410f988aff6f1c691d205c61",
+          "sha256": "25fd0b997175ddbbd2747a64a1ccf2d190f87110478fd4d6c73a01d715bdec37",
           "shape": [
             60858
           ],
@@ -522,7 +522,7 @@
         },
         "Diginetica_kmeans_seed42": {
           "path": "per_query_ranks/Diginetica_kmeans_seed42.npz",
-          "sha256": "f2ff697948fdd5e8761beaeb8f7e6404d367f8a50c78b63c2ada5265488a2748",
+          "sha256": "9fadf5d7621fc0f37a39516f6af3e8231686b4f39238c057d11561e455eb7b27",
           "shape": [
             60858
           ],
@@ -530,7 +530,7 @@
         },
         "Diginetica_kmeans_seed123": {
           "path": "per_query_ranks/Diginetica_kmeans_seed123.npz",
-          "sha256": "747b5356590bb6bd4f5ff695a69d6809b39513989e4cc80956ee19fdb5987daa",
+          "sha256": "9de7d4e3806bd8c2352611c3f46e63bfe17fbeab2bccc531b72f21a5e9ee48f7",
           "shape": [
             60858
           ],
@@ -538,7 +538,7 @@
         },
         "Diginetica_kmeans_seed456": {
           "path": "per_query_ranks/Diginetica_kmeans_seed456.npz",
-          "sha256": "e4e601d8db01479323b93f69b7aeca392c517cc7a2c72f069035111e4a2d2755",
+          "sha256": "55d8f98ac5574856ed55163a05cf81d755b9c4ebff4c238fdd87ffa3f0ff57df",
           "shape": [
             60858
           ],
@@ -546,7 +546,7 @@
         },
         "Diginetica_feature_bucketed_seed42": {
           "path": "per_query_ranks/Diginetica_feature_bucketed_seed42.npz",
-          "sha256": "3e86defeefc289b2bb35ff862fece85abe27a59c8e1e5e9818ba2ddb24146aee",
+          "sha256": "7f34fb73c153dec1d4012ac8d7a000b4cb9d1917e2fd8ff688110fbf3d416135",
           "shape": [
             60858
           ],
@@ -554,7 +554,7 @@
         },
         "Diginetica_feature_bucketed_seed123": {
           "path": "per_query_ranks/Diginetica_feature_bucketed_seed123.npz",
-          "sha256": "93eb2036e2796f3f05e9bd7a1fe531d14ee90f8cf300036c46ba9742f4e70389",
+          "sha256": "255397509496bec77c4db6ed128de36336441787d9ce3002ee9e077628793b64",
           "shape": [
             60858
           ],
@@ -562,7 +562,7 @@
         },
         "Diginetica_feature_bucketed_seed456": {
           "path": "per_query_ranks/Diginetica_feature_bucketed_seed456.npz",
-          "sha256": "01a2bd6de7cd382e98de44d5522195501bc768fa7cf82ea88ac0441c0f2d367d",
+          "sha256": "30d56ce82acda3c132900a4820a68fc2128317ff059aea83e9d51866df2384d0",
           "shape": [
             60858
           ],
@@ -570,7 +570,7 @@
         },
         "Diginetica_equal_mixing_seed42": {
           "path": "per_query_ranks/Diginetica_equal_mixing_seed42.npz",
-          "sha256": "a08d08d959075863b0a66ffec8f37a7a98e3acfba58042774edecc8600ded5c7",
+          "sha256": "9fbe91c282b99157bcc954ece6024505b0fa2cfd186b0bdaa29e4de98ff59f6d",
           "shape": [
             60858
           ],
@@ -578,7 +578,7 @@
         },
         "Diginetica_equal_mixing_seed123": {
           "path": "per_query_ranks/Diginetica_equal_mixing_seed123.npz",
-          "sha256": "8b0e51d693d18de50a82d195b21cb1aeb3b958d113a4adc6ab4de37b2d6b34e9",
+          "sha256": "fefe9b90b7f2f6a4da4cecb215eb726dc8f70d29541df4c35f947c4e06b1bccd",
           "shape": [
             60858
           ],
@@ -586,7 +586,7 @@
         },
         "Diginetica_equal_mixing_seed456": {
           "path": "per_query_ranks/Diginetica_equal_mixing_seed456.npz",
-          "sha256": "9eda6e145bcf142e48afcd03f273838d2e0e22aba1c37750e3e12f80dd2817a5",
+          "sha256": "302e7093bf6a7a08f87e03029a2070b5fa877e0087470b2d4e32ead82260d11e",
           "shape": [
             60858
           ],
@@ -594,7 +594,7 @@
         },
         "Diginetica_query_cond_seed42": {
           "path": "per_query_ranks/Diginetica_query_cond_seed42.npz",
-          "sha256": "6077a56f1e9912da81b6cdc203a5994dea2344a570285c55a7b7b90c39622347",
+          "sha256": "f872beb8c423fb742d0ca7acd714ce62dc0c76954d38fbc96cded67675e45fd2",
           "shape": [
             60858
           ],
@@ -602,7 +602,7 @@
         },
         "Diginetica_query_cond_seed123": {
           "path": "per_query_ranks/Diginetica_query_cond_seed123.npz",
-          "sha256": "2e0a7015efe143366846d2aa049868827b7400c0d27ba240aeafdaac91e3f3da",
+          "sha256": "a781bb66b018ede3e9062cfbb3cb8ca1f7b650150e9bd21e4df14cc64eb48a48",
           "shape": [
             60858
           ],
@@ -610,7 +610,7 @@
         },
         "Diginetica_query_cond_seed456": {
           "path": "per_query_ranks/Diginetica_query_cond_seed456.npz",
-          "sha256": "cf6ab5f8e61b3511eb0526423eae1443905dfd688747f2ed9b8ba0b087c5f2f8",
+          "sha256": "bb6a89826455f0b310d8d14f62f50ff7a2f180e711e1be4741609a57ef300786",
           "shape": [
             60858
           ],
@@ -618,7 +618,7 @@
         },
         "Diginetica_narm_id_seed42": {
           "path": "per_query_ranks/Diginetica_narm_id_seed42.npz",
-          "sha256": "64d09017be5b9ba1c5f40c15b4acba474b865050fa14b5712a013c29c31d16a3",
+          "sha256": "6ad2e8b3bd2a740d63e6473f6a346048d03c6822b055b8e5c8a15cec9f3eab15",
           "shape": [
             60858
           ],
@@ -626,7 +626,7 @@
         },
         "Diginetica_narm_id_seed123": {
           "path": "per_query_ranks/Diginetica_narm_id_seed123.npz",
-          "sha256": "f9fab0e659677fd82c8e243602932ca686faf4c78716686311ceeade3a9851f5",
+          "sha256": "a1bdaca5cebebd2e1114488ab10d50d623499a5badf31d5f83271b93c7d4ce37",
           "shape": [
             60858
           ],
@@ -634,7 +634,7 @@
         },
         "Diginetica_narm_id_seed456": {
           "path": "per_query_ranks/Diginetica_narm_id_seed456.npz",
-          "sha256": "2195acb2f3724eb4a0b666f06a08147f94ea85ee6032d5905949b8e544d5b721",
+          "sha256": "4cf8ae8c639ae4525f63c198ce16682b3223937572546adcc69ac53226ca2ff1",
           "shape": [
             60858
           ],
@@ -642,7 +642,7 @@
         },
         "Diginetica_narm_tfidf_seed42": {
           "path": "per_query_ranks/Diginetica_narm_tfidf_seed42.npz",
-          "sha256": "e8d186ad7ff8b5f26e7522389bcbf05bad79c7bdefdf008fc8dc783429a3dd10",
+          "sha256": "16df8c001677bd637fa51ef6e31ea31273bc5e1070c1527565138bf60bf1bd23",
           "shape": [
             60858
           ],
@@ -650,7 +650,7 @@
         },
         "Diginetica_narm_tfidf_seed123": {
           "path": "per_query_ranks/Diginetica_narm_tfidf_seed123.npz",
-          "sha256": "f7fac106acbb69113bb2330c5c3324119a7a313f904fc1a5aad007c3ed0eb0e2",
+          "sha256": "080877b8265b80495475e64490f2d272e6ba334da8cf560d8d308ff4241ef76d",
           "shape": [
             60858
           ],
@@ -658,7 +658,7 @@
         },
         "Diginetica_narm_tfidf_seed456": {
           "path": "per_query_ranks/Diginetica_narm_tfidf_seed456.npz",
-          "sha256": "d2d7ba1014cfd2e6e98843399a7683959b62f2a58ebabdd5a7e8e007c707ec80",
+          "sha256": "8fe34f63fd6e0f6b5bcf5a2c8b8536f15a63b54503bdd935535a3b45543dbff3",
           "shape": [
             60858
           ],
@@ -666,7 +666,7 @@
         },
         "Diginetica_narm_minilm_seed42": {
           "path": "per_query_ranks/Diginetica_narm_minilm_seed42.npz",
-          "sha256": "4c3997df4d0eb762b11e3416f15c8a1f2e46a2cf7734c96e166b641352330709",
+          "sha256": "1ef4391ba9bb8e415334151372f8f4d358f484443bcb8133efde9daf216a5b42",
           "shape": [
             60858
           ],
@@ -674,7 +674,7 @@
         },
         "Diginetica_narm_minilm_seed123": {
           "path": "per_query_ranks/Diginetica_narm_minilm_seed123.npz",
-          "sha256": "f38e21ac713e1bd7e03cf42be546e1b49a4ed8381747694c926f50b2a7617ee8",
+          "sha256": "3cb252f4b67b1cccce713b47970fffeb51445d5efafe8cfae29a16d6204a0d9a",
           "shape": [
             60858
           ],
@@ -682,7 +682,7 @@
         },
         "Diginetica_narm_minilm_seed456": {
           "path": "per_query_ranks/Diginetica_narm_minilm_seed456.npz",
-          "sha256": "f3d5b51b446edad4f72dc27715932ce1309e9b31315c627540273340a9690f7d",
+          "sha256": "c1855ba497588726bd2f8ce3ec38776995ebea96024748e46a2a28959afba7b5",
           "shape": [
             60858
           ],
@@ -690,7 +690,7 @@
         },
         "Diginetica_cearfn_minilm_seed42": {
           "path": "per_query_ranks/Diginetica_cearfn_minilm_seed42.npz",
-          "sha256": "40317ecf68e1226e26354e9415dde5be9caa20c9ad128189cf6b6650c28ed6db",
+          "sha256": "f5a6c399910e572dff74c95059fadefbc2b121e8cfbd934a5e1fc571b78e4dd5",
           "shape": [
             60858
           ],
@@ -698,7 +698,7 @@
         },
         "Diginetica_cearfn_minilm_seed123": {
           "path": "per_query_ranks/Diginetica_cearfn_minilm_seed123.npz",
-          "sha256": "34ceda6a4a1df0da162d781e0b4516a25349bdd75d8aac4a47e21f99f17fbdf7",
+          "sha256": "da504a126c075005e7a22d85f054fa3c2b6bb82112046e54d5b97c7e142f9c55",
           "shape": [
             60858
           ],
@@ -706,7 +706,7 @@
         },
         "Diginetica_cearfn_minilm_seed456": {
           "path": "per_query_ranks/Diginetica_cearfn_minilm_seed456.npz",
-          "sha256": "6081fbd04f11194b073914ab130281d56f1612a5fd509ae93ebd8586ae9591b6",
+          "sha256": "ac7cd7db7344f5b3ec367e7054953c4c5668af5f3f36254a2b7d2e65c1fc6c8b",
           "shape": [
             60858
           ],
@@ -714,7 +714,7 @@
         },
         "Diginetica_oof_global_seed42": {
           "path": "per_query_ranks/Diginetica_oof_global_seed42.npz",
-          "sha256": "4fdd104bfeba5aeb1243984b24a4ee4e1b2ce8f312e62cf87ea6b25a4bb5ba4c",
+          "sha256": "210c85234f0ab9bdc7ab0d91ab76d014fb0ef39cb8812fd90b4b09a448ef9ee7",
           "shape": [
             60858
           ],
@@ -722,7 +722,7 @@
         },
         "Diginetica_oof_global_seed123": {
           "path": "per_query_ranks/Diginetica_oof_global_seed123.npz",
-          "sha256": "3c31acc8afde65bc3acae34399a557d11a32ddc165f04c68c22f86637a52ee7d",
+          "sha256": "5f1a50dbbdd4fc2e5b108d29df145accd232bd5e02f64aa3c517f45471379310",
           "shape": [
             60858
           ],
@@ -730,7 +730,7 @@
         },
         "Diginetica_oof_global_seed456": {
           "path": "per_query_ranks/Diginetica_oof_global_seed456.npz",
-          "sha256": "b2211bbd009cdb27295d10c7189d0bbd3ed29273617360092d1f7e50facbfa76",
+          "sha256": "d52cd01236ff237c998668383437e4a2c476a2195675fe80c309b29658cd1dfe",
           "shape": [
             60858
           ],
