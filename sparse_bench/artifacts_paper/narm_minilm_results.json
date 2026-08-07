@@ -32,7 +32,14 @@
         "p": 0.60046816953231,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
-        "boot": "paired multinomial bootstrap, 20000 reps"
+        "boot": "paired multinomial bootstrap, 20000 reps",
+        "delta_u": 0.00052,
+        "ci95_u": [
+          -0.00128,
+          0.00229
+        ],
+        "p_u": 0.60046816953231,
+        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
       },
       "cm_vs_nm": {
         "delta_r20": 0.001,
@@ -89,7 +96,14 @@
         "p": 0.2984439832382799,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
-        "boot": "paired multinomial bootstrap, 20000 reps"
+        "boot": "paired multinomial bootstrap, 20000 reps",
+        "delta_u": 0.00056,
+        "ci95_u": [
+          -0.00036,
+          0.00147
+        ],
+        "p_u": 0.2984439832382799,
+        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
       },
       "cm_vs_nm": {
         "delta_r20": 0.0007,
@@ -146,7 +160,14 @@
         "p": 0.002517860289344949,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
-        "boot": "paired multinomial bootstrap, 20000 reps"
+        "boot": "paired multinomial bootstrap, 20000 reps",
+        "delta_u": 0.00525,
+        "ci95_u": [
+          0.00211,
+          0.00842
+        ],
+        "p_u": 0.002517860289344949,
+        "p_test_u": "exact binomial sign test on R@20 discordant pairs"
       },
       "cm_vs_nm": {
         "delta_r20": -0.00049,

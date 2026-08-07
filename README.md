@@ -1,11 +1,11 @@
-# CEARF-N: Query-Conditioned Cross-Evidence Weighting
+# CEARF-N: Bounded Out-of-Fit Dynamic Rank Allocation for Sparse Next-Item Recommendation
 
 A memory–neural rank-fusion system for sparse session recommendation. CEARF-N
 combines three retrieval memories (transition, session, popularity) with a
 neural residual (PASGR, a 1-layer GRU) via a **bounded linear gate** that
 predicts the per-query memory/neural blend coefficient β from 3 target-free
 features (session length, last-item frequency, tail flag), trained on
-out-of-fold (OOF) training data without validation labels for mixing.
+out-of-fit (OOF) training data without validation labels for mixing.
 
 ## Key results (Recall@20)
 

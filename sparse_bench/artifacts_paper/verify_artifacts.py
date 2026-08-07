@@ -21,6 +21,7 @@ METHODS = [
     "query_cond", "narm_id", "narm_tfidf", "narm_minilm", "cearfn_minilm",
     "oof_global",
 ]
+EXPECTED_ARRAYS = 90
 
 def metrics_from_ranks(ranks: np.ndarray) -> dict:
     hits = ranks > 0
@@ -37,6 +38,7 @@ def metrics_from_ranks(ranks: np.ndarray) -> dict:
 def main() -> int:
     errors = []
     per_seed = json.loads((HERE / "per_seed_metrics.json").read_text())
+    manifest = json.loads((HERE / "manifest.json").read_text())
     checked = 0
     for ds in DOMAINS:
         for m in METHODS:
@@ -48,26 +50,46 @@ def main() -> int:
                 with np.load(path) as data:
                     ranks = data["ranks"]
                 checked += 1
+                # Shape/dtype/range
                 if ranks.ndim != 1: errors.append(f"{fp}: not 1D")
                 if ranks.dtype != np.uint8: errors.append(f"{fp}: dtype != uint8")
                 if ranks.min() < 0 or ranks.max() > 20:
                     errors.append(f"{fp}: values out of [0,20]")
+                # Recompute
                 computed = metrics_from_ranks(ranks)
+                # Monotonicity
                 if not (computed["recall@6"] <= computed["recall@10"] + 1e-9
                         <= computed["recall@20"] + 1e-9):
                     errors.append(f"{fp}: monotonicity violated")
+                # nDCG <= R@20
                 if computed["ndcg@20"] > computed["recall@20"] + 1e-9:
                     errors.append(f"{fp}: nDCG > R@20")
+                # Utility formula
+                expected_u = 0.5 * computed["recall@6"] + 0.5 * computed["recall@20"]
+                if abs(computed["utility"] - expected_u) > 1e-9:
+                    errors.append(f"{fp}: utility formula mismatch")
+                # Cross-check JSON
                 if ds in per_seed and m in per_seed[ds]:
                     json_r = per_seed[ds][m]["seeds"].get(str(s))
                     if json_r:
-                        for metric in ("recall@6", "recall@10", "recall@20", "ndcg@20"):
+                        for metric in ("recall@6", "recall@10", "recall@20", "ndcg@20", "utility"):
                             if abs(computed[metric] - json_r[metric]) > 1e-4:
                                 errors.append(f"{fp}: {metric} mismatch")
+                # SHA-256 from manifest
+                if ds in manifest.get("domains", {}):
+                    arr_info = manifest["domains"][ds].get("arrays", {}).get(fp)
+                    if arr_info and "sha256" in arr_info:
+                        actual = hashlib.sha256(ranks.tobytes()).hexdigest()
+                        if actual != arr_info["sha256"]:
+                            errors.append(f"{fp}: SHA-256 mismatch")
+    # Assert expected count
+    if checked != EXPECTED_ARRAYS:
+        errors.append(f"expected {EXPECTED_ARRAYS} arrays, found {checked}")
     if errors:
-        print(f"FAIL: {len(errors)} errors"); [print(f"  {e}") for e in errors[:20]]
+        print(f"FAIL: {len(errors)} errors")
+        for e in errors[:20]: print(f"  {e}")
         return 1
-    print(f"OK: {checked} arrays verified (monotonic, nDCG<=R@20, JSON match)")
+    print(f"OK: {checked} arrays verified (monotonic, nDCG<=R@20, utility, JSON match, SHA-256)")
     return 0
 
 if __name__ == "__main__":
