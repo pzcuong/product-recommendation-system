@@ -2,48 +2,59 @@
 
 A memory–neural rank-fusion system for sparse session recommendation. CEARF-N
 combines three retrieval memories (transition, session, popularity) with a
-neural residual (GRU4Rec/PASGR) via a **query-conditioned β gate** — a
-lightweight MLP that predicts the optimal per-query memory/neural blend
-coefficient from 14 interpretable features.
+neural residual (PASGR, a 1-layer GRU) via a **bounded linear gate** that
+predicts the per-query memory/neural blend coefficient β from 3 target-free
+features (session length, last-item frequency, tail flag), trained on
+out-of-fold (OOF) training data without validation labels for mixing.
 
 ## Key results (Recall@20)
 
-| Dataset | Uniform β | k-Means | Feature bucketed | **Query-conditioned** |
-|---|---:|---:|---:|---:|
-| Video Games | .137 | .138 | .136 | **.147** |
-| Baby Products | .052 | .053 | .051 | **.056** |
-| Diginetica | .456 | .457 | .455 | **.490** |
+| Dataset | Uniform β | k-Means | Feature bucketed | Equal mixing | OOF global | **Query-cond.** |
+|---|---:|---:|---:|---:|---:|---:|
+| Video Games | .137 | .138 | .136 | .1447 | .1465 | **.147** |
+| Baby Products | .052 | .053 | .051 | .0539 | .0555 | **.056** |
+| Diginetica | .456 | .457 | .455 | .4716 | .4850 | **.490** |
 
-The query-conditioned gate achieves the best R@20 on all three domains, with
-no sign-flip across seeds. Cross-expert agreement is the most informative
-gate feature.
+The gate beats equal mixing on **3/3 domains** (all paired CI > 0). Against
+the training-learned OOF global baseline, the gate is significantly better on
+Diginetica (+.005, p=.003) and comparable on Amazon (n.s.).
 
-## Architecture
+## Method
 
-```
-Training sessions → K-fold cross-fitting → OOF predictions (memory+neural)
-                                          → 14 target-free features
-                                          → dynamic β gate (MLP 14→16→21)
-                                          → freeze → test once
-```
-
-Fusion formula: `F_q(x) = (1-β_q)/(20+rank_M(x)) + β_q/(20+rank_N(x))`
+- **Gate**: bounded linear, 3 features → β_q ∈ [0,1]
+- **Fusion**: `F_q(x) = (1-β_q)/(20+rank_M(x)) + β_q/(20+rank_N(x))`
+- **Training**: OOF holdout (deterministic source-disjoint split)
+- **Memory**: CEARF (transition + session + popularity, 120-width)
+- **Neural**: PASGR (1-layer GRU, dim=64, prototype-aligned)
 
 ## Repository layout
 
 ```
 sparse_bench/
-├── cearf.py                    # Memory index (transition/session/popularity)
+├── cearf.py                    # Memory index
 ├── pasgr.py                    # Neural residual
-├── dynamic_beta.py             # Query-conditioned β gate
-├── run_cearfn_v2.py            # Main runner
-├── run_paper_baselines.py      # Baselines (GRU4Rec/SASRec/NARM/SR-GNN/SIGMA)
+├── run_cearfn_v2.py            # Main runner (legacy validation-router)
+├── run_paper_baselines.py      # Baselines (GRU4Rec/NARM/SR-GNN/SIGMA)
 ├── plot_rq_figures.py          # Publication figures per RQ
-├── plot_latency.py             # Latency comparison chart
 ├── demo/                       # Interactive demo (FastAPI + HTML)
-│   ├── app.py                  # Backend
-│   └── templates/index.html    # Frontend (cart/purchase/history)
-└── paper/                      # Paper source (LaTeX, LNCS)
+├── artifacts_paper/            # Frozen result archive
+│   ├── per_query_ranks/        # 90 NPZ rank arrays
+│   ├── per_seed_metrics.json   # R@6/10/20/NDCG/U per method × domain × seed
+│   ├── narm_minilm_results.json # Paired bootstrap CIs
+│   ├── method_config.json      # Array → method mapping
+│   ├── minilm_config.json      # Semantic-teacher provenance
+│   ├── manifest.json           # SHA-256, shapes, query counts
+│   ├── verify_artifacts.py     # Artifact verifier
+│   └── README.md
+└── paper/                      # LNCS paper source (.tex)
+```
+
+## Verify artifacts
+
+```bash
+cd sparse_bench/artifacts_paper
+python verify_artifacts.py
+# Should print: OK: 90 arrays verified
 ```
 
 ## Run the demo
@@ -54,28 +65,7 @@ PYTHONPATH=.. python3 app.py
 # Open http://localhost:8000
 ```
 
-The demo loads 3 datasets (Baby Products, Video Games, Diginetica), computes
-memory + neural rankings in real time, and fuses them with a query-conditioned
-β. Try adding items to cart — the session grows and recommendations update.
-
-## Reproduce results
-
-```bash
-# CEARF-N v2 multi-seed
-PYTHONPATH=sparse_bench python sparse_bench/run_cearfn_v2.py \
-  Video_Games Baby_Products Diginetica_HID --seeds 42 123 456
-
-# Baselines
-PYTHONPATH=sparse_bench python sparse_bench/run_paper_baselines.py \
-  Video_Games Baby_Products
-
-# Figures
-PYTHONPATH=sparse_bench python sparse_bench/plot_rq_figures.py
-```
-
 ## Citation
-
-If you use this work, please cite:
 
 ```bibtex
 @misc{cearfn2026,

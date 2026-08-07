@@ -4,10 +4,10 @@
       "gate_vs_equal": {
         "delta_r20": 0.0023,
         "ci95": [
-          0.00046,
-          0.00411
+          0.00047,
+          0.00412
         ],
-        "p": 0.014046099571653078,
+        "p": 0.014247740150811126,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -15,10 +15,21 @@
       "gate_vs_uniform": {
         "delta_r20": 0.01,
         "ci95": [
-          0.00819,
-          0.01181
+          0.0082,
+          0.01182
         ],
-        "p": 3.839743126080729e-27,
+        "p": 3.1535327210513815e-27,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
+      },
+      "gate_vs_oof": {
+        "delta_r20": 0.0005,
+        "ci95": [
+          -0.00135,
+          0.00233
+        ],
+        "p": 0.60046816953231,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -26,10 +37,10 @@
       "cm_vs_nm": {
         "delta_r20": 0.001,
         "ci95": [
-          -0.00085,
-          0.00285
+          -0.00086,
+          0.00284
         ],
-        "p": 0.2930031591477355,
+        "p": 0.292141443354601,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -38,9 +49,9 @@
         "delta_r20": 0.00199,
         "ci95": [
           0.00015,
-          0.00386
+          0.00384
         ],
-        "p": 0.03536740482033332,
+        "p": 0.03583486153778739,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -50,10 +61,10 @@
       "gate_vs_equal": {
         "delta_r20": 0.0021,
         "ci95": [
-          0.00117,
-          0.00304
+          0.00116,
+          0.00305
         ],
-        "p": 1.1813613037443238e-05,
+        "p": 1.1991517249475237e-05,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -62,9 +73,20 @@
         "delta_r20": 0.00401,
         "ci95": [
           0.00308,
-          0.00494
+          0.00495
         ],
-        "p": 3.3851852091872275e-17,
+        "p": 3.775370957357014e-17,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
+      },
+      "gate_vs_oof": {
+        "delta_r20": 0.0005,
+        "ci95": [
+          -0.00044,
+          0.00145
+        ],
+        "p": 0.2984439832382799,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -72,10 +94,10 @@
       "cm_vs_nm": {
         "delta_r20": 0.0007,
         "ci95": [
-          -0.00031,
-          0.0017
+          -0.00033,
+          0.00169
         ],
-        "p": 0.17770991173648248,
+        "p": 0.17794951452884045,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -86,7 +108,7 @@
           0.0005,
           0.0025
         ],
-        "p": 0.003580980392464502,
+        "p": 0.0035729465683524793,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -96,10 +118,10 @@
       "gate_vs_equal": {
         "delta_r20": 0.01839,
         "ci95": [
-          0.0152,
-          0.02161
+          0.01518,
+          0.02158
         ],
-        "p": 9.085900281978926e-29,
+        "p": 9.865051743762139e-29,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -107,10 +129,21 @@
       "gate_vs_uniform": {
         "delta_r20": 0.034,
         "ci95": [
-          0.03081,
-          0.0372
+          0.03078,
+          0.03715
         ],
-        "p": 5.178339378967176e-94,
+        "p": 6.847321792220225e-94,
+        "p_test": "exact binomial sign test on discordant query pairs",
+        "sign_flip": "none",
+        "boot": "paired multinomial bootstrap, 20000 reps"
+      },
+      "gate_vs_oof": {
+        "delta_r20": 0.005,
+        "ci95": [
+          0.0018,
+          0.00821
+        ],
+        "p": 0.002517860289344949,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -118,10 +151,10 @@
       "cm_vs_nm": {
         "delta_r20": -0.00049,
         "ci95": [
-          -0.00369,
-          0.00271
+          -0.00373,
+          0.0027
         ],
-        "p": 0.7677040691151136,
+        "p": 0.7680437899868331,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -129,10 +162,10 @@
       "cm_vs_nt": {
         "delta_r20": 0.0025,
         "ci95": [
-          -0.00069,
+          -0.00073,
           0.00572
         ],
-        "p": 0.1309825897414375,
+        "p": 0.13177140238339471,
         "p_test": "exact binomial sign test on discordant query pairs",
         "sign_flip": "none",
         "boot": "paired multinomial bootstrap, 20000 reps"
@@ -142,19 +175,19 @@
   "protocol": "full-catalogue, 3 seeds, paired bootstrap 20000 reps",
   "narm_minilm": {
     "Video_Games": {
-      "R@6": 0.13853,
+      "R@6": 0.13872,
       "R@20": 0.15,
-      "NDCG@20": 0.10057
+      "NDCG@20": 0.10068
     },
     "Baby_Products": {
-      "R@6": 0.05892,
+      "R@6": 0.05907,
       "R@20": 0.0638,
-      "NDCG@20": 0.0426
+      "NDCG@20": 0.04287
     },
     "Diginetica": {
-      "R@6": 0.49333,
+      "R@6": 0.49412,
       "R@20": 0.534,
-      "NDCG@20": 0.35833
+      "NDCG@20": 0.35847
     }
   }
 }
