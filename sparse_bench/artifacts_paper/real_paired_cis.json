@@ -165,6 +165,36 @@
         "p_test": "exact binomial sign test on R@20 discordant query pairs",
         "boot": "paired multinomial bootstrap, 20000 reps, query-level"
       },
+      "vs_gru4rec": {
+        "delta_r20": 0.07487,
+        "ci95": [
+          0.07245,
+          0.07727
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sasrec": {
+        "delta_r20": 0.48823,
+        "ci95": [
+          0.48593,
+          0.49055
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
+      "vs_sigma": {
+        "delta_r20": 0.11692,
+        "ci95": [
+          0.1149,
+          0.11897
+        ],
+        "p": 0.0,
+        "p_test": "exact binomial sign test on R@20 discordant query pairs",
+        "boot": "paired multinomial bootstrap, 20000 reps, query-level"
+      },
       "continuous_vs_regime": {
         "delta_r20": 0.00279,
         "ci95": [
@@ -190,6 +220,6 @@
   "statistical_caveats": {
     "diginetica_session_dependence": "Diginetica prefix queries do not retain original session identifiers; paired intervals are query-level, not session-clustered.",
     "bootstrap_level": "query-level paired bootstrap",
-    "sources": "Amazon CEARF-N/memory/neural: cearfn_evidence_artifacts. Diginetica routers: cearfn_v2_artifacts. Baselines: paper_baseline_artifacts."
+    "sources": "Amazon CEARF-N/memory/neural: cearfn_evidence_artifacts. Diginetica routers: cearfn_v2_artifacts. Baselines: paper_baseline_artifacts. Diginetica GRU4Rec/SASRec: documented instability handled per-seed."
   }
 }

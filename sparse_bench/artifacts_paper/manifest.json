@@ -487,7 +487,7 @@
         },
         "Diginetica_HID_gru4rec_seed456": {
           "path": "per_query_ranks/Diginetica_HID_gru4rec_seed456.npz",
-          "sha256": "1683420d1e4d881d152631c9afde8b5824ad22f106c91f764f4adb43452e6bff",
+          "sha256": "4eb6334a76eb5a4aa9ffd50056cf2b94d9f4aafd48bd7b3fd9375935b6ed208d",
           "shape": [
             60858
           ],
@@ -527,7 +527,7 @@
         },
         "Diginetica_HID_sasrec_seed123": {
           "path": "per_query_ranks/Diginetica_HID_sasrec_seed123.npz",
-          "sha256": "b45584eff477b5258bea55c047f942193941d045118f95c2609f81e389685c6b",
+          "sha256": "a397a0629ea4a3777653f526df9a148926830646715fa2dffb602f1f4ea09abb",
           "shape": [
             60858
           ],
@@ -535,7 +535,7 @@
         },
         "Diginetica_HID_sasrec_seed456": {
           "path": "per_query_ranks/Diginetica_HID_sasrec_seed456.npz",
-          "sha256": "19cbcf2d89c16609bcff0d125b6baccb4bd60803a65682c8664e9786fac61795",
+          "sha256": "beaf7d67ad55fdcbf954c0c56619e790583c95b8a55b63451db754ec333b0b65",
           "shape": [
             60858
           ],
