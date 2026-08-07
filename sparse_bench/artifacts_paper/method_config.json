@@ -1,0 +1,34 @@
+{
+  "gate_type": "bounded_three_feature_linear",
+  "features": ["log_context_length", "log_last_item_frequency", "last_item_is_tail"],
+  "feature_count": 3,
+  "gate_output": "bounded_blend_coefficient_beta_q",
+  "rrf_constant_k": 20,
+  "memory_expert": "CEARF (transition + session + popularity, 120-width)",
+  "neural_expert": "PASGR (1-layer GRU, dim=64, prototype-aligned)",
+  "oof_protocol": "deterministic_source_disjoint_holdout",
+  "oof_holdout_fraction": 0.2,
+  "primary_outcome": "U = 0.5*R@6 + 0.5*R@20",
+  "seen_item_masking": {
+    "Video_Games": true,
+    "Baby_Products": true,
+    "Diginetica": false
+  },
+  "array_method_mapping": {
+    "query_cond": "CEARF-N with bounded 3-feature gate, OOF-trained",
+    "equal_mixing": "Fixed beta=0.5, no learning",
+    "uniform": "Single global beta, validation-selected",
+    "kmeans": "4-cluster k-means on session features, per-cluster beta",
+    "feature_bucketed": "12 strata by length x memory-confidence, per-strata beta",
+    "oof_global": "Single best beta from OOF training data (argmax sum utility)",
+    "narm_id": "NARM with random initialization (ID-only)",
+    "narm_tfidf": "NARM with TF-IDF semantic initialization",
+    "narm_minilm": "NARM with MiniLM-L6-v2 semantic initialization",
+    "cearfn_minilm": "CEARF-N with MiniLM-L6-v2 teacher (gate unchanged)"
+  },
+  "cearfn_minilm_note": "Same gate and memory expert as query_cond; only the neural expert's semantic teacher changes from TF-IDF to MiniLM. Gate parameters are NOT refit.",
+  "gate_equal_uses": "query_cond vs equal_mixing arrays; gate parameters from the bounded 3-feature linear model trained on OOF data",
+  "gate_oof_uses": "query_cond vs oof_global arrays; tests per-query allocation vs training-learned global policy",
+  "bootstrap_level": "query-level paired bootstrap (not session-clustered)",
+  "diginetica_caveat": "The available Diginetica evaluation representation does not retain the original session identifier for expanded prefix queries; paired intervals resample at the recoverable query level."
+}
