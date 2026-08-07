@@ -21,23 +21,27 @@
 
 ### Gate vs Equal mixing (R@20, paired CI)
 
-| Domain | Δ R@20 | paired 95% CI |
-|---|---:|---|
-| Video Games | +.0015 | [+.0001, +.0030] |
-| Baby Products | +.0014 | [+.0003, +.0024] |
-| Diginetica | +.0163 | [+.0128, +.0200] |
+| Domain | Δ R@20 | paired 95% CI | Sig? |
+|---|---:|---|---|
+| Video Games | +.0015 | [−.0003, +.0034] | No |
+| Baby Products | +.0014 | [+.0004, +.0023] | Yes |
+| Diginetica | +.0163 | [+.0132, +.0196] | Yes |
+
+The gate has higher mean R@20 than equal mixing on all three domains; the
+difference is detectably positive on Baby Products and Diginetica, and
+unresolved on Video Games.
 
 ### Gate vs OOF global (primary outcome U)
 
-| Domain | Δ U | paired 95% CI |
-|---|---:|---|
-| Video Games | +.0003 | [−.0015, +.0021] |
-| Baby Products | +.0004 | [−.0006, +.0013] |
-| **Diginetica** | **+.0046** | **[+.0015, +.0078]** |
+| Domain | Δ U | paired 95% CI | Sig? |
+|---|---:|---|---|
+| Video Games | +.0003 | [−.0015, +.0021] | No |
+| Baby Products | +.0004 | [−.0006, +.0013] | No |
+| **Diginetica** | **+.0046** | **[+.0015, +.0078]** | **Yes** |
 
 Dynamic allocation is detectably better than the training-only OOF-global
 policy on the declared primary utility (U = 0.5·R@6 + 0.5·R@20) on
-Diginetica; the Video Games and Baby Products intervals span zero.
+Diginetica only; the Video Games and Baby Products intervals span zero.
 
 ### Statistical caveat (Diginetica)
 

@@ -20,7 +20,7 @@
     "uniform": "Single global beta, validation-selected",
     "kmeans": "4-cluster k-means on session features, per-cluster beta",
     "feature_bucketed": "12 strata by length x memory-confidence, per-strata beta",
-    "oof_global": "Single best beta from OOF training data (argmax sum utility)",
+    "oof_global": "Single continuous beta optimized on OOF training data via pairwise reciprocal-rank loss (AdamW, beta_search=False)",
     "narm_id": "NARM with random initialization (ID-only)",
     "narm_tfidf": "NARM with TF-IDF semantic initialization",
     "narm_minilm": "NARM with MiniLM-L6-v2 semantic initialization",
