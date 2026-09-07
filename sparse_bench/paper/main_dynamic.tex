@@ -50,7 +50,13 @@ constituent, confirming expert complementarity. The dynamic-specific finding
 is narrower: against the training-only global policy, dynamic allocation has
 interval-above-zero early-rank gains on Video, while Baby and Diginetica shifts
 are undetectable. A fixed same-$\beta$-multiset reassignment is worse on Video
-nDCG@20.
+nDCG@20. A selection-procedure audit shows that one training-learned global
+scalar with zero validation cells comes within $2.5\times10^{-4}$ R@20 of a
+fifteen-cell oracle on every domain, while endpoint-only selection loses
+$.008$--$.023$; replacing the neural expert with a stronger NARM preserves
+the fusion gain ($+.0076$ R@20 on Diginetica), and matched-teacher
+comparisons attribute most of the Amazon gain to metadata rather than the
+fusion mechanism.
 \keywords{next-item recommendation \and dynamic rank fusion \and
 bounded rank allocation \and sparse recommendation}
 \end{abstract}
@@ -84,7 +90,10 @@ self-fit targets, and a residual bound limits every query-wise intervention.
 We ask how much gain is endpoint complementarity versus learned allocation
 (RQ1), whether a bounded residual adds conditional value beyond OOF-global
 allocation (RQ2), how robust it is to capacity/operator changes (RQ3), and
-what inference cost it adds (RQ4).
+what inference cost it adds (RQ4). Two auditing questions complete the
+analysis: how the full pipeline compares against simpler selection
+procedures under explicit tuning budgets (RQ5), and what matched-information
+and expert-swap controls isolate (RQ6).
 
 Our contributions are:
 \begin{enumerate}
@@ -98,7 +107,10 @@ last-item frequency, and a tail indicator;
 OOF-global allocation, and query assignment, with capacity and operator
 controls; and
 \item a serving audit decomposing feature+gate, rank-fusion, and expert
-retrieval latency.
+retrieval latency; and
+\item a selection-procedure audit with explicit tuning budgets, plus
+matched-information and expert-swap controls that separate metadata gains
+from mechanism gains.
 \end{enumerate}
 The claim is not that routing always wins, but that a small auditable
 controller recovers a reproducible early-rank allocation signal on Video.
@@ -413,6 +425,54 @@ In a deterministic replay check, reconstructed $\beta_q$ values differ from
 the original inference outputs by at most \DynamicRuntimeMaxBetaError{}, and
 the top-20 rankings are reproduced exactly. Expert retrieval dominates latency; the
 four-parameter residual gate is not the serving bottleneck.
+Table~\ref{tab:round2-cost} completes the audit with quality recomputed from
+the frozen per-query arrays, the recorded tuning budget of every method, and
+MRR@20. The audited grids evaluate 8 cells for V-SKNN, 16 for STAN, and
+epoch-only selection ($\leq$12, 5, and 10 epochs) for the neural baselines;
+the allocation-control family covers 15 policies. Gate and fusion together
+cost $87\,\mu$s/query on Video, $2.3\%$ of the $3.8$\,ms total, so the
+allocator cannot be justified by serving-cost savings; its value must be
+argued from the allocation evidence alone.
+\input{round2_cost}
+
+\subsection{RQ5: selection-procedure comparison}
+Table~\ref{tab:round2-procedures} compares six model-selection procedures
+directly, with their tuning budgets and regret against the test-side oracle
+over the fifteen-cell allocation-control family. Endpoint-only selection
+(P1) loses $.02173$/$.00799$/$.02282$ R@20 on Video/Baby/Diginetica, and
+per-seed recomputation from the frozen arrays confirms fusion beats the
+better endpoint in $3/3$ seeds on both Amazon domains. The central audit
+result is that P2---a single training-learned global scalar with zero
+validation cells---already sits within $2.5\times10^{-4}$ R@20 of the oracle
+on every domain. The query-conditioned gate (P6, the same fifteen-cell
+budget as the oracle search) improves the utility over P2 by
+$+.00022$ $[+.00009,+.00035]$ on Video but is statistically undetectable on
+Baby and Diginetica. Forbidding endpoint rejection (P5) costs nothing here
+because fusion dominates both endpoints on every domain and seed; the
+off-option is never selected, so ``rejection completeness'' carries no
+accuracy penalty in these regimes. We therefore report the simple-global
+result as the practical default and per-query conditioning as a detectable,
+domain-specific refinement rather than the primary source of accuracy.
+\input{round2_procedures}
+
+\subsection{RQ6: matched-information and expert-swap controls}
+Table~\ref{tab:round2-matched} separates information conditions from
+mechanism conditions. With identical TF--IDF semantic initialization, NARM+sem
+exceeds \method{} full by $+.0069$ (Video) and $+.0103$ (Baby) R@20:
+metadata, not the fusion mechanism, drives most of the Amazon gain. The
+expert-swap control answers the converse question---whether fusion only
+rescues a weak expert. Inside the identical memory/gate/fusion stack,
+replacing PASGR with NARM raises the neural endpoint from $.12571$ to
+$.13763$ (Video) and from $.44852$ to $.53178$ (Diginetica), yet the same
+gate still adds $+.01091$, $+.01121$, and $+.00761$ R@20 over the swapped
+expert alone; on Diginetica fusion helps even though the replacement expert
+is the stronger single model. The gain is constructive at the query level:
+the recorded rescue/damage decomposition counts $4451/1766$,
+$3889/1191$, and $3076/1693$ net-positive interventions on
+Video/Baby/Diginetica. The semantic conditions are recorded point estimates
+from the locked upstream audit; their per-query arrays were not retained,
+so no new paired interval is computed for them here.
+\input{round2_matched}
 
 \section{Conclusion and Limitations}
 \method{} replaces validation-selected coarse mixing weights with a
@@ -421,7 +481,11 @@ CEARF-N's main accuracy gain comes from expert complementarity; the residual
 asks the harder, narrower question of whether any source-disjoint query signal
 remains after a strong global prior. It does on Video's early ranks, while
 Baby/Diginetica are reported as boundary cases. The five-scalar allocator is
-cheap, bounded, score-scale invariant, and auditable.
+cheap, bounded, score-scale invariant, and auditable. The procedure audit
+sharpens the message: a training-learned global scalar already recovers the
+fusion gain at zero validation budget, per-query conditioning is a small
+domain-specific addition, and the complementarity finding survives swapping
+in a stronger neural expert.
 
 Three domains do not establish universal transfer, and Diginetica lacks
 original session IDs beyond expanded query rows for bootstrap clustering.
