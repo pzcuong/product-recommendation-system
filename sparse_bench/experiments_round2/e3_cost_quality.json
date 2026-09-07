@@ -1,0 +1,133 @@
+{
+ "provenance": {
+  "quality": "RECOMPUTED from frozen arrays (R@20 verified 0 mismatches)",
+  "mrr": "RECOMPUTED from frozen arrays",
+  "latency": "RECORDED generated_dynamic_beta_runtime_macros.tex",
+  "budgets": "RECORDED generated_dynamic_beta_baseline_audit.tex"
+ },
+ "domains": {
+  "Video_Games": {
+   "methods": {
+    "CEARF-N": {
+     "r20_mean": 0.14598,
+     "mrr20_mean": 0.04661,
+     "tuning_budget": "n/a"
+    },
+    "gru4rec": {
+     "r20_mean": 0.10368,
+     "mrr20_mean": 0.03171,
+     "tuning_budget": "n/a"
+    },
+    "memory": {
+     "r20_mean": 0.11901,
+     "mrr20_mean": 0.04346,
+     "tuning_budget": "n/a"
+    },
+    "narm": {
+     "r20_mean": 0.13705,
+     "mrr20_mean": 0.04264,
+     "tuning_budget": "n/a"
+    },
+    "neural": {
+     "r20_mean": 0.12625,
+     "mrr20_mean": 0.03784,
+     "tuning_budget": "n/a"
+    },
+    "sasrec": {
+     "r20_mean": 0.03794,
+     "mrr20_mean": 0.00954,
+     "tuning_budget": "n/a"
+    }
+   },
+   "cearfn_serving_latency": {
+    "gate_us": 1.171,
+    "post_us": 85.89,
+    "expert_ms": 3.71,
+    "total_ms": 3.796
+   },
+   "latency_note": "gate+fusion overhead is 0.086 ms/query (2.3% of total); dominant cost is expert retrieval"
+  },
+  "Baby_Products": {
+   "methods": {
+    "CEARF-N": {
+     "r20_mean": 0.0539,
+     "mrr20_mean": 0.01837,
+     "tuning_budget": "n/a"
+    },
+    "gru4rec": {
+     "r20_mean": 0.04501,
+     "mrr20_mean": 0.01167,
+     "tuning_budget": "n/a"
+    },
+    "memory": {
+     "r20_mean": 0.03879,
+     "mrr20_mean": 0.01493,
+     "tuning_budget": "n/a"
+    },
+    "narm": {
+     "r20_mean": 0.0299,
+     "mrr20_mean": 0.00607,
+     "tuning_budget": "n/a"
+    },
+    "neural": {
+     "r20_mean": 0.04499,
+     "mrr20_mean": 0.01373,
+     "tuning_budget": "n/a"
+    },
+    "sasrec": {
+     "r20_mean": 0.03163,
+     "mrr20_mean": 0.0067,
+     "tuning_budget": "n/a"
+    }
+   },
+   "cearfn_serving_latency": {
+    "gate_us": 1.184,
+    "post_us": 87.57,
+    "expert_ms": 4.031,
+    "total_ms": 4.119
+   },
+   "latency_note": "gate+fusion overhead is 0.088 ms/query (2.1% of total); dominant cost is expert retrieval"
+  },
+  "Diginetica_HID": {
+   "methods": {
+    "bucketed": {
+     "r20_mean": 0.48757,
+     "mrr20_mean": 0.15927,
+     "tuning_budget": "n/a"
+    },
+    "CEARF-N": {
+     "r20_mean": 0.49028,
+     "mrr20_mean": 0.16286,
+     "tuning_budget": "n/a"
+    },
+    "gru4rec": {
+     "r20_mean": 0.41541,
+     "mrr20_mean": 0.16054,
+     "tuning_budget": "n/a"
+    },
+    "narm": {
+     "r20_mean": 0.48265,
+     "mrr20_mean": 0.16831,
+     "tuning_budget": "n/a"
+    },
+    "regime": {
+     "r20_mean": 0.48749,
+     "mrr20_mean": 0.15925,
+     "tuning_budget": "n/a"
+    },
+    "sasrec": {
+     "r20_mean": 0.00204,
+     "mrr20_mean": 0.0003,
+     "tuning_budget": "n/a"
+    }
+   },
+   "cearfn_serving_latency": {
+    "gate_us": 0.774,
+    "post_us": 80.6,
+    "expert_ms": 2.428,
+    "total_ms": 2.509
+   },
+   "latency_note": "gate+fusion overhead is 0.081 ms/query (3.2% of total); dominant cost is expert retrieval"
+  }
+ }
+}

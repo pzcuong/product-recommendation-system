@@ -1,0 +1,153 @@
+{
+ "provenance": {
+  "candidate_test_values": "RECORDED generated_dynamic_beta_main_table.tex",
+  "win_frequencies": "RECOMPUTED from frozen per-query arrays",
+  "deltaU_ci": "RECORDED generated_dynamic_beta_main_table.tex"
+ },
+ "domains": {
+  "Video_Games": {
+   "procedures": {
+    "P1 endpoint-only (best of memory/neural)": {
+     "r20": 0.12571,
+     "budget": 2,
+     "note": "selects neural",
+     "regret_vs_oracle": 0.02173
+    },
+    "P2 global-beta fusion (training-learned)": {
+     "r20": 0.14719,
+     "budget": 0,
+     "note": "no validation cells; OOF scalar",
+     "regret_vs_oracle": 0.00025
+    },
+    "P3 regime router (short/long)": {
+     "r20": 0.14726,
+     "budget": 2,
+     "note": "two OOF scalars",
+     "regret_vs_oracle": 0.00018
+    },
+    "P4 oracle over gate family (upper bound)": {
+     "r20": 0.14744,
+     "budget": 15,
+     "note": "test-side argmax; spread 0.00025",
+     "regret_vs_oracle": 0.0
+    },
+    "P5 forced neural inclusion (fusion-only best)": {
+     "r20": 0.14735,
+     "budget": 4,
+     "note": "endpoints forbidden",
+     "regret_vs_oracle": 9e-05
+    },
+    "P6 query-conditioned gate (primary)": {
+     "r20": 0.14735,
+     "budget": 15,
+     "note": "3-feature bounded gate",
+     "regret_vs_oracle": 9e-05
+    }
+   },
+   "fusion_win_frequency": {
+    "fusion_beats_best_endpoint_seeds": 3,
+    "seeds": 3
+   },
+   "dU_dynamic_minus_global": 0.00022,
+   "dU_ci95": [
+    9e-05,
+    0.00035
+   ]
+  },
+  "Baby_Products": {
+   "procedures": {
+    "P1 endpoint-only (best of memory/neural)": {
+     "r20": 0.04873,
+     "budget": 2,
+     "note": "selects neural",
+     "regret_vs_oracle": 0.00799
+    },
+    "P2 global-beta fusion (training-learned)": {
+     "r20": 0.05671,
+     "budget": 0,
+     "note": "no validation cells; OOF scalar",
+     "regret_vs_oracle": 1e-05
+    },
+    "P3 regime router (short/long)": {
+     "r20": 0.05655,
+     "budget": 2,
+     "note": "two OOF scalars",
+     "regret_vs_oracle": 0.00017
+    },
+    "P4 oracle over gate family (upper bound)": {
+     "r20": 0.05672,
+     "budget": 15,
+     "note": "test-side argmax; spread 0.00029",
+     "regret_vs_oracle": 0.0
+    },
+    "P5 forced neural inclusion (fusion-only best)": {
+     "r20": 0.05671,
+     "budget": 4,
+     "note": "endpoints forbidden",
+     "regret_vs_oracle": 1e-05
+    },
+    "P6 query-conditioned gate (primary)": {
+     "r20": 0.05669,
+     "budget": 15,
+     "note": "3-feature bounded gate",
+     "regret_vs_oracle": 3e-05
+    }
+   },
+   "fusion_win_frequency": {
+    "fusion_beats_best_endpoint_seeds": 3,
+    "seeds": 3
+   },
+   "dU_dynamic_minus_global": 2e-05,
+   "dU_ci95": [
+    -3e-05,
+    6e-05
+   ]
+  },
+  "Diginetica_HID": {
+   "procedures": {
+    "P1 endpoint-only (best of memory/neural)": {
+     "r20": 0.49428,
+     "budget": 2,
+     "note": "selects memory",
+     "regret_vs_oracle": 0.02282
+    },
+    "P2 global-beta fusion (training-learned)": {
+     "r20": 0.51702,
+     "budget": 0,
+     "note": "no validation cells; OOF scalar",
+     "regret_vs_oracle": 8e-05
+    },
+    "P3 regime router (short/long)": {
+     "r20": 0.51692,
+     "budget": 2,
+     "note": "two OOF scalars",
+     "regret_vs_oracle": 0.00018
+    },
+    "P4 oracle over gate family (upper bound)": {
+     "r20": 0.5171,
+     "budget": 15,
+     "note": "test-side argmax; spread 0.00025",
+     "regret_vs_oracle": 0.0
+    },
+    "P5 forced neural inclusion (fusion-only best)": {
+     "r20": 0.51702,
+     "budget": 4,
+     "note": "endpoints forbidden",
+     "regret_vs_oracle": 8e-05
+    },
+    "P6 query-conditioned gate (primary)": {
+     "r20": 0.51701,
+     "budget": 15,
+     "note": "3-feature bounded gate",
+     "regret_vs_oracle": 9e-05
+    }
+   },
+   "fusion_win_frequency": null,
+   "dU_dynamic_minus_global": 2e-05,
+   "dU_ci95": [
+    -0.00015,
+    0.00018
+   ]
+  }
+ }
+}
