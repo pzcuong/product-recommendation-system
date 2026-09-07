@@ -54,9 +54,10 @@ nDCG@20. A selection-procedure audit shows that one training-learned global
 scalar with zero validation cells comes within $2.5\times10^{-4}$ R@20 of a
 fifteen-cell oracle on every domain, while endpoint-only selection loses
 $.008$--$.023$; replacing the neural expert with a stronger NARM preserves
-the fusion gain ($+.0076$ R@20 on Diginetica), and matched-teacher
-comparisons attribute most of the Amazon gain to metadata rather than the
-fusion mechanism.
+the fusion gain ($+.0076$ R@20 on Diginetica); and matched-teacher controls
+show that on Amazon a plain NARM given the same semantic initialization
+exceeds the full pipeline, so the allocator's advantage there is not
+established and metadata is a major confound.
 \keywords{next-item recommendation \and dynamic rank fusion \and
 bounded rank allocation \and sparse recommendation}
 \end{abstract}
@@ -278,6 +279,18 @@ transitions are removed from tuning histories. This is a single OOF holdout,
 not full $K$-fold cross-fitting; allocator parameters remain frozen for final
 test.
 
+\noindent\emph{Recorded disjointness checks.} The split is made on source
+sessions \emph{before} any prefix expansion; the recorded per-domain audit
+reports (i) declared-validation/OOF overlap $=0$, (ii) exactly 5,000
+validation-source rows excluded from the eligible test pool on every domain
+(89,762/145,777/128,724 of 94,762/150,777/133,724 candidates), and (iii) on
+Diginetica, 5,000 test rows whose target equals an OOF-training target
+removed under the repeat-consumption protocol (zero such rows on Amazon).
+Frozen profile and gate hashes (\texttt{623fdf1e}/\texttt{3df29839} on Video,
+per domain in the supplement) pin the locked artifacts. After the split, the
+expanded query rows no longer carry original session IDs; the checks above
+were computed while the IDs were still present.
+
 \section{Experimental Setup}
 We derive 5-core leave-last-out histories from Amazon Reviews 2023 for Video
 Games and Baby Products \cite{hou2024amazonreviews}; previously seen items are
@@ -312,6 +325,29 @@ Paired per-query differences are averaged over matched seeds and bootstrapped
 over query IDs with 20,000 repetitions. Intervals condition on three fitted
 seeds; seed SD is reported separately. Experiments ran on an Apple M2 Pro with
 32\,GB memory; CEARF uses one CPU process and PASGR uses Metal/MPS.
+
+\begin{table}[t]
+\caption{Configuration and provenance map. Every result table traces to one
+row; numbers from different rows are never compared directly.}
+\label{tab:config-map}
+\centering\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{llll}
+\toprule
+Tables & Lineage & CEARF-N teacher & Comparator teacher\\
+\midrule
+\ref{tab:allocation-main}, \ref{tab:round2-procedures} & dynamic-$\beta$ OOF
+runs & E5-small (V); TF--IDF/SVD (B,D) & ID-only endpoints\\
+\ref{tab:baselines}, \ref{tab:round2-cost} & audited baseline grids (3 seeds)
+& as above & ID-only; grids 8/16/$\leq$12\\
+\ref{tab:round2-matched} (upper) & TF--IDF condition (recorded) &
+TF--IDF (V,B) & TF--IDF\\
+\ref{tab:round2-matched} (lower) & expert-swap runs (3 seeds) & ID-only NARM
+expert & ID-only\\
+Runtime macros & seed-42 warm benchmark & -- & --\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Results}
 \subsection{RQ1--RQ2: endpoints, baselines, and allocation}
@@ -353,9 +389,13 @@ The stricter comparison is against the training-only global and short/long
 policies.
 
 Table~\ref{tab:baselines} is system-level context, not a metadata-matched
-architecture comparison. With the same cached teacher, NARM reaches
-.15387/.06628 R@20 on Video/Baby, exceeding CEARF-N; hence Amazon claims are
-allocation-orthogonal. Replacing PASGR by ID-only NARM inside the allocator
+architecture comparison. Under the recorded TF--IDF condition (both arms
+initialized identically; Video's main-table teacher is E5-small, see the
+configuration map in Table~\ref{tab:config-map}), NARM reaches .15387/.06628
+R@20 on Video/Baby and exceeds the CEARF-N rows of that same condition
+(.14700/.05600). The Amazon advantage therefore cannot be attributed to the
+allocator; it does not by itself quantify how much of the gain is metadata
+versus architecture. Replacing PASGR by ID-only NARM inside the allocator
 gives .14854/.05001/.53939 R@20 on Video/Baby/Diginetica, closing Diginetica
 but losing Baby's metadata benefit. SIGMA-compatible underperforms
 transition-only on Diginetica despite selected epochs 7/9/10, so it is only
@@ -425,53 +465,72 @@ In a deterministic replay check, reconstructed $\beta_q$ values differ from
 the original inference outputs by at most \DynamicRuntimeMaxBetaError{}, and
 the top-20 rankings are reproduced exactly. Expert retrieval dominates latency; the
 four-parameter residual gate is not the serving bottleneck.
-Table~\ref{tab:round2-cost} completes the audit with quality recomputed from
-the frozen per-query arrays, the recorded tuning budget of every method, and
-MRR@20. The audited grids evaluate 8 cells for V-SKNN, 16 for STAN, and
-epoch-only selection ($\leq$12, 5, and 10 epochs) for the neural baselines;
-the allocation-control family covers 15 policies. Gate and fusion together
-cost $87\,\mu$s/query on Video, $2.3\%$ of the $3.8$\,ms total, so the
-allocator cannot be justified by serving-cost savings; its value must be
+Table~\ref{tab:round2-cost} completes the audit in the \emph{same lineage} as
+Tables~\ref{tab:allocation-main} and \ref{tab:baselines}: baselines come from
+the audited grids, fused rows from the dynamic-$\beta$ runs, and every method
+carries its declared-validation budget. Allocation itself uses no validation
+cells (expert budgets are upstream and reported separately). Gate and fusion
+together cost $87\,\mu$s/query on Video, $2.3\%$ of the $3.8$\,ms total, so
+the allocator cannot be justified by serving-cost savings; its value must be
 argued from the allocation evidence alone.
 \input{round2_cost}
 
 \subsection{RQ5: selection-procedure comparison}
-Table~\ref{tab:round2-procedures} compares six model-selection procedures
-directly, with their tuning budgets and regret against the test-side oracle
-over the fifteen-cell allocation-control family. Endpoint-only selection
-(P1) loses $.02173$/$.00799$/$.02282$ R@20 on Video/Baby/Diginetica, and
-per-seed recomputation from the frozen arrays confirms fusion beats the
-better endpoint in $3/3$ seeds on both Amazon domains. The central audit
-result is that P2---a single training-learned global scalar with zero
-validation cells---already sits within $2.5\times10^{-4}$ R@20 of the oracle
-on every domain. The query-conditioned gate (P6, the same fifteen-cell
-budget as the oracle search) improves the utility over P2 by
-$+.00022$ $[+.00009,+.00035]$ on Video but is statistically undetectable on
-Baby and Diginetica. Forbidding endpoint rejection (P5) costs nothing here
-because fusion dominates both endpoints on every domain and seed; the
-off-option is never selected, so ``rejection completeness'' carries no
-accuracy penalty in these regimes. We therefore report the simple-global
-result as the practical default and per-query conditioning as a detectable,
-domain-specific refinement rather than the primary source of accuracy.
+Table~\ref{tab:round2-procedures} compares six model-selection procedures.
+The budget columns separate three different costs: \emph{validation cells}
+evaluated on declared-validation labels during selection, the \emph{OOF fit}
+on the 4,000-row calibration split (``zero validation cells'' refers to
+selection only---P2 still fits one scalar and P6 five parameters there), and
+the \emph{audit-only} variants, which are never used to select the primary
+gate: its configuration (three-feature linear, $\Delta_{\rm eff}{=}.10$) is
+fixed in advance on all domains. The fifteen audit policies define the
+test-side oracle (P4), an upper bound rather than a deployable procedure.
+Endpoint-only selection (P1) loses $.02173$/$.00799$/$.02282$ R@20 on
+Video/Baby/Diginetica, and per-seed recomputation from the frozen arrays
+confirms fusion beats the better endpoint in $3/3$ seeds on both Amazon
+domains. The central audit result is that P2---one training-learned scalar
+with zero validation cells---already sits within $2.5\times10^{-4}$ R@20 of
+the oracle on every domain. The query-conditioned gate (P6) improves utility
+over P2 by $+.00022$ $[+.00009,+.00035]$ on Video but is statistically
+undetectable on Baby and Diginetica. Forbidding endpoint rejection (P5)
+costs nothing here because fusion dominates both endpoints on every domain
+and seed; the off-option is never selected, so ``rejection completeness''
+carries no accuracy penalty in these regimes. We therefore report the
+simple-global result as the practical default and per-query conditioning as
+a detectable, domain-specific refinement rather than the primary source of
+accuracy.
 \input{round2_procedures}
 
 \subsection{RQ6: matched-information and expert-swap controls}
 Table~\ref{tab:round2-matched} separates information conditions from
-mechanism conditions. With identical TF--IDF semantic initialization, NARM+sem
-exceeds \method{} full by $+.0069$ (Video) and $+.0103$ (Baby) R@20:
-metadata, not the fusion mechanism, drives most of the Amazon gain. The
-expert-swap control answers the converse question---whether fusion only
+mechanism conditions. All four rows of the upper block are the recorded
+TF--IDF condition---including the CEARF-N rows (.14700/.05600), which are
+\emph{not} the main-system numbers of
+Table~\ref{tab:allocation-main} (.14735/.05669; Video's main teacher is
+E5-small). Within that matched condition, NARM+sem exceeds CEARF-N by
+$+.0069$ (Video) and $+.0103$ (Baby) R@20. This establishes that the
+allocator's architectural advantage is not demonstrated on Amazon and that
+semantic initialization is a major confound; it does not, by itself,
+decompose the gain into metadata versus architecture shares.
+
+The expert-swap control answers a different question---whether fusion only
 rescues a weak expert. Inside the identical memory/gate/fusion stack,
 replacing PASGR with NARM raises the neural endpoint from $.12571$ to
 $.13763$ (Video) and from $.44852$ to $.53178$ (Diginetica), yet the same
 gate still adds $+.01091$, $+.01121$, and $+.00761$ R@20 over the swapped
 expert alone; on Diginetica fusion helps even though the replacement expert
-is the stronger single model. The gain is constructive at the query level:
-the recorded rescue/damage decomposition counts $4451/1766$,
-$3889/1191$, and $3076/1693$ net-positive interventions on
-Video/Baby/Diginetica. The semantic conditions are recorded point estimates
-from the locked upstream audit; their per-query arrays were not retained,
-so no new paired interval is computed for them here.
+is the stronger single model. One caveat: this shows fusion (at the gate's
+allocation) helps the strong expert, not that \emph{dynamic} allocation
+beats global mixing for it---the equal/global controls of the swap were not
+retained and are listed as future work. The recorded rescue/damage
+decomposition belongs to the \emph{primary} comparison (dynamic fusion
+versus memory-only): $4451/1766$, $3889/1191$, $3076/1693$ net-positive
+interventions on Video/Baby/Diginetica, satisfying
+$(\text{rescue}-\text{damage})/N=\Delta\text{R@20}_{\text{fusion}-\text{memory}}$
+exactly (e.g.\ $2685/94{,}762=.02834$ on Video); a decomposition of the
+NARM-swap pair was not retained. The semantic conditions are recorded point
+estimates from the locked upstream audit; their per-query arrays were not
+kept, so no new paired interval is computed for them here.
 \input{round2_matched}
 
 \section{Conclusion and Limitations}
@@ -487,19 +546,28 @@ fusion gain at zero validation budget, per-query conditioning is a small
 domain-specific addition, and the complementarity finding survives swapping
 in a stronger neural expert.
 
-Three domains do not establish universal transfer, and Diginetica lacks
-original session IDs beyond expanded query rows for bootstrap clustering.
+Three domains do not establish universal transfer. The OOF audit is a
+single 4,000-source holdout: repeated source-level splits, temporal
+confirmation holdouts, the equal/global/dynamic control trio under the NARM
+swap, a fixed mean-$\beta$ control, and multiple $\beta$ reassignments are
+required before the dynamic residual can be claimed robust, and none of them
+is reported here. The recorded checks of Section~3.3 were computed while
+Diginetica source IDs were still present; the expanded rows no longer carry
+them, so query-level bootstrap clustering on Diginetica remains
+session-unclustered.
 Only 41.7\%, 21.1\%, and 82.5\% of OOF calibration queries are actionable on
 Video, Baby, and Diginetica; the allocator is therefore trained conditionally
 on expert-union coverage, especially narrowly on Baby.
 The PASGR cell was frozen by an upstream validation study;
 our ``training-only'' claim applies specifically to allocation $\beta$, not
 to every expert hyperparameter. Semantic metadata makes external comparisons
-system-level; matched-teacher evidence exists only on Amazon. Finally, the
+system-level; matched-teacher evidence exists only on Amazon and within the
+TF--IDF condition. Finally, the
 bounded query-wise residual gain over global fusion is small and undetectable
-on two domains; larger untouched domains and temporal cross-fitting remain
-necessary. Complete implementation details, allocation controls, and
-statistical procedures are provided in the supplementary material.
+on two domains; the bound and score-scale invariance are stated as properties
+of the construction, and an empirical count of certified top-$K$ boundary
+pairs is future work. Complete implementation details, allocation controls,
+and statistical procedures are provided in the supplementary material.
 
 \bibliographystyle{splncs04}
 \bibliography{references_dynamic}
