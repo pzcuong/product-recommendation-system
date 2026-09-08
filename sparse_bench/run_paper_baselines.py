@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader, Dataset
 
 import cearf
 import loaders
-from paper_models import build_model, model_logits
+from paper_models import BERT4Rec, build_model, model_logits
 from run_cearfn_evidence import (
     metrics_from_ranks, paired_recall_test, query_fingerprint, ranks_at_20,
     targets_for)
@@ -27,12 +27,14 @@ from validation_protocol import hold_out_validation_targets
 
 
 HERE = Path(__file__).resolve().parent
-MODELS = ("GRU4Rec", "SASRec", "NARM", "SR-GNN", "SIGMA-compatible")
+BERT_MASK_WIDTH = 50
+MODELS = ("GRU4Rec", "SASRec", "BERT4Rec", "NARM", "SR-GNN", "SIGMA-compatible")
 SEEDS = (42, 123, 456)
 # Datasets whose official protocol permits repeat consumption (target may
 # already appear in the context). For those we must NOT mask seen items at
 # scoring time, otherwise we silently cap recall at the no-repeat subset.
-REPEAT_PROTOCOL_DOMAINS = frozenset({"Diginetica_HID", "Tmall"})
+REPEAT_PROTOCOL_DOMAINS = frozenset({"Diginetica_HID", "Tmall",
+                                     "RetailRocket_Large"})
 
 
 class PrefixDataset(Dataset):
@@ -105,7 +107,9 @@ def predict_array(model, queries: dict, n_items: int, topk: int = 20,
     model.eval()
     for start in range(0, len(keys), batch_size):
         batch_keys = keys[start:start + batch_size]
-        batch = [(queries[uid]["context"][-50:], queries[uid]["targets"][0])
+        bert = model.__class__.__name__ == "BERT4Rec"
+        cap = 49 if bert else 50
+        batch = [(queries[uid]["context"][-cap:], queries[uid]["targets"][0])
                  for uid in batch_keys]
         contexts, lengths, _ = collate(batch)
         if model.__class__.__name__ != "SRGNN":
@@ -133,14 +137,15 @@ def train_one(name: str, sessions: dict, validation: dict, n_items: int,
     torch.manual_seed(seed)
     dev = device_for(name)
     model = build_model(name, n_items, 64).to(dev)
-    dataset = PrefixDataset(sessions, n_items)
+    dataset = PrefixDataset(sessions, n_items,
+                            max_seq=49 if name == "BERT4Rec" else 50)
     generator = torch.Generator().manual_seed(seed)
     effective_batch = min(batch_size, 128) if name == "SR-GNN" else batch_size
     loader = DataLoader(dataset, batch_size=effective_batch, shuffle=True,
                         collate_fn=collate, generator=generator, num_workers=0)
     # Per-architecture lr: SASRec and SIGMA destabilise at 1e-3 on large
     # vocabularies; GRU4Rec, NARM, and SR-GNN need 1e-3 to train at all.
-    ARCH_LR = {"SASRec": 5e-4, "SIGMA-compatible": 5e-4}
+    ARCH_LR = {"SASRec": 5e-4, "BERT4Rec": 1e-2, "SIGMA-compatible": 5e-4}
     base_lr = ARCH_LR.get(name, 1e-3)
     optimizer = torch.optim.AdamW(model.parameters(), lr=base_lr, weight_decay=1e-5)
     best = None
@@ -157,8 +162,30 @@ def train_one(name: str, sessions: dict, validation: dict, n_items: int,
             if name != "SR-GNN":
                 contexts, lengths = contexts.to(dev), lengths.to(dev)
             targets = targets.to(dev)
-            logits = model_logits(model, contexts, lengths)
-            loss = F.cross_entropy(logits, targets)
+            if name == "BERT4Rec":
+                # Append the next item as the final [MASK] position and
+                # predict it there (BERT4Rec serving pattern, applied to the
+                # training objective as well so train/test match).
+                width = contexts.shape[1]
+                assert width + 1 <= BERT_MASK_WIDTH
+                masked_ctx = torch.zeros(len(contexts), width + 1,
+                                         dtype=torch.long, device=dev)
+                masked_ctx[:, :width] = contexts
+                masked_ctx[torch.arange(len(contexts), device=dev),
+                           lengths] = BERT4Rec.MASK_ID
+                masked_len = lengths + 1
+                train_gen = torch.Generator(device=dev)
+                train_gen.manual_seed(seed * 100003 + step)
+                logits, mask = model.train_logits(masked_ctx, masked_len,
+                                                  train_gen)
+                last = torch.arange(mask.shape[1], device=dev)[None, :]
+                mask = mask & (last == (masked_len[:, None] - 1))
+                flat = mask.reshape(-1)
+                loss = F.cross_entropy(logits.reshape(-1, logits.shape[-1])[flat],
+                                       targets)
+            else:
+                logits = model_logits(model, contexts, lengths)
+                loss = F.cross_entropy(logits, targets)
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             # Skip the step entirely when the loss diverged; this keeps the
@@ -225,22 +252,46 @@ def train_fixed_epochs(name: str, sessions: dict, n_items: int, seed: int,
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
     dev = device_for(name)
     model = build_model(name, n_items, 64).to(dev)
-    dataset = PrefixDataset(sessions, n_items)
+    dataset = PrefixDataset(sessions, n_items,
+                            max_seq=49 if name == "BERT4Rec" else 50)
     generator = torch.Generator().manual_seed(seed)
     effective_batch = min(batch_size, 128) if name == "SR-GNN" else batch_size
     loader = DataLoader(dataset, batch_size=effective_batch, shuffle=True,
                         collate_fn=collate, generator=generator, num_workers=0)
-    base_lr = {"SASRec": 5e-4, "SIGMA-compatible": 5e-4}.get(name, 1e-3)
+    base_lr = {"SASRec": 5e-4, "BERT4Rec": 1e-2,
+                "SIGMA-compatible": 5e-4}.get(name, 1e-3)
     optimizer = torch.optim.AdamW(model.parameters(), lr=base_lr, weight_decay=1e-5)
     started = time.time(); peak = mps_memory()
     for epoch in range(1, epochs + 1):
         model.train()
-        for contexts, lengths, targets in loader:
+        for step, (contexts, lengths, targets) in enumerate(loader, 1):
             if name != "SR-GNN":
                 contexts, lengths = contexts.to(dev), lengths.to(dev)
             targets = targets.to(dev)
-            logits = model_logits(model, contexts, lengths)
-            loss = F.cross_entropy(logits, targets)
+            if name == "BERT4Rec":
+                # Append the next item as the final [MASK] position and
+                # predict it there (BERT4Rec serving pattern, applied to the
+                # training objective as well so train/test match).
+                width = contexts.shape[1]
+                assert width + 1 <= BERT_MASK_WIDTH
+                masked_ctx = torch.zeros(len(contexts), width + 1,
+                                         dtype=torch.long, device=dev)
+                masked_ctx[:, :width] = contexts
+                masked_ctx[torch.arange(len(contexts), device=dev),
+                           lengths] = BERT4Rec.MASK_ID
+                masked_len = lengths + 1
+                train_gen = torch.Generator(device=dev)
+                train_gen.manual_seed(seed * 100003 + step)
+                logits, mask = model.train_logits(masked_ctx, masked_len,
+                                                  train_gen)
+                last = torch.arange(mask.shape[1], device=dev)[None, :]
+                mask = mask & (last == (masked_len[:, None] - 1))
+                flat = mask.reshape(-1)
+                loss = F.cross_entropy(logits.reshape(-1, logits.shape[-1])[flat],
+                                       targets)
+            else:
+                logits = model_logits(model, contexts, lengths)
+                loss = F.cross_entropy(logits, targets)
             optimizer.zero_grad(set_to_none=True)
             if not torch.isfinite(loss):
                 continue

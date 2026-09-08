@@ -332,6 +332,83 @@ RETAIL_MIN_SESSION_LEN = 3         # need >=3 items in a session to keep it
 RETAIL_MIN_USER_INTERACTIONS = 2   # keep visitors with at least this many kept-events
 
 
+def load_retailrocket_large(max_items: int = 12000,
+                            min_item_support: int = 5,
+                            min_user_events: int = 5,
+                            min_session_len: int = 2,
+                            test_fraction: int = 20) -> dict:
+    from cearf import _stable_fraction
+    """Journal-scale RetailRocket protocol (v2, 2026-09).
+
+    Differences from the small ADMA external check (``load_retailrocket``):
+    the item cap rises to 12,000, visitors need at least five kept events,
+    sessions need two distinct consecutive items, and the test split holds
+    out the final event of every fifth visitor by stable hash instead of a
+    random 50/50 visitor split.  Visitors outside the test split contribute
+    their complete event sequences to training.  Declared before any model
+    run on this domain; loaders for the small variant remain untouched.
+    """
+    events_path = RETAIL_DIR / "events.csv"
+    if not events_path.exists():
+        raise FileNotFoundError(f"RetailRocket events.csv not found at {events_path}")
+
+    import pandas as pd
+
+    df = pd.read_csv(events_path,
+                     usecols=["timestamp", "visitorid", "event", "itemid"],
+                     dtype={"visitorid": str, "event": str, "itemid": str})
+    df = df.dropna(subset=["visitorid", "itemid"]).copy()
+    df["itemid"] = df["itemid"].astype(str)
+    df["visitorid"] = df["visitorid"].astype(str)
+    item_counts = df.groupby("itemid").size().sort_values(ascending=False)
+    supported = item_counts[item_counts >= min_item_support].index
+    df = df[df["itemid"].isin(supported)]
+    if df["itemid"].nunique() > max_items:
+        top_items = item_counts.loc[
+            lambda s: s.index.isin(df["itemid"].unique())].head(max_items).index
+        df = df[df["itemid"].isin(top_items)]
+    vc = df.groupby("visitorid").size()
+    df = df[df["visitorid"].isin(vc[vc >= min_user_events].index)]
+
+    item_list = sorted(df["itemid"].unique())
+    item2id = {x: i + 1 for i, x in enumerate(item_list)}
+    n_items = len(item_list) + 1
+
+    df = df.sort_values(["visitorid", "timestamp"]).reset_index(drop=True)
+    # Journal protocol: the unit is the visitor's full chronological event
+    # sequence (consecutive repeats collapsed).  A 30-minute sessionization
+    # shatters this sparse log into single-event sessions and was rejected
+    # during protocol design; declared before any model run.
+    sessions_by_visitor: Dict[str, List[int]] = defaultdict(list)
+    for vid, grp in df.groupby("visitorid", sort=False):
+        seq = [item2id[x] for x in grp["itemid"].tolist()]
+        dedup = [seq[0]] + [b for a, b in zip(seq, seq[1:]) if b != a]
+        if len(dedup) >= min_session_len:
+            sessions_by_visitor[vid] = dedup
+
+    train_sessions: Dict[str, List[int]] = {}
+    test_queries: Dict[str, dict] = {}
+    visit_counts: Dict[str, int] = {}
+    for vid, full in sessions_by_visitor.items():
+        visit_counts[vid] = 1
+        if len(full) < 3:
+            continue
+        if int(_stable_fraction(f"retail-large::{vid}")
+               * 100) < test_fraction:
+            ctx, tgt = full[:-1], full[-1]
+            train_sessions[vid] = ctx
+            test_queries[vid] = {"context": ctx, "targets": [tgt]}
+        else:
+            train_sessions[vid] = full
+
+    item_categories = _retailrocket_categories(item2id)
+    print(f"[RetailRocket-Large] users={len(train_sessions)} items={n_items} "
+          f"test={len(test_queries)} cats={len(item_categories)}")
+    return _result("RetailRocket_Large", n_items, train_sessions,
+                   test_queries, item_categories=item_categories,
+                   visit_counts=visit_counts)
+
+
 def load_retailrocket(max_items: int = 5000) -> dict:
     events_path = RETAIL_DIR / "events.csv"
     if not events_path.exists():
@@ -630,6 +707,7 @@ ALL_LOADERS = {
     "Video_Games": lambda: load_amazon("Video_Games"),
     "Arts_Crafts_and_Sewing": lambda: load_amazon("Arts_Crafts_and_Sewing"),
     "RetailRocket": load_retailrocket,
+    "RetailRocket_Large": load_retailrocket_large,
     "Diginetica_HID": load_diginetica_hid,
     "Tmall": load_tmall,
 }

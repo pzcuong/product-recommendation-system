@@ -150,11 +150,96 @@ class SRGNN(nn.Module):
         return state @ self.item.weight.T
 
 
+class BERT4Rec(nn.Module):
+    """Bidirectional Transformer with masked-item training (BERT4Rec).
+
+    Training uses the Cloze objective: 15% of positions are masked, 80% of
+    those to the shared mask token, 10% to a random item, 10% unchanged;
+    the loss covers only masked positions.  Inference re-encodes the full
+    prefix and reads the representation at the last valid position (the
+    standard BERT4Rec "[MASK] at the end" serving pattern).
+    """
+
+    MASK_ID = 1  # item ids are 1-indexed; id 1 is reserved as the mask token
+
+    def __init__(self, n_items: int, dim: int = 64, heads: int = 2,
+                 layers: int = 2, dropout: float = .2, max_seq: int = 50):
+        super().__init__()
+        self.n_items = n_items
+        self.max_seq = max_seq
+        self.item = nn.Embedding(n_items, dim, padding_idx=0)
+        self.position = nn.Embedding(max_seq, dim)
+        self.norm = nn.LayerNorm(dim)
+        layer = nn.TransformerEncoderLayer(
+            dim, heads, 4 * dim, dropout, batch_first=True, norm_first=True,
+            activation="gelu")
+        self.encoder = nn.TransformerEncoder(layer, layers)
+        self.dropout = nn.Dropout(dropout)
+        self.output = nn.Linear(dim, n_items)
+
+    def _encode(self, contexts: torch.Tensor,
+                lengths: torch.Tensor) -> torch.Tensor:
+        width = contexts.shape[1]
+        positions = torch.arange(width, device=contexts.device)[None, :]
+        hidden = self.norm(self.item(contexts) + self.position(positions))
+        padding = positions >= lengths[:, None]
+        return self.encoder(self.dropout(hidden), src_key_padding_mask=padding)
+
+    def train_logits(self, contexts: torch.Tensor, lengths: torch.Tensor,
+                     generator: torch.Generator) -> tuple[torch.Tensor,
+                                                          torch.Tensor]:
+        """Return (masked_logits, mask) for the Cloze objective."""
+        device = contexts.device
+        width = contexts.shape[1]
+        rand = torch.rand(contexts.shape, generator=generator, device=device)
+        mask = rand < .15
+        # never mask padding or the first item of a session
+        positions = torch.arange(width, device=device)[None, :]
+        mask &= positions < lengths[:, None]
+        mask &= contexts > 0
+        mask[:, 0] = False
+        masked = contexts.clone()
+        dice = torch.rand(contexts.shape, generator=generator, device=device)
+        special = (dice < .8) & mask
+        random_items = torch.randint(
+            2, self.n_items, contexts.shape, generator=generator,
+            device=device)
+        replace_random = (dice >= .8) & (dice < .9) & mask
+        masked = torch.where(special, torch.ones_like(contexts), masked)
+        masked = torch.where(replace_random, random_items, masked)
+        # positions that arrived pre-masked (e.g. the appended next-item
+        # query token) always belong to the loss
+        mask = mask | (contexts == self.MASK_ID)
+        mask &= contexts > 0
+        hidden = self._encode(masked, lengths)
+        return self.output(self.dropout(hidden)), mask
+
+    def logits(self, contexts: torch.Tensor, lengths: torch.Tensor) -> torch.Tensor:
+        # Serving pattern identical to the training objective: place the
+        # query token directly after each row's last item, encode, and read
+        # the prediction at that position.
+        device = contexts.device
+        width = min(contexts.shape[1], self.max_seq - 1)
+        lengths = lengths.clamp(max=width)
+        trimmed = contexts[:, -width:]
+        padded = torch.zeros(len(contexts), width + 1, dtype=torch.long,
+                             device=device)
+        padded[:, :width] = trimmed
+        rows = torch.arange(len(contexts), device=device)
+        padded[rows, lengths] = self.MASK_ID
+        padded_lengths = lengths + 1
+        hidden = self._encode(padded, padded_lengths)
+        state = hidden[rows, lengths]
+        return self.output(self.dropout(state))
+
+
 def build_model(name: str, n_items: int, dim: int = 64) -> nn.Module:
     if name == "GRU4Rec":
         return GRU4Rec(n_items, dim)
     if name == "SASRec":
         return CausalSASRec(n_items, dim)
+    if name == "BERT4Rec":
+        return BERT4Rec(n_items, dim)
     if name == "NARM":
         return NARM(NARMConfig(n_items=n_items, dim=dim, dropout=.25))
     if name == "SR-GNN":
