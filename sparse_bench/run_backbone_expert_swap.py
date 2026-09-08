@@ -55,7 +55,7 @@ from run_dynamic_beta_expert_swap import (
 from validation_protocol import hold_out_validation_targets
 
 PROTOCOL = "dynamic-beta-backbone-expert-swap-v1"
-EPOCH_BUDGET = {"SASRec": 12, "BERT4Rec": 12}
+EPOCH_BUDGET = {"SASRec": 12, "BERT4Rec": 12, "NARM": 12}
 DOMAINS = ("Video_Games", "Baby_Products", "Diginetica_HID",
            "RetailRocket_Large")
 HERE = Path(__file__).resolve().parent
@@ -275,15 +275,30 @@ def main() -> None:
                 fused_global = fuse_with_dynamic_beta(
                     test_memory["selected"], test_expert, betas,
                     topk=20, constant=20.0)
+                test_betas = dynamic_model.predict(test_features)
                 fused_dyn = fuse_with_dynamic_beta(
-                    test_memory["selected"], test_expert,
-                    dynamic_model.predict(test_features),
+                    test_memory["selected"], test_expert, test_betas,
                     topk=20, constant=20.0)
+                # controls: mean-level beta without per-query assignment,
+                # plus deterministic reassignments of the same beta multiset
+                fused_mean = fuse_with_dynamic_beta(
+                    test_memory["selected"], test_expert,
+                    np.full(len(test_keys), float(test_betas.mean()),
+                            dtype=np.float32),
+                    topk=20, constant=20.0)
+                reassigned = []
+                for rep in range(3):
+                    rng = np.random.default_rng(seed * 7919 + rep)
+                    perm = rng.permutation(len(test_betas))
+                    fused_perm = fuse_with_dynamic_beta(
+                        test_memory["selected"], test_expert,
+                        test_betas[perm].astype(np.float32),
+                        topk=20, constant=20.0)
+                    reassigned.append(fused_perm)
 
                 def r20(ranking):
-                    t = targets_for(test_keys, data["test_queries"])
                     return metrics_from_ranks(
-                        ranks_at_20(ranking, t))["recall@20"]
+                        ranks_at_20(ranking, test_targets))["recall@20"]
 
                 memory_metrics = metrics_from_ranks(ranks_at_20(
                     test_memory["selected"], test_targets))
@@ -302,9 +317,11 @@ def main() -> None:
                         "beta": float(global_model.beta_),
                         "recall@20": r20(fused_global)},
                     "dynamic": {
-                        "beta_mean": float(
-                            dynamic_model.predict(test_features).mean()),
+                        "beta_mean": float(test_betas.mean()),
                         "recall@20": r20(fused_dyn)},
+                    "fixed_mean_beta": {"recall@20": r20(fused_mean)},
+                    "reassigned_beta": [
+                        {"recall@20": r20(f)} for f in reassigned],
                     "seconds": round(time.time() - started, 1),
                 }
                 bb_block[str(seed)] = run
