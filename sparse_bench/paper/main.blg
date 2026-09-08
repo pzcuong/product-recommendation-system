@@ -1,0 +1,31 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+White space in argument---line 19 of file main.aux
+ : \citation{sigma2025,
+ :                      llm2rec2025,longtail2026}
+I'm skipping whatever remains of this command
+White space in argument---line 30 of file main.aux
+ : \citation{
+ :            flame2026,dynamicllm2026,energy2026,green2025}
+I'm skipping whatever remains of this command
+White space in argument---line 54 of file main.aux
+ : \citation{
+ :            mcauley2015amazon}
+I'm skipping whatever remains of this command
+The style file: splncs04.bst
+Database file #1: references.bib
+Warning--I didn't find a database entry for "popstrat2025"
+Warning--I didn't find a database entry for "ferraridacrema2019progress"
+Warning--I didn't find a database entry for "ludewig2021empirical"
+Warning--I didn't find a database entry for "jannach2017hybrid"
+Warning--I didn't find a database entry for "algselect2025"
+Warning--I didn't find a database entry for "longtail2026"
+Warning--I didn't find a database entry for "flame2026"
+Warning--I didn't find a database entry for "dynamicllm2026"
+Warning--I didn't find a database entry for "energy2026"
+Warning--I didn't find a database entry for "green2025"
+Warning--I didn't find a database entry for "xia2021cotrec"
+Warning--I didn't find a database entry for "kang2018sasrec"
+Warning--I didn't find a database entry for "ludewig2018session"
+(There were 3 error messages)

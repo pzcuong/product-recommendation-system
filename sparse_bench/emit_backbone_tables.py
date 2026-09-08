@@ -43,11 +43,16 @@ def fmt(ms):
 
 
 def baseline_rows() -> dict:
-    path = HERE / "paper_baseline_results.json"
-    if not path.exists():
-        return {}
+    out: dict = {}
+    for name in ("paper_baseline_results.json", "paper_baseline_rr.json"):
+        path = HERE / name
+        if path.exists():
+            _merge_baseline_file(out, path)
+    return out
+
+
+def _merge_baseline_file(out: dict, path: Path) -> None:
     raw = json.loads(path.read_text())
-    out = {}
     for domain, domain_block in raw.items():
         models = domain_block.get("models", domain_block)
         for model, block in models.items():
@@ -57,7 +62,6 @@ def baseline_rows() -> dict:
                    if "test" in run]
             if r20:
                 out.setdefault(domain, {})[model] = mean_std(r20)
-    return out
 
 
 def swap_table() -> None:

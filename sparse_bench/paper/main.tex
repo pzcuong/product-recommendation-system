@@ -389,11 +389,14 @@ every numerical constant in the implementation.
 Amazon Video Games & 25,613 & 94,762 & 94,762 & 0\% \\
 Amazon Baby Products & 36,014 & 150,777 & 150,777 & 0\% \\
 Diginetica & 43,098 & 186,670 & 60,858 & 45\% \\
+RetailRocket$^{\ddagger}$ & 11,511 & 33,254 & 6,633 & 0\% \\
 Tmall$^\dagger$ & 40,728 & 351,268 & 25,898 & -- \\
 \bottomrule
 \end{tabular}
 \par\raggedright\scriptsize $^\dagger$Exploratory single-artifact transfer
 diagnostic; excluded from matched-seed significance claims.
+$^{\ddagger}$Repeat-consumption protocol; split declared before any model
+run (Sec.~\ref{sec:retail-protocol}).
 \end{table}
 
 The Amazon domains are derived from the public Amazon review corpus~\cite{mcauley2015amazon} and use leave-last-out next-item prediction with
@@ -406,6 +409,16 @@ objective is coverage within a short recommendation list. All stochastic
 systems in the main comparison use matched seeds 42, 123, and 456. Tmall uses
 351,268 anonymous training sessions and a repeat-consumption protocol; it has
 no usable text metadata and is reported only as a seed-42 transfer diagnostic.
+
+\label{sec:retail-protocol}
+RetailRocket~\cite{rrkaggle} contributes a fourth, protocol-declared domain:
+the raw public event log is filtered to the top 12{,}000 items (support
+$\geq 5$), visitors with at least five retained events are kept, consecutive
+repeats are collapsed, and every fifth visitor by stable hash surrenders the
+final event of the sequence as the test target (6,633 queries), with 10\% of
+remaining visitors surrendering a validation target (2,239).  Repeat
+consumption is permitted, matching Diginetica; the split was frozen before
+any model was run on the domain.
 
 The benchmark is intentionally small but heterogeneous. Video Games and Baby
 Products contain 625,062 and 939,529 training interactions, mean sequence
