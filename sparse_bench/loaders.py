@@ -401,12 +401,27 @@ def load_retailrocket_large(max_items: int = 12000,
         else:
             train_sessions[vid] = full
 
+    # Validation: the final event of 10% of train-only visitors, held out
+    # by the same stable hash (declared with the split, before any model).
+    valid_queries: Dict[str, dict] = {}
+    for vid in list(train_sessions):
+        if vid in test_queries:
+            continue
+        seq = train_sessions[vid]
+        if len(seq) < 4:
+            continue
+        if int(_stable_fraction(f"retail-large-valid::{vid}") * 100) < 10:
+            valid_queries[f"{vid}_v"] = {
+                "context": seq[:-1], "targets": [seq[-1]]}
+            train_sessions[vid] = seq[:-1]
+
     item_categories = _retailrocket_categories(item2id)
     print(f"[RetailRocket-Large] users={len(train_sessions)} items={n_items} "
-          f"test={len(test_queries)} cats={len(item_categories)}")
+          f"test={len(test_queries)} valid={len(valid_queries)} "
+          f"cats={len(item_categories)}")
     return _result("RetailRocket_Large", n_items, train_sessions,
                    test_queries, item_categories=item_categories,
-                   visit_counts=visit_counts)
+                   valid_queries=valid_queries, visit_counts=visit_counts)
 
 
 def load_retailrocket(max_items: int = 5000) -> dict:
