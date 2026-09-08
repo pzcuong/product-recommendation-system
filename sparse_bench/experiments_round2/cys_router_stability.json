@@ -1,0 +1,68 @@
+{
+ "lineage": "frozen artifacts_paper arrays (v2/evidence lineage)",
+ "domains": {
+  "Video_Games": {
+   "seed42": {
+    "fusion_r20": 0.14510035668305862,
+    "best_endpoint_r20": 0.12591545134125492,
+    "margin_over_best_endpoint": 0.0191849053418037
+   },
+   "seed123": {
+    "fusion_r20": 0.1462822650429497,
+    "best_endpoint_r20": 0.12653806378084043,
+    "margin_over_best_endpoint": 0.019744201262109268
+   },
+   "seed456": {
+    "fusion_r20": 0.14654608387328255,
+    "best_endpoint_r20": 0.12630590321014754,
+    "margin_over_best_endpoint": 0.020240180663135016
+   }
+  },
+  "Baby_Products": {
+   "seed42": {
+    "fusion_r20": 0.053907426198956075,
+    "best_endpoint_r20": 0.045086452177719415,
+    "margin_over_best_endpoint": 0.00882097402123666
+   },
+   "seed123": {
+    "fusion_r20": 0.05419924789589924,
+    "best_endpoint_r20": 0.04504002599866027,
+    "margin_over_best_endpoint": 0.009159221897238973
+   },
+   "seed456": {
+    "fusion_r20": 0.053589075256836254,
+    "best_endpoint_r20": 0.04484768897112955,
+    "margin_over_best_endpoint": 0.008741386285706705
+   }
+  },
+  "Diginetica_HID": {
+   "seed42": {
+    "r20": {
+     "regime": 0.48673962338558613,
+     "bucketed": 0.48754477636465215,
+     "continuous": 0.490502481185711
+    },
+    "spread_max_min": 0.0037628578001248636,
+    "winner": "continuous"
+   },
+   "seed123": {
+    "r20": {
+     "regime": 0.48787341023365866,
+     "bucketed": 0.48761050313845344,
+     "continuous": 0.4900095303822012
+    },
+    "spread_max_min": 0.0023990272437477422,
+    "winner": "continuous"
+   },
+   "seed456": {
+    "r20": {
+     "regime": 0.4878569785402084,
+     "bucketed": 0.4875612080581025,
+     "continuous": 0.4903217325577574
+    },
+    "spread_max_min": 0.002760524499654915,
+    "winner": "continuous"
+   }
+  }
+ }
+}

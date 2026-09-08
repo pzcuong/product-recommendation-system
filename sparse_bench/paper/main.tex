@@ -1,5 +1,7 @@
 \documentclass[runningheads]{llncs}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{microtype}
@@ -18,7 +20,9 @@
 \begin{abstract}
 Sparse, large-catalogue next-item recommendation makes it unclear when neural
 sequence evidence is more reliable than explicit local memory. We introduce
-\emph{rejection-complete validation gating}: every optional source, neural
+\emph{rejection-complete validation gating}---complete only relative to the
+candidate families declared before evaluation, never a globally complete
+search: every optional source, neural
 mechanism, fusion weight, and router is paired with an explicit null or simpler
 alternative, and complexity is admitted only by held-out utility. We instantiate
 the principle in \method{}, which combines transition, session-neighbour,
@@ -79,7 +83,9 @@ memory as the stable base, express each component only through rank, and admit
 neural evidence only when held-out validation supports it. This is the
 principle behind \method{}, a memory-first rank-fusion system with a compact
 neural residual. The fusion primitive is deliberately standard. The new object
-is instead a \emph{rejection-complete} configuration space: every proposed
+is instead a \emph{rejection-complete} configuration space---complete
+relative to the families declared before evaluation, which is a different
+claim from globally complete search: every proposed
 mechanism has a null endpoint, every router competes with a global constant,
 and exact router-selection ties resolve toward the simpler system.
 Consequently, the procedure can falsify a design idea rather than merely tune
@@ -170,6 +176,37 @@ secondary rather than foundational: a global or regime-level $\beta$ remains a
 valid outcome, and finer routing survives only if it wins on a disjoint
 validation fold.
 
+\paragraph{How this differs from ablation, HPO, nested validation, and NAS.}
+Table~\ref{tab:vs-selection} states the difference compactly. Conventional
+ablation removes a component \emph{after} a full system is chosen, and the
+absent variant usually cannot win; HPO, nested validation, and NAS may
+discover degenerate configurations incidentally but do not require a
+comparable absent state to compete \emph{before} test access, and they
+seldom report when an admitted mechanism fails on test as a first-class
+outcome. The novelty claimed here is not ``we use validation''; it is that
+absence is part of the candidate space before test access, and that a test
+failure of an admitted mechanism is retained as a scientific result rather
+than re-tuned away.
+
+\begin{table}[t]
+\caption{Selection protocols compared. Explicit-null gating requires a
+comparable absent state to compete before test access and tracks whether the
+admitted mechanism retains its validation advantage on test.}
+\label{tab:vs-selection}\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+Method & Null/off state & Absence can win & Decided before test & Test reversal tracked\\
+\midrule
+Post-hoc ablation & $\times$ & $\times$ & usually $\times$ & $\times$\\
+HPO & optional & possible & $\surd$ & $\times$\\
+NAS & optional & possible & $\surd$ & $\times$\\
+Nested validation & optional & possible & $\surd$ & $\times$\\
+\textbf{Explicit-null gating} & \textbf{required} & \textbf{first-class} & \textbf{$\surd$} & \textbf{$\surd$}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Reliability, side information, and cost}
 Semantic item representations are increasingly used to address sparse
 interaction data~\cite{llm2rec2025}. Because semantic information can make an
@@ -230,7 +267,12 @@ rewards items supported by multiple lists, the extra term is retained only to
 match the locked implementation and is interpreted as inert.
 
 \subsection{Neural residual}
-PASGR is a single-layer GRU with hidden size 64 and dropout .2. Item
+PASGR (\emph{Prototype-Aligned Semantic GRU residual}) is the neural expert
+of \method{}: a single-layer GRU with hidden size 64 and dropout .2. It is
+deliberately compact because the paper's question is whether \emph{any}
+neural evidence is admitted next to memory, not whether a stronger encoder
+wins; the expert-swap study in the supplement replaces it with NARM to test
+exactly this. Item
 embeddings are initialized from a 128-dimensional semantic matrix. On Amazon,
 the matrix is obtained by truncated singular-value decomposition of TF--IDF
 vectors built from titles, categories, features, descriptions, and brands. On
@@ -292,6 +334,44 @@ validation queries fit and calibrate each router family; the disjoint twenty
 percent selects the family, with simpler routers winning exact ties. The
 selected family is then refit on all validation queries. Test labels are never
 consulted during selection.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=4.5mm,
+  box/.style={draw, rounded corners=1pt, font=\scriptsize, inner sep=2.6pt,
+              align=center},
+  lab/.style={font=\scriptsize\itshape, align=center}]
+\node[box] (train) {training data};
+\node[box, below=of train] (fam) {declared candidate families\\
+  \emph{memory ON/OFF $\cdot$ neural ON/OFF + switches $\cdot$
+  $\beta\in\{0,\ldots,1\}$ $\cdot$ router vs.\ constant}};
+\node[box, below=of fam, minimum width=42mm] (val) {validation (5{,}000 queries)};
+\node[box, below left=3mm and 6mm of val] (rej) {REJECT complexity\\
+  (null wins)};
+\node[box, below right=3mm and 6mm of val] (adm) {ADMIT complexity\\
+  (margin $A_j$)};
+\node[box, below=8mm of $(rej)!0.5!(adm)$] (lock) {LOCK configuration};
+\node[box, below=of lock] (test) {test access};
+\node[box, below left=2mm and 4mm of test] (keep) {retained\\(margin $R_j$)};
+\node[box, below right=2mm and 4mm of test] (rev) {REVERSAL\\
+  reported as result};
+\draw[-latex] (train) -- (fam);
+\draw[-latex] (fam) -- (val);
+\draw[-latex] (val) -- (rej);
+\draw[-latex] (val) -- (adm);
+\draw[-latex] (rej) -- (lock);
+\draw[-latex] (adm) -- (lock);
+\draw[-latex] (lock) -- (test);
+\draw[-latex] (test) -- (keep);
+\draw[-latex] (test) -- (rev);
+\node[lab, right=2mm of fam] {null states declared\\before any test access};
+\end{tikzpicture}
+\caption{The gating workflow. Every optional mechanism enters validation
+against a comparable absent or simpler candidate; the winner is locked, and
+test access either retains the margin or produces a reported reversal.}
+\label{fig:workflow}
+\end{figure}
 
 For Diginetica, each validation target and its incoming transition are removed
 before any validation memory or model is constructed. Full training sessions
@@ -497,6 +577,14 @@ because no matched checkpoint is available. The selector uses
 $.5\,\mathrm{Recall}@10+.5\,\mathrm{Recall}@20$ on validation data; test
 metrics are read only after the candidate is fixed.
 
+\paragraph{Comparison contract.} This external gate is an \emph{ID-only
+matched} comparison (Gate A): every candidate, including NARM, uses public
+interaction data only. The \emph{teacher-matched} comparison (Gate B) is
+reported separately in the metadata section, where NARM receives the same
+semantic initialization as \method{}. Gains observed under unmatched side
+information are therefore system-level gains, not architectural ones, and
+the two gates are never mixed within one table.
+
 \begin{table}[t]
 \caption{Broader expert selection from persisted seed-42 rank artifacts.
 $\Delta$R@20 is relative to the strongest individual expert. This diagnostic
@@ -608,6 +696,46 @@ therefore do not present fine-
 grained routing as a standalone contribution. The defensible contribution is
 the gate that may retain or discard routing granularity.
 
+\subsection{Utility sensitivity and why router selection is unstable}
+\label{sec:utility-sensitivity}
+Two further questions complete the audit on the released frozen per-query
+arrays (the artifact-package lineage; its point estimates differ slightly
+from Table~\ref{tab:main} and are never compared with them directly).
+
+\emph{(i) Do conclusions depend on the utility definition?}
+Table~\ref{tab:cys-utility} sweeps
+$U_\alpha=\alpha\,\mathrm{R}@6+(1-\alpha)\,\mathrm{R}@20$ over
+$\alpha\in\{0,.25,.5,.75,1\}$ and adds nDCG@20. The orderings are
+utility-stable: fusion beats both endpoints at \emph{every} $\alpha$ and on
+nDCG@20 on both Amazon domains, and the continuous router leads at every
+utility on Diginetica. The specific choice $U_{.5}$ in
+Sec.~4 is therefore not load-bearing for any qualitative conclusion.
+
+\emph{(ii) Why do router decisions reverse across seeds?}
+Table~\ref{tab:cys-stability} reports per-seed test margins. Fusion's
+advantage over the better endpoint is $+.019$ to $+.020$ (Video) and
+$+.009$ (Baby) in every seed---five to eight times larger than the
+Diginetica seed SD (.00268)---which is why endpoint-level admission is
+stable. By contrast, the three router variants lie within $.0024$--$.0038$
+of one another on test, the same order as seed variation. When the true gap
+between candidates is below seed noise, a 5,000-query validation split
+cannot separate them reliably, and 3-of-9 divergence is the expected
+behaviour of an honest selector rather than an implementation fault. The
+practical consequence mirrors Sec.~6.4: decisions whose admission margins
+approach seed noise should be treated as ties resolved toward the simpler
+system.
+\input{cys_utility}
+\input{cys_stability}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{../figures/fig_cys_utility.pdf}
+\caption{Utility sensitivity on the frozen arrays: $U_\alpha$ curves for the
+leading candidates. Fusion dominates at every $\alpha$ on both Amazon
+domains; router variants cross on Diginetica only at noise scale.}
+\label{fig:cys-utility}
+\end{figure}
+
 \subsection{Efficiency}
 \begin{table}[t]
 \caption{Representative cost profile.}
@@ -690,6 +818,18 @@ neural-baseline suite.
 Finally, the RRF(STAN,NARM) control is currently a single-artifact diagnostic;
 matched-seed replication is necessary before making a significance claim about
 the selected expert family.
+
+An additional practical limitation concerns backbone and dataset coverage.
+BERT4Rec is absent from the baseline suite, the external gate instantiates
+the neural expert only as PASGR (main comparison) and NARM (swap diagnostic),
+and a fourth domain such as RetailRocket or Yoochoose would strengthen
+generality. All of these require retraining on the raw datasets; after the
+reported experiments were frozen, the local raw-data copies were lost in a
+storage incident, so we release the frozen per-query rank arrays for every
+reported system instead and list the additional backbones and domains as
+explicitly re-runnable future work: the datasets are public, and the rank-only
+expert interface means a new backbone requires no system redesign, only its
+top-120 rankings.
 
 \section{Conclusion}
 \method{} combines three explicit memories with a compact neural residual
