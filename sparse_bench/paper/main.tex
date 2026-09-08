@@ -1,5 +1,6 @@
 \documentclass[runningheads]{llncs}
 \usepackage{graphicx}
+\usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usepackage{booktabs}
@@ -56,8 +57,7 @@ Sparse, large-catalogue data creates three recurring failures. First, neural
 sequence models allocate parameters to items whose representations may receive
 too few updates to become reliable. Recent state-space, semantic-embedding,
 and long-tail-oriented systems improve efficiency or representation quality,
-but they do not remove this basic long-tail constraint~\cite{sigma2025,
-llm2rec2025,longtail2026}. Second, neighbourhood and transition methods remain
+but they do not remove this basic long-tail constraint~\cite{sigma2025,llm2rec2025,longtail2026}. Second, neighbourhood and transition methods remain
 strong under careful evaluation, and a 2026 audit shows that local graph
 evidence alone can solve a surprising fraction of widely used sequential
 benchmarks~\cite{popstrat2025,graphshortcut2026}. Their weakness is not lack
@@ -96,8 +96,7 @@ analysis shows that neighbourhood and neural recommenders win on different
 regions of the same data~\cite{popstrat2025}, while algorithm-selection work
 shows that per-instance routing closes only part of the gap to an
 oracle~\cite{algselect2025}. At the same time, learned ensembles and LLM
-routing systems can carry substantial serving and energy cost~\cite{
-flame2026,dynamicllm2026,energy2026,green2025}, and evaluation defaults can
+routing systems can carry substantial serving and energy cost~\cite{flame2026,dynamicllm2026,energy2026,green2025}, and evaluation defaults can
 change apparent winners~\cite{defaults2025,seqsplit2026}. A lightweight hybrid
 is therefore useful not only as a practical system, but as a cost floor that
 more elaborate approaches should exceed.
@@ -338,24 +337,20 @@ consulted during selection.
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
-  node distance=4.5mm,
+  node distance=4mm and 6mm,
   box/.style={draw, rounded corners=1pt, font=\scriptsize, inner sep=2.6pt,
-              align=center},
-  lab/.style={font=\scriptsize\itshape, align=center}]
+              align=center}]
 \node[box] (train) {training data};
 \node[box, below=of train] (fam) {declared candidate families\\
   \emph{memory ON/OFF $\cdot$ neural ON/OFF + switches $\cdot$
   $\beta\in\{0,\ldots,1\}$ $\cdot$ router vs.\ constant}};
-\node[box, below=of fam, minimum width=42mm] (val) {validation (5{,}000 queries)};
-\node[box, below left=3mm and 6mm of val] (rej) {REJECT complexity\\
-  (null wins)};
-\node[box, below right=3mm and 6mm of val] (adm) {ADMIT complexity\\
-  (margin $A_j$)};
-\node[box, below=8mm of $(rej)!0.5!(adm)$] (lock) {LOCK configuration};
+\node[box, below=of fam, minimum width=40mm] (val) {validation (5{,}000 queries)};
+\node[box, below left=4mm and 8mm of val] (rej) {REJECT complexity\\(null wins)};
+\node[box, below right=4mm and 8mm of val] (adm) {ADMIT complexity\\(margin $A_j$)};
+\node[box, below=14mm of val] (lock) {LOCK configuration};
 \node[box, below=of lock] (test) {test access};
-\node[box, below left=2mm and 4mm of test] (keep) {retained\\(margin $R_j$)};
-\node[box, below right=2mm and 4mm of test] (rev) {REVERSAL\\
-  reported as result};
+\node[box, below left=3mm and 6mm of test] (keep) {retained (margin $R_j$)};
+\node[box, below right=3mm and 6mm of test] (rev) {REVERSAL reported};
 \draw[-latex] (train) -- (fam);
 \draw[-latex] (fam) -- (val);
 \draw[-latex] (val) -- (rej);
@@ -365,7 +360,6 @@ consulted during selection.
 \draw[-latex] (lock) -- (test);
 \draw[-latex] (test) -- (keep);
 \draw[-latex] (test) -- (rev);
-\node[lab, right=2mm of fam] {null states declared\\before any test access};
 \end{tikzpicture}
 \caption{The gating workflow. Every optional mechanism enters validation
 against a comparable absent or simpler candidate; the winner is locked, and
@@ -402,8 +396,7 @@ Tmall$^\dagger$ & 40,728 & 351,268 & 25,898 & -- \\
 diagnostic; excluded from matched-seed significance claims.
 \end{table}
 
-The Amazon domains are derived from the public Amazon review corpus~\cite{
-mcauley2015amazon} and use leave-last-out next-item prediction with
+The Amazon domains are derived from the public Amazon review corpus~\cite{mcauley2015amazon} and use leave-last-out next-item prediction with
 exclude-seen ranking. Diginetica uses the CIKM Cup split and allows repeat
 consumption. Tmall follows the public COTREC preprocessing of the IJCAI-15
 shopping-log data~\cite{xia2021cotrec}.
@@ -427,7 +420,7 @@ rather than as repeated measurements of one regime.
 baselines---GRU4Rec~\cite{hidasi2016gru4rec},
 SASRec~\cite{kang2018sasrec}, NARM~\cite{li2017narm},
 SR-GNN~\cite{wu2019srgnn}, and SIGMA~\cite{sigma2025}---and three non-neural
-baselines---V-SKNN~\cite{ludewig2018session}, STAN~\cite{garg2019stan}, and
+baselines---V-SKNN~\cite{ludewig2019performance}, STAN~\cite{garg2019stan}, and
 a transition-graph retriever. Neural baselines train for at most twelve epochs
 over fifteen validation-selected configurations per seed. The reported
 checkpoint is the epoch maximizing the same validation utility used by
