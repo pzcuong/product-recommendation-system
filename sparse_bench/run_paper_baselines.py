@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import copy
 import gc
 import json
@@ -88,7 +89,10 @@ MPS_UNSTABLE_MODELS = frozenset({"NARM", "SR-GNN", "SIGMA-compatible"})
 
 
 def device_for(name: str) -> torch.device:
-    if name in MPS_UNSTABLE_MODELS:
+    # torch 2.14/MPS deadlocks inside the CE backward at large vocabularies
+    # (Diginetica, 43k items); BERT4REC_CPU=1 pins the expert to CPU there.
+    if name in MPS_UNSTABLE_MODELS or (
+            name == "BERT4Rec" and os.environ.get("BERT4REC_CPU") == "1"):
         return torch.device("cpu")
     return device()
 
@@ -178,11 +182,9 @@ def train_one(name: str, sessions: dict, validation: dict, n_items: int,
                 train_gen.manual_seed(seed * 100003 + step)
                 logits, mask = model.train_logits(masked_ctx, masked_len,
                                                   train_gen)
-                last = torch.arange(mask.shape[1], device=dev)[None, :]
-                mask = mask & (last == (masked_len[:, None] - 1))
-                flat = mask.reshape(-1)
-                loss = F.cross_entropy(logits.reshape(-1, logits.shape[-1])[flat],
-                                       targets)
+                rows = torch.arange(len(logits), device=dev)
+                query_logits = logits[rows, masked_len - 1]
+                loss = F.cross_entropy(query_logits, targets)
             else:
                 logits = model_logits(model, contexts, lengths)
                 loss = F.cross_entropy(logits, targets)
@@ -284,11 +286,9 @@ def train_fixed_epochs(name: str, sessions: dict, n_items: int, seed: int,
                 train_gen.manual_seed(seed * 100003 + step)
                 logits, mask = model.train_logits(masked_ctx, masked_len,
                                                   train_gen)
-                last = torch.arange(mask.shape[1], device=dev)[None, :]
-                mask = mask & (last == (masked_len[:, None] - 1))
-                flat = mask.reshape(-1)
-                loss = F.cross_entropy(logits.reshape(-1, logits.shape[-1])[flat],
-                                       targets)
+                rows = torch.arange(len(logits), device=dev)
+                query_logits = logits[rows, masked_len - 1]
+                loss = F.cross_entropy(query_logits, targets)
             else:
                 logits = model_logits(model, contexts, lengths)
                 loss = F.cross_entropy(logits, targets)
